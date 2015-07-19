@@ -1,0 +1,15 @@
+0.18
+Uses the codecs package to open files to read unicode directly.  This permits
+the use of non-ascii characters in site names.  Modifies the way in which we
+look for the FREQ card in output files to a more robust (and simpler) method
+that doens't require regex..
+0.17
+Revised the order of some of the imports to remove the 'AttributeError: When
+using gi.repository you must not import static modules like "gobject". Please
+change all occurrences of "import gobject" to "from gi.repository import
+GObject". See: https://bugzilla.gnome.org/show_bug.cgi?id=70918' warning
+message on new versions fo GTK3(3.14).  This has the effect of changing the
+backend to TkAgg.
+0.15
+Included a .desktop file for voacapgui that allows the application to be called up directly on the Gnome desktop.  This should also work on Unity but has not been tested.
+Extensively modified the directory structure and build files which now follow a more conventional automake methodology, hopefully making future work much easier to manage.  One side effect of this is that the applications now installs to different locations.  /usr/local/bin for the wrapper scripts used to start the applications from the command line, /usr/local/lib/python2.7/site-packages/ for the python files and /usr/local/share/pythonprop/ for the UI files and support data files.

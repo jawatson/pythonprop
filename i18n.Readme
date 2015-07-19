@@ -1,0 +1,44 @@
+
+
+How to make a i18n translation:
+
+- Needed: xgettext, msginit, msgfmt 
+I'm not know if this is possible on other OSes, this procedure should work on
+GNU/Linux.
+
+
+On the src dir, extract the translatable lines from the source and
+glade files:
+    xgettext -k_ -kN_ -o voacapgui.pot *.glade *.py
+    
+This lets there a voacapgui.pot file (a poTemplate).
+
+For any new translator, a .po file is needed. To generate this file there
+exists two possibilities:
+- Run msginit on the voacapgui.pot file to get the xx_XX.po file, in the
+  environment of the translator:
+     msginit -i voacapgui.pot  
+  or setting a proper LC_ALL variable instead:
+     LC_ALL=es_ES msginit -i voacapgui.pot
+
+  For example, if the translator locale environment is es_ES, then a es_ES.po
+  file will be created, which will be a copy of the voacapgui.pot file but with
+  all the needed relevant fields in the file header already completed.
+
+The other way is obviously to copy the voacapgui.pot over a .po file and
+complete all the data by hand.
+
+For updating an existing .po file, use msgmerge:
+    % msgmerge -o xx_XX.po existingfile.po newfile.pot 
+
+Whit the .po file the translator work is to edit every string on it with a
+translator editor or a normal text editor.
+
+The translated .po file is then converted to the machine readable binary format
+.mo with msgfmt:
+     msgfmt es_ES.po -o po/es_ES/LC_MESSAGES/voacapgui.mo
+
+That's it, to test the translation:
+     LC_ALL=es_ES python voacapgui.py
+
+-- FMM, 2009-11-22

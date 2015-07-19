@@ -1,0 +1,2 @@
+pythonProp-0.13 will be the last to use the PyGTK bindings, work has started on porting PythonProp to use the PyGObject bindings will be used in all future releases.
+
