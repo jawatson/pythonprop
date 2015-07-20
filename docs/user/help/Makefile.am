@@ -21,7 +21,7 @@ pdf_DATA = voacapgui.pdf
 
 EXTRA_DIST = $(pdf_DATA) 
 
-pdf: C/voacapgui.xml C/legal.xml
+voacapgui.pdf: C/voacapgui.xml C/legal.xml
 	dblatex C/voacapgui.xml -o voacapgui.pdf
 
 CLEANFILES = $(pdf_DATA)
