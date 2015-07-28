@@ -1,4 +1,4 @@
-AC_INIT(pythonprop, 0.18)
+AC_INIT(pythonprop, 0.19alpha)
 #AM_INIT_AUTOMAKE([dist-bzip2 subdir-objects 1.6])
 
 AM_INIT_AUTOMAKE

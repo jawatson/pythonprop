@@ -58,7 +58,8 @@ class VOAFile:
     Freqs    :  9.850  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000
     System   :  145     0.100   90   73     3.000     0.100
     Fprob    : 1.00 1.00 1.00 0.00
-    Rec Ants :[default /swwhip.voa  ]  gain=   0.0   0.0    Tx Ants  :[default /const17.voa ]  0.000  57.0   500.0000
+    Rec Ants :[default /swwhip.voa  ]  gain=   0.0   0.0
+    Tx Ants  :[default /const17.voa ]  0.000  57.0   500.0000
         
     """
     def __init__(self, fn):
@@ -480,7 +481,8 @@ class VOAFile:
 
     
     def write_file(self):
-        f = open(self.filename, 'wt')
+        #f = open(self.filename, 'wt')
+        f = codecs.open(self.filename, "wt", "utf-8")
         f.write('Model    :VOACAP\n')
         f.write('Colors   :Black    :Blue     :Ignore   :Ignore   :Red      :Black with shading\n')
         f.write('Cities   :Receive.cty\n')
