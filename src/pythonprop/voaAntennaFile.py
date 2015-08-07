@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # A simple class to bind an antenna filepath
 # with it's description.
 
