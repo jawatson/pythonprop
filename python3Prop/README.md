@@ -1,0 +1,1 @@
+This folder is uded to contain code being tested as part of the porting exercise to move pythonProp tools to Python 3.  As part of this exercise, it is planned to refactor the code into a more modular structure, abstracting the file parsing from the graphical presentation, in order to support output from additional propagation engines.
