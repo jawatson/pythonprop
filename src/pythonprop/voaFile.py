@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+# -*- coding: utf-8 -*-
 #
 # File: voafile.py
 #
@@ -71,7 +72,7 @@ class VOAFile:
         self.pcentrelabel = ''
         self.pcentrelat = 0.0
         self.pcentrelon = 0.0
-        self.txlabel = ''
+        self.txlabel = u''
         self.txlat = 0.0
         self.txlon = 0.0
         self.txPower = 0.0
@@ -401,7 +402,7 @@ class VOAFile:
             theFrequency = "%.3f MHz" % self.frequencies[int(field)]
             return _month + ', ' + hour_str + ', ' + theFrequency  
         
-        
+    # The following method is failing for Jari
     def get_plot_description_string(self, field, plot_type, time_zone=0):
         """Returns a formatted string that may be used as a title for the plot.
         
@@ -413,6 +414,7 @@ class VOAFile:
         time_zone -- an integer specifying the time zone.  Default = 0
         
         """
+        
         _month = cal.month_abbr[int(math.floor(self.monthDays[int(field)]))]
         hour = int(self.utcs[int(field)] + time_zone)
         #todo can't we do this with a proper python time class????
@@ -448,6 +450,17 @@ class VOAFile:
     	elif self.RSN == 17:
     		theMode = "ROS"
     	else: theMode = str(self.RSN) # "N/A"
+    	
+    	print "****************************************"
+        print "encoding: " + sys.getdefaultencoding()
+        print "siteLocation:" + type(siteLocation).__name__
+        print "_month:" + type(_month).__name__        
+        print "hour_str:" + type(hour_str).__name__        
+
+        print "thePower:" + type(thePower).__name__        
+        print "theSSN:" + type(theSSN).__name__        
+        print "theMode:" + type(theMode).__name__      
+
 
         if (plot_type == 'MUF'):
             return siteLocation + _month + ', ' + hour_str + ', ' + thePower + ', SSN ' + theSSN  
@@ -455,8 +468,18 @@ class VOAFile:
         else:
             # Add the frequency to the data string
             theFrequency = "%.3f MHz" % self.frequencies[int(field)]
-            #return 'SSN ' + theSSN + ',' + theFrequency + '\n' + hour_str + _month
-            return siteLocation + _month + ', ' + hour_str + ', ' + theFrequency + ', ' + thePower + ', SSN ' + theSSN + ', Mode: ' + theMode  
+            print "theFrequency:" + type(theFrequency).__name__    
+            site_description = siteLocation + \
+                    unicode(_month, "utf-8") + u', ' + \
+                    unicode(hour_str, "utf-8") + u', ' + \
+                    unicode(theFrequency, "utf-8") + u', ' + \
+                    unicode(thePower, "utf-8") + \
+                    u', SSN ' + unicode(theSSN, "utf-8") + \
+                    u', Mode: ' + unicode(theMode, "utf-8")
+            print "site_description:" + type(site_description).__name__   
+            print "****************************************"
+            return site_description    
+        
 
     def get_detailed_plot_description_string(self, field):
         """Returns a string of comprehensive information about the plot.
@@ -491,7 +514,7 @@ class VOAFile:
         f.write('Parameter:DBU      0\n')
         f.write('Parameter:SNRxx    0\n')
         f.write('Parameter:REL      0\n')
-        tmpStr= "Transmit :%10s%10s%18sShort\n" % (self.lat_as_string(self.txlat), self.lon_as_string(self.txlon), self.txlabel)
+        tmpStr= "Transmit :%10s%10s%18sShort\n" % (self.lat_as_string(self.txlat), self.lon_as_string(self.txlon), unicode(self.txlabel, "utf-8"))
         f.write(tmpStr)
 
         tmpStr= "Area     :%10.1f%10.1f%10.1f%10.1f\n" % \
