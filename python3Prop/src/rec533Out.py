@@ -117,9 +117,9 @@ if __name__ == "__main__":
     print ("Y: ", Y.shape)
 
     im1 = m.pcolormesh(X, Y, points, shading='gouraud', cmap=plt.cm.jet, latlon=True)
-    #cb = m.colorbar(im1,"bottom", size="5%", pad="2%")
+    cb = m.colorbar(im1,"bottom", size="5%", pad="2%")
     #plt.title('Test ITU Image')
 
-    plt.savefig('foo.png', dpi=1200, bbox_inches='tight')
+    plt.savefig('foo.png', dpi=400, bbox_inches='tight')
 
     plt.show()
