@@ -1,5 +1,8 @@
 
 import datetime
+import sys
+
+from optparse import OptionParser
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -10,11 +13,16 @@ from rec533Out import REC533Out
 
 class PropAreaPlot:
 
-    def __init__(self):
-        r533 = REC533Out("area.out")
-        points,lons,lats,num_pts_lon,num_pts_lat = r533.get_plot_data('01', '3.52')
-
-        plt.figure(figsize=(12,6))
+    def __init__(self, data_file,
+            plot_terminator = False,
+            dpi = 150):
+        ctr = 1
+        r533 = REC533Out(data_file)
+        dataset = r533.get_plot_data(r533.datasets[1])
+        #for dataset in r533:
+        points, lons, lats, num_pts_lon, num_pts_lat, params = dataset
+        plot_dt, freq, idx = params
+        #plt.figure(figsize=(12,6))
         m = Basemap(projection='cyl', resolution='l')
         m.drawcoastlines(color='black', linewidth=0.75)
         m.drawcountries(color='grey')
@@ -25,22 +33,52 @@ class PropAreaPlot:
         X,Y = np.meshgrid(lons, lats)
 
         #todo remove hard-coded values for vmin and vmax
-        im = m.pcolormesh(X, Y, points, shading='gouraud', cmap=plt.cm.jet, latlon=True, vmin=-20, vmax=40)
-        #im = m.imshow(points, interpolation='bilinear', vmin=-20, vmax=40)
+        #im = m.pcolormesh(X, Y, points, shading='gouraud', cmap=plt.cm.jet, latlon=True, vmin=-20, vmax=40)
+        #im = m.pcolormesh(X, Y, points, shading='gouraud', cmap=plt.cm.jet, latlon=True, vmin=-20, vmax=40)
 
-        plot_dt = datetime.datetime(2015, 3, 15, hour=1)
-        m.nightshade(plot_dt)
+        im = m.imshow(points, interpolation='bilinear', vmin=-20, vmax=40)
+
+        if plot_terminator:
+            m.nightshade(plot_dt)
 
         cb = m.colorbar(im,"bottom", size="5%", pad="2%")
         #plt.title('Test ITU Image')
 
-        plt.savefig('foo.png', dpi=400, bbox_inches='tight')
+        plot_fn = "area_{:d}_{:s}.png".format(plot_dt.month, "d".join(str(freq).split('.')))
+        print ("Saving file ", plot_fn)
+        plt.savefig(plot_fn, dpi=float(dpi), bbox_inches='tight')
+        ctr += 1
 
-        plt.show()
+        #plt.show()
 
 
 
 
+
+def main(data_file):
+    parser = OptionParser(usage="propAreaPlot [options] file", version="propAreaPlot 0.9.1")
+    parser.disable_interspersed_args()
+
+    parser.add_option("-d", "--dpi",
+        dest="dpi",
+        default=150,
+        help=("Dots per inch (dpi)."))
+    parser.add_option("-t", "--terminator",
+        dest="plot_terminator",
+        action="store_true",
+        default = False,
+        help=("Plot day/night regions on map"))
+
+    (options, args) = parser.parse_args()
+
+    PropAreaPlot(data_file,
+                plot_terminator = options.plot_terminator,
+                dpi = options.dpi)
 
 if __name__ == "__main__":
-    r533 = PropAreaPlot()
+    if len(sys.argv) >= 2:
+        main(sys.argv[-1])
+    else:
+        print ('propAreaPlot error: No data file specified')
+        print ('propAreaPlot [options] filename')
+        sys.exit(1)
