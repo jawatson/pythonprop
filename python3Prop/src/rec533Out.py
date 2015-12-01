@@ -70,6 +70,10 @@ class REC533Out:
         return (lat_inc, lon_inc)
 
 
+    def get_datasets(self):
+        return self.datasets
+
+
     def build_dataset_list(self):
         datasets = []
         #todo remove hardcoded year

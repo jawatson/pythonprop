@@ -14,11 +14,19 @@ from rec533Out import REC533Out
 class PropAreaPlot:
 
     def __init__(self, data_file,
+            list_files = False,
+            plot_files = 1,
             plot_terminator = False,
             dpi = 150):
+
+        self.r533 = REC533Out(data_file)
+
+        if list_files:
+            self.dump_datasets()
+            quit()
+
         ctr = 1
-        r533 = REC533Out(data_file)
-        dataset = r533.get_plot_data(r533.datasets[1])
+        dataset = self.r533.get_plot_data(r533.datasets[1])
         #for dataset in r533:
         points, lons, lats, num_pts_lon, num_pts_lat, params = dataset
         plot_dt, freq, idx = params
@@ -52,7 +60,11 @@ class PropAreaPlot:
         #plt.show()
 
 
-
+    def dump_datasets(self):
+        ds_list = self.r533.get_datasets()
+        for ctr, ds in enumerate(ds_list):
+            plot_dt, freq, idx = ds
+            print('{:03d}  {:s}\t{:s}'.format(ctr, plot_dt.strftime("%b %Y"), freq))
 
 
 def main(data_file):
@@ -63,6 +75,15 @@ def main(data_file):
         dest="dpi",
         default=150,
         help=("Dots per inch (dpi)."))
+    parser.add_option("-l", "--list",
+        dest = "list",
+        action="store_true",
+        default = False,
+        help=("List files and quit.") )
+    parser.add_option("-p", "--plots",
+        dest = "plot_files",
+        default = '1',
+        help=("Plots to print, e.g '-v 1,3,5,6' or use '-v a' to print all plots.") )
     parser.add_option("-t", "--terminator",
         dest="plot_terminator",
         action="store_true",
@@ -72,6 +93,8 @@ def main(data_file):
     (options, args) = parser.parse_args()
 
     PropAreaPlot(data_file,
+                list_files = options.list,
+                plot_files = options.plot_files,
                 plot_terminator = options.plot_terminator,
                 dpi = options.dpi)
 
