@@ -44,12 +44,14 @@ class REC533Out:
 
     filename = ""
 
-    def __init__(self, filename):
+    def __init__(self, filename, data_opt='REL'):
         self.filename = filename
         self.plot_rect = VOAAreaRect()
-        self.lat_step_size, self.lon_step_size, self.plot_title = self.parse_global_params()
+        self.lat_step_size, self.lon_step_size, self.plot_title, data_format_dict = self.parse_global_params()
         self.datasets = self.build_dataset_list()
         print ("Found ",len(self.datasets), " datasets")
+
+        self.data_column = data_format_dict[data_opt]
         self.itr_ctr = -1
 
     def consume(self, iterator, n):
@@ -63,10 +65,14 @@ class REC533Out:
             next(itertools.islice(iterator, n, n), None)
 
     def parse_global_params(self):
+        data_format_dict = {}
         title = ""
         pathname_pattern = re.compile("\** P533 Input Parameters")
         lat_inc_pattern = re.compile("^\s*Latitude increment\s*= ([\d.]+) \(deg\)")
         lon_inc_pattern = re.compile("^\s*Longitude increment\s*= ([\d.]+) \(deg\)")
+        col_rel_pattern = re.compile("Column (\d+): BSR - Basic circuit reliability")
+        col_snr_pattern = re.compile("Column (\d+): SNR - Median signal-to-noise ratio")
+
         title_line_ptr = False
         with open(self.filename) as f:
             for line in f:
@@ -87,9 +93,17 @@ class REC533Out:
                 if m:
                     lon_inc = float(m.group(1))
                     continue
+                m = col_rel_pattern.match(line)
+                if m:
+                    data_format_dict['REL'] = int(m.group(1)) - 1
+                    continue
+                m = col_snr_pattern.match(line)
+                if m:
+                    data_format_dict['SNR'] = int(m.group(1)) - 1
+                    continue
                 if '*** Calculated Parameters ***' in line:
                     break
-        return (lat_inc, lon_inc, title)
+        return (lat_inc, lon_inc, title, data_format_dict)
 
 
     def get_datasets(self):
@@ -159,10 +173,9 @@ class REC533Out:
                     #print("looking in +", row[1].strip(), "+ for +", formatted_hour_str, ": looking in +", row[2].strip(), "+ for +", freq,"+")
                     if row[1].strip()==formatted_hour_str and row[2].strip()==freq:
                         #print (row)
-                        #todo remove the hardcodes values of 3, 4 and 8 below
                         lat_grid_pos = (int(float(row[3])-self.plot_rect.get_sw_lat()) / self.lat_step_size)
                         lon_grid_pos = (int(float(row[4])-self.plot_rect.get_sw_lon()) / self.lon_step_size)
-                        points[lat_grid_pos][lon_grid_pos] = float(row[8])
+                        points[lat_grid_pos][lon_grid_pos] = float(row[self.data_column])
         finally:
             f.close()
         return (points, lons, lats, num_pts_lon, num_pts_lat, dataset_params)

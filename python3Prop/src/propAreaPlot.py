@@ -56,7 +56,7 @@ class PropAreaPlot:
         #todo remove hard-coded values for vmin and vmax
         #im = m.pcolormesh(X, Y, points, shading='gouraud', cmap=plt.cm.jet, latlon=True, vmin=-20, vmax=40)
         #im = m.pcolormesh(X, Y, points, shading='gouraud', cmap=plt.cm.jet, latlon=True, vmin=-20, vmax=40)
-        im = m.imshow(points, interpolation='bilinear', vmin=-20, vmax=40)
+        im = m.imshow(points, interpolation='bilinear', vmin=0, vmax=100)
 
         if self.plot_terminator:
             m.nightshade(plot_dt)
