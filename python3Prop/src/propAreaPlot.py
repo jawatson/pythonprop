@@ -19,14 +19,27 @@ class PropAreaPlot:
             plot_terminator = False,
             dpi = 150):
 
+        self.plot_terminator = plot_terminator
+        self.dpi = dpi
+
         self.r533 = REC533Out(data_file)
 
         if list_files:
             self.dump_datasets()
             quit()
 
-        ctr = 1
-        dataset = self.r533.get_plot_data(r533.datasets[1])
+        if plot_files == 'a':
+            print("doing all of the plots")
+            quit
+        else:
+            for dataset_id in plot_files:
+                if dataset_id < len(self.r533.datasets):
+                    dataset = self.r533.get_plot_data(self.r533.datasets[dataset_id])
+                    self.do_plot(dataset)
+                else:
+                    print ("Invalid index", dataset_id)
+
+    def do_plot(self, dataset):
         #for dataset in r533:
         points, lons, lats, num_pts_lon, num_pts_lat, params = dataset
         plot_dt, freq, idx = params
@@ -43,19 +56,17 @@ class PropAreaPlot:
         #todo remove hard-coded values for vmin and vmax
         #im = m.pcolormesh(X, Y, points, shading='gouraud', cmap=plt.cm.jet, latlon=True, vmin=-20, vmax=40)
         #im = m.pcolormesh(X, Y, points, shading='gouraud', cmap=plt.cm.jet, latlon=True, vmin=-20, vmax=40)
-
         im = m.imshow(points, interpolation='bilinear', vmin=-20, vmax=40)
 
-        if plot_terminator:
+        if self.plot_terminator:
             m.nightshade(plot_dt)
 
         cb = m.colorbar(im,"bottom", size="5%", pad="2%")
-        #plt.title('Test ITU Image')
+        plt.title('Test ITU Image')
 
-        plot_fn = "area_{:d}_{:s}.png".format(plot_dt.month, "d".join(str(freq).split('.')))
+        plot_fn = "area_{:s}_{:s}.png".format(plot_dt.strftime("%H%M_%b_%Y"), "d".join(str(freq).split('.')))
         print ("Saving file ", plot_fn)
-        plt.savefig(plot_fn, dpi=float(dpi), bbox_inches='tight')
-        ctr += 1
+        plt.savefig(plot_fn, dpi=float(self.dpi), bbox_inches='tight')
 
         #plt.show()
 
@@ -64,7 +75,7 @@ class PropAreaPlot:
         ds_list = self.r533.get_datasets()
         for ctr, ds in enumerate(ds_list):
             plot_dt, freq, idx = ds
-            print('{:03d}  {:s}\t{:s}'.format(ctr, plot_dt.strftime("%b %Y"), freq))
+            print('{: 4d}  {:s}\t{:.3f}'.format(ctr, plot_dt.strftime("%H:%M %b %Y"), float(freq)))
 
 
 def main(data_file):
@@ -92,11 +103,42 @@ def main(data_file):
 
     (options, args) = parser.parse_args()
 
+    plot_files = []
+    if options.plot_files:
+        options.plot_files.strip()
+        if options.plot_files == 'a':
+            plot_files = 'a'
+        # todo if not defined
+        else:
+            try:
+                plot_files = hyphen_range(options.plot_files)
+            except:
+                print ("Error reading vg files, resetting to '1'")
+                plot_files = [1]
+
+        print ("The following {:d} files have been selected {:s}: ".format(len(plot_files), str(plot_files)))
+
     PropAreaPlot(data_file,
                 list_files = options.list,
-                plot_files = options.plot_files,
+                plot_files = plot_files,
                 plot_terminator = options.plot_terminator,
                 dpi = options.dpi)
+
+
+def hyphen_range(s):
+    """ Takes a range in form of "a-b" and generate a list of numbers between a and b inclusive.
+    Also accepts comma separated ranges like "a-b,c-d,f" will build a list which will include
+    Numbers from a to b, a to d and f"""
+    s="".join(s.split())#removes white space
+    r=set()
+    for x in s.split(','):
+        t=x.split('-')
+        if len(t) not in [1,2]: raise SyntaxError("hash_range is given its arguement as "+s+" which seems not correctly formated.")
+        r.add(int(t[0])) if len(t)==1 else r.update(set(range(int(t[0]),int(t[1])+1)))
+    l=list(r)
+    l.sort()
+    return l
+
 
 if __name__ == "__main__":
     if len(sys.argv) >= 2:
