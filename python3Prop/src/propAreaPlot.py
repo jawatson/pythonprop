@@ -42,7 +42,7 @@ class PropAreaPlot:
     def do_plot(self, dataset):
         #for dataset in r533:
         points, lons, lats, num_pts_lon, num_pts_lat, params = dataset
-        plot_dt, freq, idx = params
+        plot_dt, plot_title, freq, idx = params
         #plt.figure(figsize=(12,6))
         m = Basemap(projection='cyl', resolution='l')
         m.drawcoastlines(color='black', linewidth=0.75)
@@ -62,7 +62,7 @@ class PropAreaPlot:
             m.nightshade(plot_dt)
 
         cb = m.colorbar(im,"bottom", size="5%", pad="2%")
-        plt.title('Test ITU Image')
+        plt.title(plot_title)
 
         plot_fn = "area_{:s}_{:s}.png".format(plot_dt.strftime("%H%M_%b_%Y"), "d".join(str(freq).split('.')))
         print ("Saving file ", plot_fn)

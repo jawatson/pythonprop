@@ -22,6 +22,7 @@
 
 import csv
 import datetime
+import itertools
 import re
 
 import numpy as np
@@ -46,28 +47,49 @@ class REC533Out:
     def __init__(self, filename):
         self.filename = filename
         self.plot_rect = VOAAreaRect()
-        self.lat_step_size, self.lon_step_size = self.parse_global_params()
+        self.lat_step_size, self.lon_step_size, self.plot_title = self.parse_global_params()
         self.datasets = self.build_dataset_list()
         print ("Found ",len(self.datasets), " datasets")
         self.itr_ctr = -1
 
+    def consume(self, iterator, n):
+        "Advance the iterator n-steps ahead. If n is none, consume entirely."
+        # Use functions that consume iterators at C speed.
+        if n is None:
+            # feed the entire iterator into a zero-length deque
+            collections.deque(iterator, maxlen=0)
+        else:
+            # advance to the empty slice starting at position n
+            next(itertools.islice(iterator, n, n), None)
 
     def parse_global_params(self):
+        title = ""
+        pathname_pattern = re.compile("\** P533 Input Parameters")
         lat_inc_pattern = re.compile("^\s*Latitude increment\s*= ([\d.]+) \(deg\)")
         lon_inc_pattern = re.compile("^\s*Longitude increment\s*= ([\d.]+) \(deg\)")
-
+        title_line_ptr = False
         with open(self.filename) as f:
             for line in f:
+                m = pathname_pattern.match(line)
+                if m:
+                    self.consume(f,1)
+                    title_line_ptr = True
+                    continue
+                if title_line_ptr:
+                    title = line.strip()
+                    title_line_ptr = False
+                    continue
                 m = lat_inc_pattern.match(line)
                 if m:
                     lat_inc = float(m.group(1))
+                    continue
                 m = lon_inc_pattern.match(line)
                 if m:
                     lon_inc = float(m.group(1))
-
+                    continue
                 if '*** Calculated Parameters ***' in line:
                     break
-        return (lat_inc, lon_inc)
+        return (lat_inc, lon_inc, title)
 
 
     def get_datasets(self):
@@ -96,7 +118,7 @@ class REC533Out:
                             freq =params[2]
                             h = int(hour) if (int(hour) < 24) else int(hour) % 24
                             plot_dt = datetime.datetime(int(year), int(month), 15, hour=h)
-                            datasets.append((plot_dt, freq.strip(), idx))
+                            datasets.append((plot_dt, self.plot_title, freq.strip(), idx))
                             #print (month, hour, freq, idx)
                 idx += len(line)+1
         return datasets
@@ -115,7 +137,7 @@ class REC533Out:
 
 
     def get_plot_data(self, dataset_params):
-        plot_dt, freq, idx = dataset_params
+        plot_dt, title, freq, idx = dataset_params
         num_pts_lat = ((self.plot_rect.get_ne_lat() - self.plot_rect.get_sw_lat()) / self.lat_step_size) + 1
         num_pts_lon = ((self.plot_rect.get_ne_lon() - self.plot_rect.get_sw_lon()) / self.lon_step_size) + 1
         points = np.zeros([num_pts_lat, num_pts_lon], float)
