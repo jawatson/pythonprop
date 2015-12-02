@@ -73,8 +73,9 @@ class PropAreaPlot:
 
     def dump_datasets(self):
         ds_list = self.r533.get_datasets()
+        print("ID\tUTC Title Frequency")
         for ctr, ds in enumerate(ds_list):
-            plot_dt, freq, idx = ds
+            plot_dt, title, freq, idx = ds
             print('{: 4d}  {:s}\t{:.3f}'.format(ctr, plot_dt.strftime("%H:%M %b %Y"), float(freq)))
 
 
