@@ -44,19 +44,14 @@ class REC533Out:
 
     filename = ""
 
-    def __init__(self, filename, data_opt='SNR'):
+    def __init__(self, filename):
         self.filename = filename
-        self.data_opt = data_opt
         self.plot_rect = VOAAreaRect()
-        self.lat_step_size, self.lon_step_size, self.plot_title, data_format_dict = self.parse_global_params()
+        self.lat_step_size, self.lon_step_size, self.plot_title, self.data_format_dict = self.parse_global_params()
         self.datasets = self.build_dataset_list()
         print ("Found ",len(self.datasets), " datasets")
 
-        try:
-            self.data_column = data_format_dict[self.data_opt]
-        except KeyError:
-            print("Error: Specified data set {:s} not found in file {:s}".format(self.data_opt, filename))
-            quit()
+
         self.itr_ctr = -1
 
     def consume(self, iterator, n):
@@ -155,8 +150,13 @@ class REC533Out:
             raise StopIteration
 
 
-    def get_plot_data(self, dataset_params):
-        plot_dt, title, freq, idx = dataset_params
+    def get_plot_data(self, dataset_id, plot_type):
+        try:
+            data_column = self.data_format_dict[plot_type]
+        except KeyError:
+            print("Error: Specified data set {:s} not found in file {:s}".format(plot_type, self.filename))
+            quit()
+        plot_dt, title, freq, idx = self.datasets[dataset_id]
         num_pts_lat = ((self.plot_rect.get_ne_lat() - self.plot_rect.get_sw_lat()) / self.lat_step_size) + 1
         num_pts_lon = ((self.plot_rect.get_ne_lon() - self.plot_rect.get_sw_lon()) / self.lon_step_size) + 1
         points = np.zeros([num_pts_lat, num_pts_lon], float)
@@ -168,7 +168,6 @@ class REC533Out:
                     self.plot_rect.get_ne_lat()+1,
                     self.lat_step_size)
         f = open(self.filename, 'rt')
-        #f.seek(idx)
         freq=freq.strip()
         formatted_hour_str = '{0:02d}'.format(plot_dt.hour)
         try:
@@ -180,7 +179,8 @@ class REC533Out:
                         #print (row)
                         lat_grid_pos = (int(float(row[3])-self.plot_rect.get_sw_lat()) / self.lat_step_size)
                         lon_grid_pos = (int(float(row[4])-self.plot_rect.get_sw_lon()) / self.lon_step_size)
-                        points[lat_grid_pos][lon_grid_pos] = float(row[self.data_column])
+                        points[lat_grid_pos][lon_grid_pos] = float(row[data_column])
         finally:
             f.close()
-        return (points, lons, lats, num_pts_lon, num_pts_lat, dataset_params)
+        # todo don't return the full self.datasets params
+        return (points, plot_type, lons, lats, num_pts_lon, num_pts_lat, self.datasets[dataset_id])

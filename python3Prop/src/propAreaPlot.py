@@ -15,6 +15,7 @@ class PropAreaPlot:
 
     def __init__(self, data_file,
             list_files = False,
+            data_opt = 'SNR',
             plot_files = 1,
             plot_terminator = False,
             dpi = 150):
@@ -33,15 +34,16 @@ class PropAreaPlot:
             quit
         else:
             for dataset_id in plot_files:
+                # todo don't expose the datasets here
                 if dataset_id < len(self.r533.datasets):
-                    dataset = self.r533.get_plot_data(self.r533.datasets[dataset_id])
+                    dataset = self.r533.get_plot_data(dataset_id, data_opt)
                     self.do_plot(dataset)
                 else:
                     print ("Invalid index", dataset_id)
 
     def do_plot(self, dataset):
         #for dataset in r533:
-        points, lons, lats, num_pts_lon, num_pts_lat, params = dataset
+        points, plot_type, lons, lats, num_pts_lon, num_pts_lat, params = dataset
         plot_dt, plot_title, freq, idx = params
         #plt.figure(figsize=(12,6))
         m = Basemap(projection='cyl', resolution='l')
@@ -64,7 +66,7 @@ class PropAreaPlot:
         cb = m.colorbar(im,"bottom", size="5%", pad="2%")
         plt.title(plot_title)
 
-        plot_fn = "area_{:s}_{:s}.png".format(plot_dt.strftime("%H%M_%b_%Y"), "d".join(str(freq).split('.')))
+        plot_fn = "area_{:s}_{:s}_{:s}.png".format(plot_type, plot_dt.strftime("%H%M_%b_%Y"), "d".join(str(freq).split('.')))
         print ("Saving file ", plot_fn)
         plt.savefig(plot_fn, dpi=float(self.dpi), bbox_inches='tight')
 
@@ -83,25 +85,32 @@ def main(data_file):
     parser = OptionParser(usage="propAreaPlot [options] file", version="propAreaPlot 0.9.1")
     parser.disable_interspersed_args()
 
-    parser.add_option("-d", "--dpi",
-        dest="dpi",
-        default=150,
-        help=("Dots per inch (dpi)."))
-    parser.add_option("-l", "--list",
-        dest = "list",
-        action="store_true",
-        default = False,
-        help=("List files and quit.") )
-    parser.add_option("-p", "--plots",
-        dest = "plot_files",
-        default = '1',
-        help=("Plots to print, e.g '-v 1,3,5,6' or use '-v a' to print all plots.") )
-    parser.add_option("-t", "--terminator",
+    parser.add_option("-d", "--datatype",
+        dest="data_opt",
+        default='SNR',
+        help=("DATATYPE - a string representation of the data to plot. Valid values are 'SNR' and 'REL'. Default value is 'SNR'.") )
+
+    parser.add_option("-g", "--grey-line",
         dest="plot_terminator",
         action="store_true",
         default = False,
         help=("Plot day/night regions on map"))
 
+    parser.add_option("-l", "--list",
+        dest = "list",
+        action="store_true",
+        default = False,
+        help=("List files and quit.") )
+
+    parser.add_option("-p", "--plots",
+        dest = "plot_files",
+        default = '1',
+        help=("Plots to print, e.g '-v 1,3,5,6' or use '-v a' to print all plots.") )
+
+    parser.add_option("-r", "--resolution",
+        dest="dpi",
+        default=150,
+        help=("Dots per inch (dpi)."))
     (options, args) = parser.parse_args()
 
     plot_files = []
@@ -120,6 +129,7 @@ def main(data_file):
         print ("The following {:d} files have been selected {:s}: ".format(len(plot_files), str(plot_files)))
 
     PropAreaPlot(data_file,
+                data_opt = options.data_opt,
                 list_files = options.list,
                 plot_files = plot_files,
                 plot_terminator = options.plot_terminator,
