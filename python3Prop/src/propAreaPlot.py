@@ -87,6 +87,8 @@ def main(data_file):
 
     parser.add_option("-d", "--datatype",
         dest="data_opt",
+        type='choice',
+        choices=['SNR', 'REL'],
         default='SNR',
         help=("DATATYPE - a string representation of the data to plot. Valid values are 'SNR' and 'REL'. Default value is 'SNR'.") )
 
