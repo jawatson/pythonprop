@@ -67,7 +67,7 @@ class REC533Out:
     def parse_global_params(self):
         data_format_dict = {}
         title = ""
-        pathname_pattern = re.compile("\** P533 Input Parameters")
+        input_param_start_pattern = re.compile("\** P533 Input Parameters")
         lat_inc_pattern = re.compile("^\s*Latitude increment\s*= ([\d.]+) \(deg\)")
         lon_inc_pattern = re.compile("^\s*Longitude increment\s*= ([\d.]+) \(deg\)")
         col_rel_pattern = re.compile("Column (\d+): BSR - Basic circuit reliability")
@@ -76,7 +76,7 @@ class REC533Out:
         title_line_ptr = False
         with open(self.filename) as f:
             for line in f:
-                m = pathname_pattern.match(line)
+                m = input_param_start_pattern.match(line)
                 if m:
                     self.consume(f,1)
                     title_line_ptr = True

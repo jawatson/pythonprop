@@ -78,7 +78,7 @@ class PropAreaPlot:
         print("ID\tUTC Title Frequency")
         for ctr, ds in enumerate(ds_list):
             plot_dt, freq, title = ds
-            print('{: 4d}  {:s}\t{:.3f}'.format(ctr, plot_dt.strftime("%H:%M %b %Y"), float(freq)))
+            print('{: 4d}  {:s}\t{:6.3f}\t{:}'.format(ctr, plot_dt.strftime("%H:%M %b %Y"), float(freq), title))
 
 
 def main(data_file):
@@ -116,7 +116,7 @@ def main(data_file):
     (options, args) = parser.parse_args()
 
     plot_files = []
-    if options.plot_files:
+    if options.plot_files and not options.list:
         options.plot_files.strip()
         if options.plot_files == 'a':
             plot_files = 'a'
@@ -125,7 +125,7 @@ def main(data_file):
             try:
                 plot_files = hyphen_range(options.plot_files)
             except:
-                print ("Error reading vg files, resetting to '1'")
+                print ("Error reading plot datasets; resetting to '1'")
                 plot_files = [1]
 
         print ("The following {:d} files have been selected {:s}: ".format(len(plot_files), str(plot_files)))
@@ -146,7 +146,7 @@ def hyphen_range(s):
     r=set()
     for x in s.split(','):
         t=x.split('-')
-        if len(t) not in [1,2]: raise SyntaxError("hash_range is given its arguement as "+s+" which seems not correctly formated.")
+        if len(t) not in [1,2]: raise SyntaxError("Error parsing",s)
         r.add(int(t[0])) if len(t)==1 else r.update(set(range(int(t[0]),int(t[1])+1)))
     l=list(r)
     l.sort()
