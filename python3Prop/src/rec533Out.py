@@ -44,14 +44,19 @@ class REC533Out:
 
     filename = ""
 
-    def __init__(self, filename, data_opt='REL'):
+    def __init__(self, filename, data_opt='SNR'):
         self.filename = filename
+        self.data_opt = data_opt
         self.plot_rect = VOAAreaRect()
         self.lat_step_size, self.lon_step_size, self.plot_title, data_format_dict = self.parse_global_params()
         self.datasets = self.build_dataset_list()
         print ("Found ",len(self.datasets), " datasets")
 
-        self.data_column = data_format_dict[data_opt]
+        try:
+            self.data_column = data_format_dict[self.data_opt]
+        except KeyError:
+            print("Error: Specified data set {:s} not found in file {:s}".format(self.data_opt, filename))
+            quit()
         self.itr_ctr = -1
 
     def consume(self, iterator, n):
@@ -107,7 +112,7 @@ class REC533Out:
 
 
     def get_datasets(self):
-        return self.datasets
+        return [(plot_dt, freq, title) for plot_dt, title, freq, idx in self.datasets]
 
 
     def build_dataset_list(self):
