@@ -155,7 +155,7 @@ class REC533Out:
             data_column = self.data_format_dict[plot_type]
         except KeyError:
             print("Error: Specified data set {:s} not found in file {:s}".format(plot_type, self.filename))
-            quit()
+            raise LookupError
         plot_dt, title, freq, idx = self.datasets[dataset_id]
         num_pts_lat = ((self.plot_rect.get_ne_lat() - self.plot_rect.get_sw_lat()) / self.lat_step_size) + 1
         num_pts_lon = ((self.plot_rect.get_ne_lon() - self.plot_rect.get_sw_lon()) / self.lon_step_size) + 1
