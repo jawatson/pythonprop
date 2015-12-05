@@ -59,7 +59,6 @@ class PropAreaPlot:
         X,Y = np.meshgrid(lons, lats)
 
         im = m.pcolormesh(X, Y, points, shading='gouraud', cmap=plt.cm.jet, latlon=True, vmin=plot_params['vmin'], vmax=plot_params['vmax'])
-
         #im = m.imshow(points, interpolation='bilinear', vmin=self.plot_params['vmin'], vmax=self.plot_params['vmax'])
 
         if plot_terminator:
@@ -89,6 +88,14 @@ class PropAreaPlot:
         for ctr, ds in enumerate(ds_list):
             plot_dt, freq, title = ds
             print('{: 4d}  {:s}\t{:6.3f}\t{:}'.format(ctr, plot_dt.strftime("%H:%M %b %Y"), float(freq), title))
+
+    def get_metadata(self):
+        '''Returns metadata about the file.'''
+        return 'Not implemented yet.'
+
+    def dump_metadata(self):
+        '''Dumps metadata to the screen'''
+        print (self.get_metadata())
 
     ###############################
     # COLORBAR FORMATTERS
@@ -128,6 +135,12 @@ def main(data_file):
         default = False,
         help = "List files and quit." )
 
+    query_mode_parser.add_argument("-a", "--about",
+        dest = "about",
+        action = "store_true",
+        default = False,
+        help = "Dump file information to the screen." )
+
     plot_mode_parser.add_argument("-p", "--plots",
         dest = "plot_files",
         default = '0',
@@ -161,7 +174,11 @@ def main(data_file):
 
     pp = PropAreaPlot(args.data_file)
     if hasattr(args, 'list'):
-        pp.dump_datasets()
+        if args.list:
+            pp.dump_datasets()
+    if hasattr(args, 'about'):
+        if args.about:
+            pp.dump_metadata()
     else:
         pp.plot_datasets(plot_files,
             args.data_opt,

@@ -49,10 +49,8 @@ class REC533Out:
         self.plot_rect = VOAAreaRect()
         self.lat_step_size, self.lon_step_size, self.plot_title, self.data_format_dict = self.parse_global_params()
         self.datasets = self.build_dataset_list()
-        print ("Found ",len(self.datasets), " datasets")
-
-
         self.itr_ctr = -1
+
 
     def consume(self, iterator, n):
         "Advance the iterator n-steps ahead. If n is none, consume entirely."
@@ -63,7 +61,7 @@ class REC533Out:
         else:
             # advance to the empty slice starting at position n
             next(itertools.islice(iterator, n, n), None)
-            
+
 
     def parse_global_params(self):
         data_format_dict = {}
