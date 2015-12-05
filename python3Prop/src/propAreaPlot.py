@@ -6,6 +6,7 @@ import argparse
 
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
 
 from mpl_toolkits.basemap import Basemap
 
@@ -15,8 +16,8 @@ class PropAreaPlot:
 
     IMG_TYPE_DICT  = { \
         'MUF':{'title':('MUF'), 'vmin':2, 'vmax':30, 'y_labels':(2, 5, 10, 15, 20, 25, 30), 'formatter':'frequency_format'}, \
-        'REL':{'title':('Reliability (%)'), 'vmin':0, 'vmax':1, 'y_labels':(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1), 'formatter':'percent_format'}, \
-        'SNR':{'title':('SNR'), 'vmin':-10, 'vmax':70, 'y_labels':(20, 30, 40, 50, 60, 70), 'formatter':'SNR_format' }}
+        'REL':{'title':('Reliability (%)'), 'vmin':0, 'vmax':100, 'y_labels':(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100), 'formatter':'percent_format'}, \
+        'SNR':{'title':('SNR'), 'vmin':-10, 'vmax':70, 'y_labels':(-10, 0, 10, 20, 30, 40, 50, 60, 70), 'formatter':'SNR_format' }}
 
 
     def __init__(self, data_file):
@@ -64,7 +65,12 @@ class PropAreaPlot:
         if plot_terminator:
             m.nightshade(plot_dt)
 
-        cb = m.colorbar(im,"right", size="5%", pad="2%")
+        cb = m.colorbar(im,"right",
+            size="5%",
+            pad="2%",
+            ticks=plot_params['y_labels'],
+            format = FuncFormatter(eval('self.'+plot_params['formatter'])))
+
         plt.title("{:s} - {:s}".format(plot_title, plot_params['title']))
 
         plot_fn = "area_{:s}_{:s}_{:s}.png".format(plot_type, plot_dt.strftime("%H%M_%b_%Y"), "d".join(str(freq).split('.')))
@@ -83,6 +89,18 @@ class PropAreaPlot:
         for ctr, ds in enumerate(ds_list):
             plot_dt, freq, title = ds
             print('{: 4d}  {:s}\t{:6.3f}\t{:}'.format(ctr, plot_dt.strftime("%H:%M %b %Y"), float(freq), title))
+
+    ###############################
+    # COLORBAR FORMATTERS
+    ###############################
+
+    def percent_format(self, x, pos):
+        #return '%(percent)3d%%' % {'percent':x*100}
+        return "{:3d}%".format(x)
+
+    def SNR_format(self, x, pos):
+        #return '%3ddB' % x
+        return "{:3d}dB".format(x)
 
 
 def main(data_file):
@@ -112,7 +130,7 @@ def main(data_file):
 
     plot_mode_parser.add_argument("-p", "--plots",
         dest = "plot_files",
-        default = '1',
+        default = '0',
         help = "Plots to print, e.g '-v 1,3,5,6' or use '-v a' to print all plots." )
 
     plot_mode_parser.add_argument("-r", "--resolution",
@@ -137,7 +155,7 @@ def main(data_file):
                 plot_files = hyphen_range(args.plot_files)
             except:
                 print ("Error reading plot datasets; resetting to '1'")
-                plot_files = [1]
+                plot_files = [0]
 
         print ("The following {:d} files have been selected {:s}: ".format(len(plot_files), str(plot_files)))
 

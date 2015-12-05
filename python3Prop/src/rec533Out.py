@@ -63,6 +63,7 @@ class REC533Out:
         else:
             # advance to the empty slice starting at position n
             next(itertools.islice(iterator, n, n), None)
+            
 
     def parse_global_params(self):
         data_format_dict = {}
