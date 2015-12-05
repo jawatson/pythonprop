@@ -87,31 +87,35 @@ class PropAreaPlot:
 
 def main(data_file):
     parser = argparse.ArgumentParser(description="Plot HF Area Predictions.")
+    subparsers = parser.add_subparsers()
 
-    parser.add_argument("-d", "--datatype",
+    query_mode_parser = subparsers.add_parser('query', help="Query mode commands")
+    plot_mode_parser = subparsers.add_parser('plot', help="Plot mode commands")
+
+    plot_mode_parser.add_argument("-d", "--datatype",
         dest = "data_opt",
         choices = ['SNR', 'REL'],
         default = 'SNR',
         help = "DATATYPE - a string representation of the data to plot. Valid values are 'SNR' and 'REL'. Default value is 'SNR'." )
 
-    parser.add_argument("-g", "--grey-line",
+    plot_mode_parser.add_argument("-g", "--grey-line",
         dest = "plot_terminator",
         action = "store_true",
         default = False,
         help = "Plot day/night regions on map")
 
-    parser.add_argument("-l", "--list",
+    query_mode_parser.add_argument("-l", "--list",
         dest = "list",
         action = "store_true",
         default = False,
         help = "List files and quit." )
 
-    parser.add_argument("-p", "--plots",
+    plot_mode_parser.add_argument("-p", "--plots",
         dest = "plot_files",
         default = '1',
         help = "Plots to print, e.g '-v 1,3,5,6' or use '-v a' to print all plots." )
 
-    parser.add_argument("-r", "--resolution",
+    plot_mode_parser.add_argument("-r", "--resolution",
         dest = "dpi",
         type = int,
         default = 150,
@@ -123,7 +127,7 @@ def main(data_file):
     args = parser.parse_args()
 
     plot_files = []
-    if args.plot_files:
+    if hasattr(args, 'plot_files'):
         args.plot_files.strip()
         if args.plot_files == 'a':
             plot_files = 'a'
@@ -138,12 +142,13 @@ def main(data_file):
         print ("The following {:d} files have been selected {:s}: ".format(len(plot_files), str(plot_files)))
 
     pp = PropAreaPlot(args.data_file)
-    if args.list:
+    if hasattr(args, 'list'):
         pp.dump_datasets()
-    pp.plot_datasets(plot_files,
-        args.data_opt,
-        plot_terminator=args.plot_terminator,
-        dpi=args.dpi)
+    else:
+        pp.plot_datasets(plot_files,
+            args.data_opt,
+            plot_terminator=args.plot_terminator,
+            dpi=args.dpi)
 
 def hyphen_range(s):
     """ Takes a range in form of "a-b" and generate a list of numbers between a and b inclusive.
