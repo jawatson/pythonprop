@@ -29,6 +29,9 @@ import numpy as np
 
 from voaAreaRect import VOAAreaRect
 
+# todo make the filters import dynamic
+from filters.LFFilter import LFFilter
+
 class REC533Out:
     '''
     A small class to encapsulate files produced by the ITURHFProp
@@ -64,13 +67,17 @@ class REC533Out:
 
 
     def parse_global_params(self):
-        data_format_dict = {}
+        data_format_dict = {'MONTH':0, 'HOUR':1, 'FREQ':2}
         title = ""
         input_param_start_pattern = re.compile("\** P533 Input Parameters")
         lat_inc_pattern = re.compile("^\s*Latitude increment\s*= ([\d.]+) \(deg\)")
         lon_inc_pattern = re.compile("^\s*Longitude increment\s*= ([\d.]+) \(deg\)")
-        col_rel_pattern = re.compile("Column (\d+): BSR - Basic circuit reliability")
+        col_bcr_pattern = re.compile("Column (\d+): BSR - Basic circuit reliability")
+        col_e_pattern = re.compile("Column (\d+): E - Path Field Strength \(dB\(1uV/m\)\)")
+        col_rx_location_lat_pattern = re.compile("Column (\d+): Receiver latitude \(deg\)")
+        col_rx_location_lon_pattern = re.compile("Column (\d+): Receiver longitude \(deg\)")
         col_snr_pattern = re.compile("Column (\d+): SNR - Median signal-to-noise ratio")
+        col_opmuf10_pattern = re.compile("Column (\d+): OPMUF10 - 10% Operation MUF \(MHz\)")
 
         title_line_ptr = False
         with open(self.filename) as f:
@@ -92,16 +99,34 @@ class REC533Out:
                 if m:
                     lon_inc = float(m.group(1))
                     continue
-                m = col_rel_pattern.match(line)
+                m = col_bcr_pattern.match(line)
                 if m:
                     data_format_dict['REL'] = int(m.group(1)) - 1
+                    continue
+                m = col_e_pattern.match(line)
+                if m:
+                    data_format_dict['E'] = int(m.group(1)) - 1
+                    print ("got E in column", data_format_dict['E'])
+                    continue
+                m = col_rx_location_lat_pattern.match(line)
+                if m:
+                    data_format_dict['RX_LAT'] = int(m.group(1)) - 1
+                    continue
+                m = col_rx_location_lon_pattern.match(line)
+                if m:
+                    data_format_dict['RX_LON'] = int(m.group(1)) - 1
                     continue
                 m = col_snr_pattern.match(line)
                 if m:
                     data_format_dict['SNR'] = int(m.group(1)) - 1
                     continue
+                m = col_opmuf10_pattern.match(line)
+                if m:
+                    data_format_dict['OPMUF10'] = int(m.group(1)) - 1
+                    continue
                 if '*** Calculated Parameters ***' in line:
                     break
+        print (data_format_dict)
         return (lat_inc, lon_inc, title, data_format_dict)
 
 
@@ -150,11 +175,19 @@ class REC533Out:
 
 
     def get_plot_data(self, dataset_id, plot_type):
+        print (plot_type)
+
         try:
             data_column = self.data_format_dict[plot_type]
         except KeyError:
             print("Error: Specified data set {:s} not found in file {:s}".format(plot_type, self.filename))
             raise LookupError
+        ##filter
+        try:
+            data_filter = LFFilter(self.data_format_dict)
+        except KeyError as e:
+            data_filter = None
+            print (e)
         plot_dt, title, freq, idx = self.datasets[dataset_id]
         num_pts_lat = ((self.plot_rect.get_ne_lat() - self.plot_rect.get_sw_lat()) / self.lat_step_size) + 1
         num_pts_lon = ((self.plot_rect.get_ne_lon() - self.plot_rect.get_sw_lon()) / self.lon_step_size) + 1
@@ -176,6 +209,9 @@ class REC533Out:
                     #print("looking in +", row[1].strip(), "+ for +", formatted_hour_str, ": looking in +", row[2].strip(), "+ for +", freq,"+")
                     if row[1].strip()==formatted_hour_str and row[2].strip()==freq:
                         #print (row)
+                        ## Apply filters here ##
+                        if data_filter is not None:
+                            data_filter.apply_filter(row)
                         lat_grid_pos = (int(float(row[3])-self.plot_rect.get_sw_lat()) / self.lat_step_size)
                         lon_grid_pos = (int(float(row[4])-self.plot_rect.get_sw_lon()) / self.lon_step_size)
                         points[lat_grid_pos][lon_grid_pos] = float(row[data_column])

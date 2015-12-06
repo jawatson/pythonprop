@@ -48,7 +48,7 @@ class PropAreaPlot:
     def do_plot(self, dataset, plot_params, dpi=150, plot_terminator=False):
         points, plot_type, lons, lats, num_pts_lon, num_pts_lat, params = dataset
         plot_dt, plot_title, freq, idx = params
-        plt.cla() #Clear any existing plot data e.g. nightshade
+        plt.cla() #Clear any existing plot data, specifically nightshade
         m = Basemap(projection='cyl', resolution='l')
         m.drawcoastlines(color='black', linewidth=0.75)
         m.drawcountries(color='grey')
