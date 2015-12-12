@@ -22,11 +22,12 @@ dependencies;
 The application itself requires a few python dependancies;
 * matplotlib
 * basemap
+* python-matplotlib-gtk3
 
-These can be installed on Fedora 22 with the 
+These can be installed on Fedora 23 with the 
 following command;
 
-    $ sudo yum install rarian-compat gnome-doc-utils pkgconfig python-basemap
+    $ sudo yum install rarian-compat gnome-doc-utils pkgconfig python-basemap python-matplotlib-gtk3
 
 Debian / Ubuntu users can install these dependancies with the following command;
 
