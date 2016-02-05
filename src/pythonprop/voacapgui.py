@@ -17,7 +17,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
 from __future__ import with_statement
@@ -46,8 +46,9 @@ try:
     from gi.repository import GObject
     from gi.repository import GdkPixbuf
     from gi.repository import Gtk
-except:
-    print "Failed to import required package"
+except ImportError as exc:
+    print "Error: failed to import settings module ({})".format(exc)
+    print "Check that the python-gi module is installed"
     sys.exit(1)
 
 
@@ -106,7 +107,7 @@ class VOACAP_GUI():
         itshfbc_path = os.path.expanduser("~")+os.sep+'itshfbc'
         prefs_dir = os.path.expanduser("~")+os.sep+'.voacapgui'+os.sep
 
-    
+
     prefs_path = prefs_dir + 'voacapgui.prefs'
     ssn_path = prefs_dir + 'table_international-sunspot-numbers_monthly-predicted.txt'
     # Check if the prefs directory exists, create one if if it doesn't
@@ -114,7 +115,7 @@ class VOACAP_GUI():
     # creating and populating this directory.)
 
     if not os.path.isdir(prefs_dir):
-        os.makedirs(prefs_dir) 
+        os.makedirs(prefs_dir)
 
     #ant_list = []
 
@@ -122,14 +123,14 @@ class VOACAP_GUI():
     firstCornerY = 0
 
     area_rect = VOAAreaRect()
-    
+
     model_list = ('CCIR', 'URSI88')
     path_list = (_('Short'), _('Long'))
-    
-    # These need to be lists later on to support multiple antennas    
+
+    # These need to be lists later on to support multiple antennas
     tx_antenna_path = ''
     rx_antenna_path = ''
-   
+
     main_window_size = (560, 410)
     site_chooser_map_size = area_chooser_map_size = (384,192)
     antenna_chooser_size = (500,400)
@@ -138,7 +139,7 @@ class VOACAP_GUI():
         self.datadir = datadir
         self.pythonprop_version = pythonprop_version
         self.area_templates_file = None
-        #Set the GUI file    
+        #Set the GUI file
         #self.uifile = os.path.join(os.path.realpath(os.path.dirname(sys.argv[0])), "voacapgui.ui")
         self.ui_file = os.path.join(self.datadir, "ui", "voacapgui.ui")
 
@@ -146,7 +147,7 @@ class VOACAP_GUI():
         self.builder = Gtk.Builder()
         self.builder.add_from_file(self.ui_file)
 
-        self.get_objects("main_window", "statusbar", "notebook", 
+        self.get_objects("main_window", "statusbar", "notebook",
                 "tx_site_button", "tx_site_entry", "tx_lat_spinbutton",
                 "tx_lon_spinbutton", "tx_antenna_button", "tx_antenna_entry",
                 "tx_bearing_button", "tx_bearing_spinbutton",
@@ -172,7 +173,7 @@ class VOACAP_GUI():
                 )
         #self.p2pcalbt.set_label(_('_Cal'))
         #self.p2pcalbt.set_image(Gtk.Image.new_from_stock(Gtk.STOCK_INDEX, Gtk.IconSize.BUTTON))
-        # TODO clear up "p2psavebt", "p2pcircuitcb", 
+        # TODO clear up "p2psavebt", "p2pcircuitcb",
         self.p2p_useday = False
         self.p2pdayspinbutton.set_sensitive(self.p2p_useday)
         self.p2puseday_handler_id = self.p2pusedayck.connect('toggled', self.p2p_useday_tog)
@@ -181,7 +182,7 @@ class VOACAP_GUI():
         self.p2pmonthspinbutton.set_value(today.month)
         self.p2pdayspinbutton.set_value(today.day)
         self.p2pfreqspinbutton.set_value(14.2)
-        
+
         col_cm_t = [GObject.TYPE_UINT, GObject.TYPE_STRING]
         self.circuit_method_model = Gtk.ListStore(*col_cm_t)
         [ self.circuit_method_model.append( [i, label]) for i, label in [
@@ -205,21 +206,21 @@ class VOACAP_GUI():
             (22, _("Method 22 (Forced SP Model)")),
             (21, _("Method 21 (Forced LP Model)")),
             (20, _("Method 20 (Complete System Performance)")) ]]
-            
-            
+
+
         self.main_window.resize(self.main_window_size[0], self.main_window_size[1])
-        
-        _model = Gtk.ListStore(GObject.TYPE_STRING) 
+
+        _model = Gtk.ListStore(GObject.TYPE_STRING)
         for item in self.model_list:
             _model.append([item])
         self.populate_combo(self.model_combo, _model)
 
-        _model = Gtk.ListStore(GObject.TYPE_STRING) 
+        _model = Gtk.ListStore(GObject.TYPE_STRING)
         for item in self.path_list:
             _model.append([item])
-        self.populate_combo(self.path_combo, _model)    
-        
-       
+        self.populate_combo(self.path_combo, _model)
+
+
         self.max_vg_files_warn = False
         self.max_frequencies_warn = False
         if os.name == 'posix':
@@ -260,7 +261,7 @@ class VOACAP_GUI():
         event_dic = { "on_main_window_destroy" : self.quit_application,
             "on_tx_site_button_clicked" : self.choose_site,
             "on_rx_site_button_clicked" : self.choose_site,
-            "on_tx_antenna_button_clicked" : self.choose_antenna, 
+            "on_tx_antenna_button_clicked" : self.choose_antenna,
             "on_rx_antenna_button_clicked" : self.choose_antenna,
             "on_tx_antenna_entry_changed" : self.update_run_button_status,
             "on_rx_antenna_entry_changed" : self.update_run_button_status,
@@ -275,7 +276,7 @@ class VOACAP_GUI():
             "on_main_window_destroy" : self.quit_application,
             "on_ssn_web_update_button_clicked" : self.update_ssn_table,
 
-            # notebook area page widgets event dict 
+            # notebook area page widgets event dict
             'on_notebook_switch_page' : self.nb_switch_page,
             'on_area_addbt_clicked' : self.area_add_tv_row_from_user,
             'on_add_templ_btn_clicked' : self.area_add_template,
@@ -284,7 +285,7 @@ class VOACAP_GUI():
             #'on_area_save_btn_clicked' : self.area_save_as_template,
             'on_area_clear_btn_clicked' : self.area_clean_tv,
             'on_area_select_btn_clicked' : self.show_area_chooser,
-            'on_area_run_btn_clicked' : self.run_prediction, 
+            'on_area_run_btn_clicked' : self.run_prediction,
 
             # notebook p2p page widgets event dict
             'on_p2pmonthspinbutton_value_changed' : self.p2p_set_days_range,
@@ -303,29 +304,29 @@ class VOACAP_GUI():
             'on_p2pcircuitckb_toggled' : self.p2p_toggle_circuit,
             'on_p2pmethodcb_changed' : self.p2p_method_changed
             }
-        self.builder.connect_signals(event_dic)    
+        self.builder.connect_signals(event_dic)
 
         # area plot accelgrp
-        self.area_accelgrp = None        
+        self.area_accelgrp = None
         self.main_window.show_all()
 
 
-        # test for ~/itshfbc tree    
+        # test for ~/itshfbc tree
         if not os.path.exists(self.itshfbc_path):
             e = _("ITSHFBC directory not found")
             if os.name == 'posix':
                 e_os = _("Please install voacap for Linux and run 'makeitshfbc'.\n")
             e_os += _("A 'itshfbc' directory cannot be found at: %s.\n") % (self.itshfbc_path)
-            e_os += _("Please install voacap before running voacapgui.") 
-            dialog = Gtk.MessageDialog(self.main_window, 
+            e_os += _("Please install voacap before running voacapgui.")
+            dialog = Gtk.MessageDialog(self.main_window,
                 Gtk.DialogFlags.MODAL|Gtk.DialogFlags.DESTROY_WITH_PARENT,
                 Gtk.MessageType.ERROR, Gtk.ButtonsType.CLOSE, e )
-            dialog.format_secondary_text(e_os)     
+            dialog.format_secondary_text(e_os)
             dialog.run()
             dialog.destroy()
             return -1
-    
-     
+
+
 
     def populate_combo(self, cb, model):
         cb.set_model(model)
@@ -333,13 +334,13 @@ class VOACAP_GUI():
         cb.pack_start(cell, True)
         cb.add_attribute(cell, 'text', 0)
         #cb.set_wrap_width(20)
-        cb.set_active(0)    
-    
-        
+        cb.set_active(0)
+
+
     def p2p_set_days_range(self, widget):
         """
-        Sets the adjustment of the 'days' spinbutton on the P2P panel, modifying the 
-        upper limit according to the values of the month/year. 
+        Sets the adjustment of the 'days' spinbutton on the P2P panel, modifying the
+        upper limit according to the values of the month/year.
         """
         current_day = self.p2pdayspinbutton.get_value()
         first_day, num_days = monthrange(int(self.p2pyearspinbutton.get_value()),\
@@ -349,27 +350,27 @@ class VOACAP_GUI():
         self.p2pdayspinbutton.set_adjustment(adjustment)
         self.p2pdayspinbutton.set_value(current_day)
 
-            
+
     def get_objects(self, *names):
         for name in names:
             widget = self.builder.get_object(name)
             if widget is None:
                 raise ValueError, "Widget '%s' not found" % name
             setattr(self, name, widget)
-            
-            
+
+
     def choose_antenna(self, widget):
-        dialog  = VOAAntennaChooser(self.itshfbc_path, size=self.antenna_chooser_size, parent=self.main_window, datadir=self.datadir) 
-        return_code, return_antenna, antenna_description, self.antenna_chooser_size = dialog.run()  
-        #print self.antenna_chooser_size  
-        if ((return_code == 0) and (return_antenna)): # response_id: 0=OK, 1=Cancel  
+        dialog  = VOAAntennaChooser(self.itshfbc_path, size=self.antenna_chooser_size, parent=self.main_window, datadir=self.datadir)
+        return_code, return_antenna, antenna_description, self.antenna_chooser_size = dialog.run()
+        #print self.antenna_chooser_size
+        if ((return_code == 0) and (return_antenna)): # response_id: 0=OK, 1=Cancel
             if widget == self.builder.get_object('tx_antenna_button'):
                 self.tx_antenna_entry.set_text(return_antenna + ' : ' + antenna_description)
                 self.tx_antenna_path = return_antenna
             else:
                 self.rx_antenna_entry.set_text(return_antenna + ' : ' + antenna_description)
-                self.rx_antenna_path = return_antenna 
-       
+                self.rx_antenna_path = return_antenna
+
 
     def choose_site(self, widget):
         if widget == self.builder.get_object('tx_site_button'):
@@ -400,8 +401,8 @@ class VOACAP_GUI():
                 self.rx_site_entry.set_text(location.get_name())
                 self.rx_lat_spinbutton.set_value(location.get_latitude())
                 self.rx_lon_spinbutton.set_value(location.get_longitude())
-                
-                
+
+
     def calculate_antenna_bearing(self, widget):
         try:
             tx_loc = HamLocation(self.tx_lat_spinbutton.get_value(),
@@ -411,14 +412,14 @@ class VOACAP_GUI():
         except Exception:
             #todo add a note to the status bar explaining the reason
             #for the failure to actually do anything
-            return                            
+            return
         if widget == self.builder.get_object('tx_bearing_button'):
             bearing, distance = tx_loc.path_to(rx_loc)
             self.tx_bearing_spinbutton.set_value(bearing)
         else:
             bearing, distance = rx_loc.path_to(tx_loc)
             self.rx_bearing_spinbutton.set_value(bearing)
-                    
+
 
     def read_user_prefs(self) :
         config = ConfigParser(VOADefaultDictionary())
@@ -426,27 +427,27 @@ class VOACAP_GUI():
         #set some defaults here for the system variables
         try:
             self.foe_spinbutton.set_value(float(config.get('DEFAULT','foe')))
-            self.fof1_spinbutton.set_value(float(config.get('DEFAULT','fof1')))                        
-            self.fof2_spinbutton.set_value(float(config.get('DEFAULT','fof2')))                        
+            self.fof1_spinbutton.set_value(float(config.get('DEFAULT','fof1')))
+            self.fof2_spinbutton.set_value(float(config.get('DEFAULT','fof2')))
             self.foes_spinbutton.set_value(float(config.get('DEFAULT','foes')))
             self.model_combo.set_active(int(config.get('DEFAULT', 'model')))
-            self.path_combo.set_active(int(config.get('DEFAULT', 'path')))            
-    
+            self.path_combo.set_active(int(config.get('DEFAULT', 'path')))
+
             self.mm_noise_spinbutton.set_value(float(config.get('DEFAULT','mm_noise')))
             self.min_toa_spinbutton.set_value(float(config.get('DEFAULT','min_toa')))
             self.reliability_spinbutton.set_value(float(config.get('DEFAULT','required_reliability')))
             self.snr_spinbutton.set_value(float(config.get('DEFAULT','required_snr')))
             self.mpath_spinbutton.set_value(float(config.get('DEFAULT','mpath')))
-            self.delay_spinbutton.set_value(float(config.get('DEFAULT','delay')))    
-            
+            self.delay_spinbutton.set_value(float(config.get('DEFAULT','delay')))
+
             self.tx_bearing_spinbutton.set_value(float(config.get('DEFAULT', 'tx_bearing')))
             self.tx_power_spinbutton.set_value(float(config.get('DEFAULT', 'tx_power')))
             self.rx_bearing_spinbutton.set_value(float(config.get('DEFAULT', 'rx_bearing')))
-                            
+
             self.tx_site_entry.set_text(config.get('tx site','name'))
             self.tx_lat_spinbutton.set_value(float(config.get('tx site','lat')))
             self.tx_lon_spinbutton.set_value(float(config.get('tx site','lon')))
-            self.tx_antenna_entry.set_text(config.get('tx site', 'antenna' )) 
+            self.tx_antenna_entry.set_text(config.get('tx site', 'antenna' ))
             self.tx_antenna_path, sep, suffix = (config.get('tx site', 'antenna' )).partition(' :')
             self.tx_bearing_spinbutton.set_value(float(config.get('tx site', 'bearing')))
             self.tx_power_spinbutton.set_value(float(config.get('tx site', 'power')))
@@ -455,13 +456,13 @@ class VOACAP_GUI():
             self.rx_lon_spinbutton.set_value(float(config.get('rx site','lon')))
             self.rx_antenna_entry.set_text(config.get('rx site', 'antenna' ))
             self.rx_antenna_path, sep, suffix = (config.get('rx site', 'antenna' )).partition(' :')
-            self.rx_bearing_spinbutton.set_value(float(config.get('rx site', 'bearing')))    
+            self.rx_bearing_spinbutton.set_value(float(config.get('rx site', 'bearing')))
 
-            self.site_chooser_map_size = (config.getint('site chooser','map_width'), 
+            self.site_chooser_map_size = (config.getint('site chooser','map_width'),
                                           config.getint('site chooser','map_height'))
-            self.area_chooser_map_size = (config.getint('area chooser','map_width'), 
+            self.area_chooser_map_size = (config.getint('area chooser','map_width'),
                                           config.getint('area chooser','map_height'))
-            self.antenna_chooser_size = (config.getint('antenna chooser','width'), 
+            self.antenna_chooser_size = (config.getint('antenna chooser','width'),
                                           config.getint('antenna chooser','height'))
             self.gridsizespinbutton.set_value(config.getint('area', 'gridsize'))
             self.areayearspinbutton.set_value(config.getint('area','year'))
@@ -469,7 +470,7 @@ class VOACAP_GUI():
             self.utcspinbutton.set_value(config.getint('area','utc'))
             self.freqspinbutton.set_value(config.getfloat('area', 'frequency'))
             self.area_templates_file = config.get('area', 'templates_file')
-            self.area_rect=VOAAreaRect(config.getfloat('area','sw_lat'), 
+            self.area_rect=VOAAreaRect(config.getfloat('area','sw_lat'),
                                         config.getfloat('area','sw_lon'),
                                         config.getfloat('area','ne_lat'),
                                         config.getfloat('area','ne_lon'))
@@ -498,7 +499,7 @@ class VOACAP_GUI():
         config.set('tx site', 'name', self.tx_site_entry.get_text())
         config.set('tx site', 'lat', self.tx_lat_spinbutton.get_value())
         config.set('tx site', 'lon', self.tx_lon_spinbutton.get_value())
-        config.set('tx site', 'antenna', self.tx_antenna_entry.get_text())    
+        config.set('tx site', 'antenna', self.tx_antenna_entry.get_text())
         config.set('tx site', 'bearing', self.tx_bearing_spinbutton.get_value())
         config.set('tx site', 'power', self.tx_power_spinbutton.get_value())
         # Rx Site Parameters
@@ -506,21 +507,21 @@ class VOACAP_GUI():
         config.set('rx site', 'name', self.rx_site_entry.get_text())
         config.set('rx site', 'lat', self.rx_lat_spinbutton.get_value())
         config.set('rx site', 'lon', self.rx_lon_spinbutton.get_value())
-        config.set('rx site', 'antenna', self.rx_antenna_entry.get_text())    
-        config.set('rx site', 'bearing', self.rx_bearing_spinbutton.get_value())   
+        config.set('rx site', 'antenna', self.rx_antenna_entry.get_text())
+        config.set('rx site', 'bearing', self.rx_bearing_spinbutton.get_value())
         # Ionospheric Parameters
-        config.set('DEFAULT', 'foe', self.foe_spinbutton.get_value())   
+        config.set('DEFAULT', 'foe', self.foe_spinbutton.get_value())
         config.set('DEFAULT', 'fof1', self.fof1_spinbutton.get_value())
-        config.set('DEFAULT', 'fof2', self.fof2_spinbutton.get_value())    
-        config.set('DEFAULT', 'foes', self.foes_spinbutton.get_value())    
+        config.set('DEFAULT', 'fof2', self.fof2_spinbutton.get_value())
+        config.set('DEFAULT', 'foes', self.foes_spinbutton.get_value())
         config.set('DEFAULT', 'model', self.model_combo.get_active())
-        config.set('DEFAULT', 'path', self.path_combo.get_active())                
+        config.set('DEFAULT', 'path', self.path_combo.get_active())
         # System parameters
-        config.set('DEFAULT','mm_noise', self.mm_noise_spinbutton.get_value())    
+        config.set('DEFAULT','mm_noise', self.mm_noise_spinbutton.get_value())
         config.set('DEFAULT','min_toa', self.min_toa_spinbutton.get_value())
         config.set('DEFAULT','required_reliability', self.reliability_spinbutton.get_value())
-        config.set('DEFAULT','required_snr', self.snr_spinbutton.get_value())                                    
-        config.set('DEFAULT','mpath', self.mpath_spinbutton.get_value())    
+        config.set('DEFAULT','required_snr', self.snr_spinbutton.get_value())
+        config.set('DEFAULT','mpath', self.mpath_spinbutton.get_value())
         config.set('DEFAULT','delay', self.delay_spinbutton.get_value())
         # area parameters
         config.add_section('area')
@@ -534,7 +535,7 @@ class VOACAP_GUI():
         config.set('area','ne_lat', self.area_rect.ne_lat)
         config.set('area','ne_lon', self.area_rect.ne_lon)
         config.set('area','templates_file', self.area_templates_file if self.area_templates_file else '')
-        
+
         with open(self.prefs_path, 'w') as configfile:
             config.write(configfile)
 
@@ -553,7 +554,7 @@ class VOACAP_GUI():
         should be called everytime any of the prerequisites are modified.
         """
         valid = self.is_ssn_valid() and self.is_tx_site_data_valid() and self.is_rx_site_data_valid()
-        print "P2P first step is ", valid 
+        print "P2P first step is ", valid
         if self.p2pcircuitckb.get_active():
             table_model = self.p2pfreq_tv.get_model()
             if (table_model):
@@ -570,7 +571,7 @@ class VOACAP_GUI():
         if self.p2pmethodcb.get_model().get_value(iter, 0) == 0:
             valid = False
         self.p2prunbt.set_sensitive(valid)
-        
+
 
     def update_area_run_button_status(self):
         """
@@ -586,7 +587,7 @@ class VOACAP_GUI():
             valid = valid and (len(table_model) > 0)
         else:
             valid = False
-        
+
         self.area_run_btn.set_sensitive(valid)
 
 
@@ -594,16 +595,16 @@ class VOACAP_GUI():
         _valid = True
         _table_model = self.ssn_tv.get_model()
         if (_table_model):
-            _valid = _valid and (len(_table_model) > 0)            
+            _valid = _valid and (len(_table_model) > 0)
         else:
             _valid = False
-        
+
         if _valid != True:
             context_id = self.statusbar.get_context_id("nossns")
             self.statusbar.push(context_id, _("No SSNs are defined"))
         return _valid
-        
-        
+
+
     def is_tx_site_data_valid(self):
         _is_valid = True
         if self.tx_power_spinbutton.get_value() == 0: _is_valid = False
@@ -614,27 +615,27 @@ class VOACAP_GUI():
         _is_valid = True
         if self.rx_antenna_entry.get_text_length() == 0: _is_valid = False
         return _is_valid
-            
+
 #gettext here
 #This function is used to force an update
-    def update_ssn_table(self, widget):     
+    def update_ssn_table(self, widget):
         self.ssn_repo.update_ssn_file() #Force an update
 #        self.update_ssn_data_label()
         self.ssn_file_data_label.set_text(self.ssn_repo.get_file_data())
         #self.write_ssns(self.ssn_repo.get_ssn_list())
-       
-        
+
+
     def update_ssn_data_label(self):
         _text = _("SSN Data Last Updated:\n")
         _text += self.ssn_repo.get_file_mtime_str()
-        self.ssn_file_data_label.set_text(_text)        
-    
-    
+        self.ssn_file_data_label.set_text(_text)
+
+
     def p2p_toggle_circuit(self, widget):
         self.set_circuit_panel_state(widget.get_active())
         self.update_p2p_run_button_status()
-        
-        
+
+
     def set_circuit_panel_state(self, state):
         self.p2pfreqspinbutton.set_sensitive(state)
         self.p2padd_freqbt.set_sensitive(state)
@@ -642,7 +643,7 @@ class VOACAP_GUI():
         self.p2pfreqrstbt.set_sensitive(state)
         self.p2pfreq_tv.set_sensitive(state)
         self.build_graphcb()
-    
+
     def p2p_method_changed(self, widget):
         self.update_p2p_run_button_status()
 
@@ -679,7 +680,7 @@ class VOACAP_GUI():
         self.p2pmy_tv_idx_month_n = 1
         self.p2pmy_tv_idx_month_i = 2
         self.p2pmy_tv_idx_year = 3
-        
+
         self.p2pfreq_tv_idx_freq = 0
 
         def dow_celldatafunction(column, cell, model, iter, user_data=None):
@@ -733,7 +734,7 @@ class VOACAP_GUI():
     def build_graphcb(self):
         if self.p2pcircuitckb.get_active():
             model = self.circuit_method_model
-        else:   
+        else:
             model = self.graphic_method_model
 
         self.p2pmethodcb.clear()
@@ -742,7 +743,7 @@ class VOACAP_GUI():
         self.p2pmethodcb.pack_start(cell, True)
         self.p2pmethodcb.add_attribute(cell, 'text', 1)
         self.p2pmethodcb.set_active(0)
-        
+
 
 
     def build_macrocb(self):
@@ -767,7 +768,7 @@ class VOACAP_GUI():
 
     def p2p_macro_next_months(self, vals):
         day = 0
-	
+
         # if the tv has any entries, use the last one as our
         # start in the sequence.
         tv_model = self.p2pmy_tv.get_model()
@@ -778,7 +779,7 @@ class VOACAP_GUI():
             today = date.today()
             self.p2pmy_add_tv_rows([(day, today.month, today.year)])
         else:
-            # the table has entries.  find the last entry and use that 
+            # the table has entries.  find the last entry and use that
             # as our starting point for the 'next' months
             last_iter = None
             while tv_iter:
@@ -789,8 +790,8 @@ class VOACAP_GUI():
             today = date(year, month, 1)
             #get the last entry
             #build the value for today
-            
-        
+
+
         mr = relativedelta(months=+1)
         if len(vals) == 1:
             next = today + mr
@@ -817,7 +818,7 @@ class VOACAP_GUI():
         day = 0
         # start the count from Jan of the current year
         year = self.p2pyearspinbutton.get_value_as_int()
-        today = date(year, 1, 1)     
+        today = date(year, 1, 1)
         self.p2pmy_add_tv_rows([(day, today.month, today.year)])
         mr = relativedelta(months=+(12/vals[0]))
         if len(vals) == 1:
@@ -868,7 +869,7 @@ class VOACAP_GUI():
         self.area_tv_idx_month_i = 2
         self.area_tv_idx_utc = 3
         self.area_tv_idx_freq = 4
-        
+
         title = _("Year")
         cell = Gtk.CellRendererText()
         cell.set_property('xalign', 1.0)
@@ -924,11 +925,11 @@ class VOACAP_GUI():
         # so the templates/*.py can import between themselves
         current_dir = os.path.dirname(os.path.abspath(__file__))
         sys.path.append(os.path.join(current_dir, 'templates'))
-        
+
         # Revised module loading thanks to the following link
         # http://stackoverflow.com/questions/3365740/how-to-import-all-submodules
         for loader, module_name, is_pkg in  pkgutil.walk_packages(templates.__path__):
-            
+
             try:
                 t_o = loader.find_module(module_name).load_module(module_name).templates(self.main_window)
             except Exception, X:
@@ -937,7 +938,7 @@ class VOACAP_GUI():
 
             # set module parameters
             ps = t_o.get_params()
-            for p in ps: 
+            for p in ps:
                 try:
                     t_o.__dict__[p] = self.__dict__[p]
                 except Exception, X:
@@ -947,7 +948,7 @@ class VOACAP_GUI():
             if ret:
                 print _("Can't load() template module %s") % f
                 continue
-                
+
             for tname in t_o.get_names():
                 model.append([tname, t_o])
 
@@ -977,14 +978,14 @@ class VOACAP_GUI():
             if len(self.p2pmy_tv.get_model()):
                 ee += _("Values of 'day' in existing entries will be set to '1'.")
                 change_to = 1
-        else: 
+        else:
             e = _("Not specifing days reverts the forced use of URSI88 coefficients. \
 The current setting is %s.") % ('CCIR' if (self.model_combo.get_active()==0) else 'URSI88')
             if len(self.p2pmy_tv.get_model()):
                 ee = _("All existing day values will be deleted.")
                 change_to = 0
-        dialog = Gtk.MessageDialog(self.main_window, 
-                Gtk.DialogFlags.MODAL|Gtk.DialogFlags.DESTROY_WITH_PARENT, 
+        dialog = Gtk.MessageDialog(self.main_window,
+                Gtk.DialogFlags.MODAL|Gtk.DialogFlags.DESTROY_WITH_PARENT,
                 Gtk.MessageType.WARNING, Gtk.ButtonsType.OK_CANCEL, e)
         dialog.set_title(_('Warning'))
         dialog.format_secondary_text(ee)
@@ -1086,15 +1087,15 @@ The current setting is %s.") % ('CCIR' if (self.model_combo.get_active()==0) els
             self.p2pfreq_tv.set_cursor(0)
         if len(tv_model) > 11 and not self.max_frequencies_warn:
             e = _("VOACAP can only process 11 frequencies")
-            dialog = Gtk.MessageDialog(self.main_window, 
-                    Gtk.DialogFlags.MODAL|Gtk.DialogFlags.DESTROY_WITH_PARENT, 
+            dialog = Gtk.MessageDialog(self.main_window,
+                    Gtk.DialogFlags.MODAL|Gtk.DialogFlags.DESTROY_WITH_PARENT,
                     Gtk.MessageType.WARNING, Gtk.ButtonsType.CLOSE, e)
             dialog.format_secondary_text(_('Only the first 11 entries will \
 be processed, all other entries will be ignored.  Please delete some entries \
 from the frequency table.'))
             dialog.run()
             dialog.destroy()
-            self.max_frequencies_warn = True 
+            self.max_frequencies_warn = True
 
     def area_add_tv_row_from_user(self, *args):
         year = self.areayearspinbutton.get_value_as_int()
@@ -1116,7 +1117,7 @@ from the frequency table.'))
             row.insert(self.area_tv_idx_utc, utc)
             row.insert(self.area_tv_idx_freq, '%.3f' % freq)
             iter = tv_model.append(row)
-        
+
         self.area_delbt.set_sensitive(True)
         self.area_clear_btn.set_sensitive(True)
         self.update_area_run_button_status()
@@ -1126,21 +1127,21 @@ from the frequency table.'))
         #let the user know we did not run all their data
         if len(tv_model) > self.max_vg_files and not self.max_vg_files_warn:
             e = _("VOACAP can only process %d area entries") % self.max_vg_files
-            dialog = Gtk.MessageDialog(self.main_window, 
-                    Gtk.DialogFlags.MODAL|Gtk.DialogFlags.DESTROY_WITH_PARENT, 
+            dialog = Gtk.MessageDialog(self.main_window,
+                    Gtk.DialogFlags.MODAL|Gtk.DialogFlags.DESTROY_WITH_PARENT,
                     Gtk.MessageType.WARNING, Gtk.ButtonsType.CLOSE, e)
             dialog.format_secondary_text(_('Only the first 12 entries will \
 be processed, all other entries will be ignored.  Please delete some entries.'))
             dialog.run()
             dialog.destroy()
-            self.max_vg_files_warn = True 
+            self.max_vg_files_warn = True
 
     def p2p_clean_my_tv(self, *args):
         self.p2pmy_tv.get_model().clear()
         self.p2pmydelbt.set_sensitive(False)
         self.p2pmyrstbt.set_sensitive(False)
         self.update_p2p_run_button_status()
-        
+
     def p2p_clean_freq_tv(self, *args):
         self.p2pfreq_tv.get_model().clear()
         self.p2pfreqdelbt.set_sensitive(False)
@@ -1156,14 +1157,14 @@ be processed, all other entries will be ignored.  Please delete some entries.'))
 
     def p2p_del_my_tv_row(self, *args):
         selection = self.p2pmy_tv.get_selection()
-        if not selection.count_selected_rows(): return 
+        if not selection.count_selected_rows(): return
         model, paths = selection.get_selected_rows()
         self.p2pmy_tv.freeze_child_notify()
         self.p2pmy_tv.set_model(None)
         iters = []
-        for path in paths: 
-            iters.append(model.get_iter(path))        
-        for iter in iters: 
+        for path in paths:
+            iters.append(model.get_iter(path))
+        for iter in iters:
             model.remove(iter)
         if not len(model):
             self.p2pmydelbt.set_sensitive(False)
@@ -1185,14 +1186,14 @@ be processed, all other entries will be ignored.  Please delete some entries.'))
 
     def p2p_del_freq_tv_row(self, *args):
         selection = self.p2pfreq_tv.get_selection()
-        if not selection.count_selected_rows(): return 
+        if not selection.count_selected_rows(): return
         model, paths = selection.get_selected_rows()
         self.p2pfreq_tv.freeze_child_notify()
         self.p2pfreq_tv.set_model(None)
         iters = []
-        for path in paths: 
-            iters.append(model.get_iter(path))        
-        for iter in iters: 
+        for path in paths:
+            iters.append(model.get_iter(path))
+        for iter in iters:
             model.remove(iter)
         if not len(model):
             self.p2pfreqdelbt.set_sensitive(False)
@@ -1216,14 +1217,14 @@ be processed, all other entries will be ignored.  Please delete some entries.'))
 
     def area_del_tv_row(self, *args):
         selection = self.area_tv.get_selection()
-        if not selection.count_selected_rows(): return 
+        if not selection.count_selected_rows(): return
         model, paths = selection.get_selected_rows()
         self.area_tv.freeze_child_notify()
         self.area_tv.set_model(None)
         iters = []
-        for path in paths: 
-            iters.append(model.get_iter(path))        
-        for iter in iters: 
+        for path in paths:
+            iters.append(model.get_iter(path))
+        for iter in iters:
             model.remove(iter)
         if not len(model):
             self.area_delbt.set_sensitive(False)
@@ -1242,8 +1243,8 @@ be processed, all other entries will be ignored.  Please delete some entries.'))
             else:
                 self.area_tv.set_cursor((last_path,))
                 return
-	
-	
+
+
     def p2p_save_as_template(self, *args):
         pass
 
@@ -1273,7 +1274,7 @@ be processed, all other entries will be ignored.  Please delete some entries.'))
         hb.pack_start(nentry, True, True, 0)
         hb.show_all()
         dialog.vbox.pack_start(hb, True, True, 0)
-       
+
         ok_bt = Gtk.Button(None, Gtk.STOCK_OK)
         ok_bt.set_sensitive(False)
         ok_bt.show()
@@ -1294,7 +1295,7 @@ be processed, all other entries will be ignored.  Please delete some entries.'))
                 fd.write('\n%02d      %02d      %.3f' % (m,u,float(f)))
                 iter = model.iter_next(iter)
             fd.write(_('\n#End of %s') % title)
-            fd.close() 
+            fd.close()
             # reload templates_file to repopulate templatescb, then
             # select this recently saved as the active one
             self.build_area_template_ts()
@@ -1318,7 +1319,7 @@ be processed, all other entries will be ignored.  Please delete some entries.'))
         model = self.area_tv.get_model()
         if t_o.set_ini(model):
             print "Can't initialize module %s" % t_n
-            return 
+            return
         if t_o.run(): return
         try:
             templ_tups = t_o.ret_templates[t_n]
@@ -1332,7 +1333,7 @@ be processed, all other entries will be ignored.  Please delete some entries.'))
 #####################SSN Tab functions follow
     def ssn_build_tv(self):
         self.ssn_tv.set_model(self.ssn_repo)
-        
+
         self.ssn_file_data_label.set_text(self.ssn_repo.get_file_data())
 
         self.ssn_tv.set_property("rules_hint", True)
@@ -1341,7 +1342,7 @@ be processed, all other entries will be ignored.  Please delete some entries.'))
 
         # col idx
         self.ssn_tv_idx_year = 0
-        
+
         title = _("Year")
         cell = Gtk.CellRendererText()
         font = Pango.FontDescription('bold')
@@ -1353,7 +1354,7 @@ be processed, all other entries will be ignored.  Please delete some entries.'))
         tvcol.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
         tvcol.set_expand(True)
         self.ssn_tv.append_column(tvcol)
-        
+
         for i in range (1,13):
             cell = Gtk.CellRendererText()
             cell.set_property('xalign', 0.5)
@@ -1365,12 +1366,12 @@ be processed, all other entries will be ignored.  Please delete some entries.'))
             tvcol.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
             tvcol.set_expand(True)
             self.ssn_tv.append_column(tvcol)
-            
+
         ssn_thumb = VOASSNThumb(self.ssn_repo)
         _th = ssn_thumb.get_thumb()
         _th.show()
         self.ssn_plot_box.pack_start(_th, True, True, 0)
-        
+
         # scroll to the current year
         iter = self.ssn_repo.get_iter_first()
         while iter:
@@ -1380,7 +1381,7 @@ be processed, all other entries will be ignored.  Please delete some entries.'))
                 self.ssn_tv.scroll_to_cell(path, None)
                 break
             iter = self.ssn_repo.iter_next(iter)
-            
+
 
     def nb_switch_page(self, *args):
         # area is the last page in the nb
@@ -1395,7 +1396,7 @@ be processed, all other entries will be ignored.  Please delete some entries.'))
                 self.area_accelgrp = None
 
 
-    def show_area_chooser(self, widget):    
+    def show_area_chooser(self, widget):
         dialog = VOAAreaChooser(self.area_rect, self.area_chooser_map_size, parent=self.main_window, datadir=self.datadir)
         return_code, return_rect, return_size = dialog.run()
         if (return_code == 0): # 0=ok, 1=cancel
@@ -1415,7 +1416,7 @@ be processed, all other entries will be ignored.  Please delete some entries.'))
             vf.set_location(vf.TX_SITE,
                             self.tx_site_entry.get_text(),
                             self.tx_lon_spinbutton.get_value(),
-                            self.tx_lat_spinbutton.get_value()) 
+                            self.tx_lat_spinbutton.get_value())
             vf.P_CENTRE = vf.TX_SITE
 
             vf.set_xnoise(abs(self.mm_noise_spinbutton.get_value()))
@@ -1435,17 +1436,17 @@ be processed, all other entries will be ignored.  Please delete some entries.'))
             # Antennas, gain, tx power, bearing
             #def set_rx_antenna(self, data_file, gain=0.0, bearing=0.0):
             #rel_dir, file, description = self.ant_list[self.rx_ant_combobox.get_active()]
-            vf.set_rx_antenna(self.rx_antenna_path.ljust(21), 0.0, 
+            vf.set_rx_antenna(self.rx_antenna_path.ljust(21), 0.0,
                 self.rx_bearing_spinbutton.get_value())
 
             #def set_tx_antenna(self, data_file, design_freq=0.0, bearing=0.0, power=0.125):
             #rel_dir, file, description = self.ant_list[self.tx_ant_combobox.get_active()]
-            vf.set_tx_antenna(self.tx_antenna_path.ljust(21), 0.0, 
-                self.tx_bearing_spinbutton.get_value(), 
+            vf.set_tx_antenna(self.tx_antenna_path.ljust(21), 0.0,
+                self.tx_bearing_spinbutton.get_value(),
                 self.tx_power_spinbutton.get_value()/1000.0)
 
             vf.clear_plot_data()
-            # treeview params            
+            # treeview params
             model = self.area_tv.get_model()
             iter = model.get_iter_first()
             # we're limited to 12 entries here
@@ -1455,7 +1456,7 @@ be processed, all other entries will be ignored.  Please delete some entries.'))
                 month_i = float(model.get_value(iter, self.area_tv_idx_month_i))
                 utc = model.get_value(iter, self.area_tv_idx_utc)
                 freq = model.get_value(iter, self.area_tv_idx_freq)
-                # ssn entries are named as months (jan_ssn_entry) so to be sure 
+                # ssn entries are named as months (jan_ssn_entry) so to be sure
                 # we're getting the correct one, we need to map them
                 ssn = self.ssn_repo.get_ssn(month_i, year)
                 vf.add_plot((freq, utc, month_i, ssn))
@@ -1465,20 +1466,20 @@ be processed, all other entries will be ignored.  Please delete some entries.'))
             #let the user know we did not run all their data
             if iter:
                 e = _("VOACAP can only process %d area entries") % self.max_vg_files
-                dialog = Gtk.MessageDialog(self.main_window, 
-                    Gtk.DialogFlags.MODAL|Gtk.DialogFlags.DESTROY_WITH_PARENT, 
+                dialog = Gtk.MessageDialog(self.main_window,
+                    Gtk.DialogFlags.MODAL|Gtk.DialogFlags.DESTROY_WITH_PARENT,
                     Gtk.MessageType.WARNING, Gtk.ButtonsType.CLOSE, e)
                 dialog.format_secondary_text(_('Only the first 12 entries will be processed,\
 all other entries will be ignored.'))
                 dialog.run()
                 dialog.destroy()
- 
+
             print "executing vocapl..."
 #            os.system('voacapl ~/itshfbc area calc pyArea.voa')
 #            print  os.path.join(os.path.expanduser("~"), 'itshfbc')
             ret = os.spawnlp(os.P_WAIT, 'voacapl', 'voacapl', os.path.join(os.path.expanduser("~"), 'itshfbc'), "area", "calc",  "pyArea.voa")
 
-            if ret: 
+            if ret:
                 e = "voacapl returned %s. Can't continue." % ret
                 dialog = Gtk.MessageDialog(self.main_window, Gtk.DialogFlags.MODAL|Gtk.DialogFlags.DESTROY_WITH_PARENT, Gtk.MessageType.ERROR, Gtk.ButtonsType.CLOSE, e )
                 dialog.run()
@@ -1510,10 +1511,10 @@ all other entries will be ignored.'))
             #method = method if rt == 'g' else c_method
             df.set_method(method)
             df.set_coeffs(_coeff)
-            df.set_sites(HamLocation(self.tx_lat_spinbutton.get_value(), 
+            df.set_sites(HamLocation(self.tx_lat_spinbutton.get_value(),
                                     self.tx_lon_spinbutton.get_value(),
-                                    self.tx_site_entry.get_text()), 
-                        HamLocation(self.rx_lat_spinbutton.get_value(), 
+                                    self.tx_site_entry.get_text()),
+                        HamLocation(self.rx_lat_spinbutton.get_value(),
                                     self.rx_lon_spinbutton.get_value(),
                                     self.rx_site_entry.get_text()), _path)
             df.set_system(self.tx_power_spinbutton.get_value()/1000.0,\
@@ -1538,19 +1539,19 @@ all other entries will be ignored.'))
                     try:
                         freqs.append(float(model.get_value(iter, self.p2pfreq_tv_idx_freq)))
                     except:
-                        pass                        
+                        pass
                     iter = model.iter_next(iter)
                 df.set_frequency_list(tuple(freqs))
 
             df.set_antenna(VOADatFile.TX_ANTENNA, self.tx_antenna_path.ljust(21),
-                self.tx_bearing_spinbutton.get_value(), 
+                self.tx_bearing_spinbutton.get_value(),
                 self.tx_power_spinbutton.get_value()/1000.0)
-            df.set_antenna(VOADatFile.RX_ANTENNA, self.rx_antenna_path.ljust(21), 
-                self.rx_bearing_spinbutton.get_value()) 
-            df.set_fprob(self.foe_spinbutton.get_value(), 
+            df.set_antenna(VOADatFile.RX_ANTENNA, self.rx_antenna_path.ljust(21),
+                self.rx_bearing_spinbutton.get_value())
+            df.set_fprob(self.foe_spinbutton.get_value(),
                 self.fof1_spinbutton.get_value(), self.fof2_spinbutton.get_value(),
                 self.foes_spinbutton.get_value())
-            # ssn_list is a list of tuples (day, month, year, ssn)            
+            # ssn_list is a list of tuples (day, month, year, ssn)
             ssn_list = []
             model = self.p2pmy_tv.get_model()
             iter = model.get_iter_first()
@@ -1565,7 +1566,7 @@ all other entries will be ignored.'))
                 ssn = self.ssn_repo.get_ssn(month, year)
                 if not ssn:
                     e = _("Can't find SSN number for <%(m)s>-<%(y)s>. Can't continue without all SSNs.") % {'m':month, 'y':year}
-                    dialog = Gtk.MessageDialog(self.main_window, 
+                    dialog = Gtk.MessageDialog(self.main_window,
                         Gtk.DialogFlags.MODAL|Gtk.DialogFlags.DESTROY_WITH_PARENT,
                         Gtk.MessageType.ERROR, Gtk.ButtonsType.CLOSE, e )
                     dialog.run()
@@ -1587,23 +1588,23 @@ all other entries will be ignored.'))
                     graph.quit_application()
             except OSError, e:
                     print "Voacapl execution failed:", e
-                    
+
 
     def show_yelp(self, widget):
         #subprocess.call(["yelp", os.path.join(self.datadir, "help", "C", "voacapgui.xml")])
 		Gtk.show_uri(None, "ghelp:voacapgui", Gdk.CURRENT_TIME)
-		
+
     def show_about_dialog(self, widget):
         about = Gtk.AboutDialog(parent=self.main_window,
                         program_name = "voacapgui",
                         version = self.pythonprop_version,
                         authors = (("J.Watson (HZ1JW/M0DNS)", "Fernando M. Maresca (LU2DFM)")),
                         comments = (_("A voacap GUI")),
-                        website = "http://www.qsl.net/hz1jw", 
+                        website = "http://www.qsl.net/hz1jw",
                         logo = (GdkPixbuf.Pixbuf.new_from_file(os.path.join(self.datadir, "ui", "voacap.png"))))
         about.run()
         about.destroy()
-        
+
     def build_new_template_file(self):
         fn = os.path.join(self.prefs_dir,'area_templ.ex')
         s = _('''# rough format for area plot templates:
@@ -1656,14 +1657,14 @@ all other entries will be ignored.'))
 
     def quit_application(self, widget):
         self.save_user_prefs()
-        Gtk.main_quit 
+        Gtk.main_quit
         sys.exit(0)
-        
+
     def run(self, argv):
         print "run"
         self.connect('activate', self.on_activate)
         return super(VOACAP_GUI, self).run(argv)
-    
+
 def main(argv, datadir="", pythonprop_version="dev"):
     if not datadir:
         print "no datadir defined, using current dir"
@@ -1677,5 +1678,3 @@ def main(argv, datadir="", pythonprop_version="dev"):
 
 if __name__ == '__main__':
     main(sys.argv)
-
-    
