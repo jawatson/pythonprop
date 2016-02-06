@@ -51,7 +51,7 @@ import matplotlib.colors as colors
 from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg
 from matplotlib.figure import Figure
 from matplotlib.font_manager import FontProperties
-from numpy import ma #for warping
+#from numpy import ma #for warping
 from matplotlib.ticker import FuncFormatter
 import numpy as np
 
@@ -268,82 +268,33 @@ class VOAAreaPlot:
             map.drawcountries(color='grey')
             map.drawmapboundary(color='black', linewidth=1.0)
 
-            warped = ma.zeros((grid, grid),float)
-            warped, warped_lon, warped_lat = map.transform_scalar(points,lons,lats,grid,grid, returnxy=True, checkbounds=False, masked=True)
-            warped = warped.filled(self.image_defs['min']-1.0)
+            X,Y = np.meshgrid(lons, lats)
+            points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
 
             colMap.set_under(color ='k', alpha=0.0)
 
-            im = map.imshow(warped,
+            im = map.contourf(X, Y, points, self.image_defs['y_labels'],
+                latlon=True,
+                cmap = colMap,
+                vmin=self.image_defs['min'],
+                vmax=self.image_defs['max'] )
+            """
+            im = map.imshow(points,
                 cmap=colMap,
                 extent = (-180, 180, -90, 90),
                 origin = 'lower',
                 norm = colors.Normalize(clip = False,
                 vmin=self.image_defs['min'],
                 vmax=self.image_defs['max']))
-
+            """
 
             #######################
             # Plot greyline
             #######################
             if plot_terminator:
-                map.nightshade(datetime.datetime.now())
+                map.nightshade(plot_parameters.get_daynight_datetime(vg_files[plot_ctr]-1))
 
-            """
-            if plot_terminator:
-                the_sun = Sun()
-                the_month = plot_parameters.get_month(vg_files[plot_ctr]-1)
-                the_day = plot_parameters.get_day(vg_files[plot_ctr]-1)
-                the_hour = plot_parameters.get_utc(vg_files[plot_ctr]-1)
-                if (the_day == 0):
-                    the_day = 15
-                the_year = datetime.date.today().year
-                num_days_since_2k = the_sun.daysSince2000Jan0(the_year, the_month, the_day)
 
-                res =  the_sun.sunRADec(num_days_since_2k)
-                declination = res[1]
-                if(declination==0.0):
-                    declination=-0.001
-
-                tau = the_sun.computeGHA(the_day, the_month, the_year, the_hour);
-
-                if declination > 0:
-                    terminator_end_lat = area_rect.get_sw_lat()
-                else:
-                    terminator_end_lat = area_rect.get_ne_lat()
-
-                terminator_lat = [terminator_end_lat]
-                terminator_lon = [area_rect.get_sw_lon()]
-
-                for i in range(int(area_rect.get_sw_lon()),int(area_rect.get_ne_lon()),1)+[int(area_rect.get_ne_lon())]:
-                    longitude=i+tau;
-                    tan_lat = - the_sun.cosd(longitude) / the_sun.tand(declination)
-                    latitude = the_sun.atand(tan_lat)
-                    latitude = max(latitude, area_rect.get_sw_lat())
-                    latitude = min(latitude, area_rect.get_ne_lat())
-                    xpt, ypt = map(i, latitude)
-                    terminator_lon.append(xpt)
-                    terminator_lat.append(ypt)
-
-                terminator_lon.append(area_rect.get_ne_lon())
-                terminator_lat.append(terminator_end_lat)
-
-                #This is a little simplistic and doesn't work for ortho plots....
-                ax.plot(terminator_lon, terminator_lat, color='grey', alpha=0.75)
-                ax.fill(terminator_lon, terminator_lat, facecolor='grey', alpha = 0.5)
-
-                tau = -tau
-                if (tau > 180.0):
-                    tau = tau-360.0
-                if (tau < -180.0):
-                    tau = tau+360.0
-
-                #Plot the position of the sun (if it's in the coverage area)
-                if area_rect.contains(declination, tau):
-                    xpt,ypt = map(tau,declination)
-                    #sbplt_ax.plot([xpt],[ypt],'yh')
-                    ax.plot([xpt],[ypt],'yh')
-            """
             ##########################
             # Points of interest
             ##########################
@@ -376,10 +327,15 @@ class VOAAreaPlot:
                     map.drawparallels(parallels,labels=[1,1,0,1])
 
             if plot_contours:
-                map.contour(warped_lon, warped_lat, warped, self.image_defs['y_labels'], linewidths=1.0, colors='k', alpha=0.5)
+                ct = map.contour(X, Y, points, self.image_defs['y_labels'],
+                    latlon=True,
+                    linestyles='solid',
+                    linewidths=0.5,
+                    colors='k',
+                    vmin=self.image_defs['min'],
+                    vmax=self.image_defs['max'] )
 
             #add a title
-
             title_str = plot_parameters.get_plot_description_string(vg_files[plot_ctr]-1, self.image_defs['plot_type'], time_zone)
             if self.number_of_subplots == 1:
                 title_str = plot_parameters.get_plot_description_string(vg_files[plot_ctr]-1, self.image_defs['plot_type'], time_zone)

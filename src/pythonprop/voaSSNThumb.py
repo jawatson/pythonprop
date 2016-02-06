@@ -15,7 +15,7 @@ and num2date
 from datetime import datetime
 from datetime import date
 import matplotlib
-matplotlib.use('GTK3Agg')
+#matplotlib.use('GTK3Agg')
 
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
@@ -30,34 +30,34 @@ class VOASSNThumb:
         years    = mdates.YearLocator(2)   # every year
         months   = mdates.MonthLocator()  # every month
         yearsFmt = mdates.DateFormatter('%y')
-        
+
         dt_list, ssn_list = data_source.get_plotting_data()
-        
-        self.figure = Figure(figsize=(12,8), dpi=72)   
+
+        self.figure = Figure(figsize=(12,8), dpi=72)
         self.figure.patch.set_facecolor('white')
         self.figure.subplots_adjust(bottom=0.2)
-        self.axis = self.figure.add_subplot(111) 
+        self.axis = self.figure.add_subplot(111)
         self.axis.plot_date(dt_list, ssn_list, '-', lw=2)
         self.axis.axvline(date.today(), color='r')
-        
+
         # format the ticks
         self.axis.xaxis.set_major_locator(years)
         self.axis.xaxis.set_major_formatter(yearsFmt)
-        
+
         self.axis.grid(True)
-        
+
         # rotates and right aligns the x labels, and moves the bottom of the
         # axes up to make room for them
-        # The following line currently breaks voacapgui if the thumbnail is 
+        # The following line currently breaks voacapgui if the thumbnail is
         # inserted into a panel
         # self.figure.autofmt_xdate(rotation=90)
-        
-        self.canvas = FigureCanvas(self.figure) # a Gtk.DrawingArea   
 
-        
+        self.canvas = FigureCanvas(self.figure) # a Gtk.DrawingArea
+
+
     def get_thumb(self):
         return self.canvas
-        
+
 #short test routine
 def main():
     s = SSNFetch(save_location="table_international-sunspot-numbers_monthly-predicted.txt")
