@@ -273,20 +273,23 @@ class VOAAreaPlot:
 
             colMap.set_under(color ='k', alpha=0.0)
 
-            im = map.contourf(X, Y, points, self.image_defs['y_labels'],
-                latlon=True,
-                cmap = colMap,
-                vmin=self.image_defs['min'],
-                vmax=self.image_defs['max'] )
-            """
-            im = map.imshow(points,
-                cmap=colMap,
-                extent = (-180, 180, -90, 90),
-                origin = 'lower',
-                norm = colors.Normalize(clip = False,
-                vmin=self.image_defs['min'],
-                vmax=self.image_defs['max']))
-            """
+            if (True):
+                im = map.contourf(X, Y, points, self.image_defs['y_labels'],
+                    latlon=True,
+                    cmap = colMap,
+                    vmin=self.image_defs['min'],
+                    vmax=self.image_defs['max'] )
+                plot_contours = True
+                
+            else:
+                im = map.imshow(points,
+                    cmap=colMap,
+                    extent = (-180, 180, -90, 90),
+                    origin = 'lower',
+                    norm = colors.Normalize(clip = False,
+                    vmin=self.image_defs['min'],
+                    vmax=self.image_defs['max']))
+
 
             #######################
             # Plot greyline
