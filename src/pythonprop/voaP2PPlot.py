@@ -17,24 +17,24 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 #
 # Contact jimwatson @@ mac.com
 #
 # A short script to display the contents of voacapg.out type files
-# (method 30). 
+# (method 30).
 #
 # Examples
-# './voaP2PPlot -c voacapx.out' plots the contents of the file 
+# './voaP2PPlot -c voacapx.out' plots the contents of the file
 # named voacapg.out.  Adds contours to the image overlay.
 #
 # './voaP2PPlot -c -t 2 voacapx.out' prints a REL overlay
 #
-# './voaP2PPlot -c -t 2 -m 11 voacapx.out' Uses colourmap 11 (Use -h 
+# './voaP2PPlot -c -t 2 -m 11 voacapx.out' Uses colourmap 11 (Use -h
 # to list the available colour maps
 #
-# './voaP2PPlot -c -t 2 -o saveFile.png voacapx.out' save plot to 
+# './voaP2PPlot -c -t 2 -o saveFile.png voacapx.out' save plot to
 # a file named saveFile.png
 #
 # './voaP2PPlot -h' - Prints a help message
@@ -47,7 +47,7 @@
 #from gi.repository import Gtk
 
 import matplotlib
-matplotlib.use('GTK3Agg')
+#matplotlib.use('GTK3Agg')
 
 import sys
 import re
@@ -100,15 +100,15 @@ lang.install()
 
 class VOAP2PPlot:
     """Program to plot .out files produced by voacap"""
-    
+
     AUTOSCALE = -1.0
-    
+
     IMG_TYPE_DICT  = { 0:{'title':'', 'min':0, 'max':1, 'y_labels':(0), 'formatter':'defaultFormat'}, \
         1:{'title':_('MUF Days (%)'), 'min':0, 'max':1, 'y_labels':(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1), 'formatter':'percent_format'}, \
         2:{'title':_('Circuit Reliability (%)'), 'min':0, 'max':1, 'y_labels':(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1), 'formatter':'percent_format'}, \
         3:{'title':_('SNR at Receiver (dB)'), 'min':20, 'max':70, 'y_labels':(20, 30, 40, 50, 60, 70), 'formatter':'SNR_format'}, \
         4:{'title':_('Signal Strength at Receiver (dBW)'), 'min':-151, 'max':-43, 'y_labels':(-151, -145, -139, -133, -127, -121,-115, -109, -103, -93, -83, -73, -63, -53, -43), 'formatter':'SDBW_format'} }
-    
+
     mono_font = {'family' : 'monospace'}
     #default_font = {'family' : 'sans-serif'}
 
@@ -123,16 +123,16 @@ class VOAP2PPlot:
     KSA_BANDS = [(7.0, 7.2), (14.0, 14.35), (18.068, 18.168), \
                     (21.0, 21.45), (24.89, 24.99), (28.0, 29.7)]
 
-        
-    def __init__(self, data_file, 
-                plot_groups = [1], 
+
+    def __init__(self, data_file,
+                plot_groups = [1],
                 data_type = 2,
                 color_map = 'jet',
                 plot_contours = False,
                 face_colour = "white",
                 plot_label = "",
                 plot_bands = None,
-                time_zone = 0, 
+                time_zone = 0,
                 plot_max_freq = 30.0,
                 run_quietly = False,
                 save_file = '',
@@ -152,8 +152,8 @@ class VOAP2PPlot:
         self.image_defs = self.IMG_TYPE_DICT[self.data_type]
         self.user_bands = user_bands
         #color_map = eval('P.cm.' + color_map)
-    
-        if plot_groups[0]=='a':            
+
+        if plot_groups[0]=='a':
             num_grp = self.df.get_number_of_groups()
             plot_groups = range(0,num_grp)
 
@@ -171,8 +171,8 @@ class VOAP2PPlot:
         matplotlib.rcParams['figure.subplot.wspace'] = 0.35
         matplotlib.rcParams['figure.subplot.right'] = 0.85
         colorbar_fontsize = 12
-               
-        if number_of_subplots <= 1:    
+
+        if number_of_subplots <= 1:
             self.num_rows = 1
             self.main_title_fontsize = 24
             matplotlib.rcParams['legend.fontsize'] = 12
@@ -200,24 +200,24 @@ class VOAP2PPlot:
             matplotlib.rcParams['xtick.labelsize'] = 6
             matplotlib.rcParams['ytick.labelsize'] = 6
             self.x_axes_ticks = np.arange(0,25,4)
-        
-        self.num_cols = int(math.ceil(float(number_of_subplots)/float(self.num_rows)))  
+
+        self.num_cols = int(math.ceil(float(number_of_subplots)/float(self.num_rows)))
         self.fig=Figure(figsize=(7,6.5), facecolor=face_colour)
         self.main_title_label = self.fig.suptitle(plot_label+unicode(self.image_defs['title'],'utf-8'), fontsize=self.main_title_fontsize)
 
         for chan_grp in plot_groups:
             (group_name, group_info, fot, muf, hpf, image_buffer) = self.df.get_group_data(chan_grp)
-            
-            ax = self.fig.add_subplot(self.num_rows, 
-                    self.num_cols, 
+
+            ax = self.fig.add_subplot(self.num_rows,
+                    self.num_cols,
                     plot_groups.index(chan_grp)+1)
-            
+
             self.subplots.append(ax)
-            
+
             if number_of_subplots > 4:
                 #save a little space by only labelling the outer edges of the plot
                 ax.label_outer()
-                        
+
             _sign = '+' if (time_zone >= 0) else ''
             self.x_label = ax.set_xlabel(_('Time (UTC%(sig)s%(tz)s)') % {'sig':_sign, 'tz':time_zone})
             self.y_label = ax.set_ylabel(_('Frequency (MHz)'))
@@ -231,34 +231,34 @@ class VOAP2PPlot:
                 y_max = math.ceil(plot_max_freq / 5.0) * 5.0
             #resize the image
             image_buffer = image_buffer[0:y_max-1,:]
-            
+
             y_ticks = [2, 5]
             for y_tick_value in np.arange(10, y_max+1, 5):
-                y_ticks.append(y_tick_value)    
-            
+                y_ticks.append(y_tick_value)
+
             ax.plot(range(0, 25), muf,'r-', range(0, 25), fot, 'g-')
             ax.set_ylim([2, y_max])
 
             ax.set_xticks(self.x_axes_ticks)
             ax.set_yticks(y_ticks)
-            
+
 
             self.add_legend(ax)
             title_str = group_info.strip()
             if number_of_subplots > 1:
                 title_str = self.get_small_title(title_str)
             self.subplot_title_label = ax.set_title(title_str, multialignment='left', **self.mono_font)
-            
+
             if (self.data_type > 0):
-                im = ax.imshow(image_buffer, interpolation='bicubic', 
+                im = ax.imshow(image_buffer, interpolation='bicubic',
                     extent=(0, 24, 2, y_max), origin = 'lower', cmap=color_map,
                     alpha = 0.95,
-                    norm = matplotlib.colors.Normalize(clip = False, 
-                    vmin=self.image_defs['min'], 
+                    norm = matplotlib.colors.Normalize(clip = False,
+                    vmin=self.image_defs['min'],
                     vmax=self.image_defs['max']))
                 if plot_contours:
                     ax.contour(image_buffer, self.image_defs['y_labels'], extent=(0, 24, 2, y_max), linewidths=1.0, colors='k', alpha=0.6)
-    
+
             if plot_bands:
                 for a,b in plot_bands:
                     ax.axhspan(a, b, alpha=0.5, ec='k', fc='k')
@@ -269,7 +269,7 @@ class VOAP2PPlot:
 
         if (self.data_type > 0):
             self.cb_ax = self.fig.add_axes(self.get_cb_axes())
-            self.fig.colorbar(im, cax=self.cb_ax, 
+            self.fig.colorbar(im, cax=self.cb_ax,
                     orientation='vertical',
                     format = FuncFormatter(eval('self.'+self.image_defs['formatter'])))
             for t in self.cb_ax.get_yticklabels():
@@ -286,8 +286,8 @@ class VOAP2PPlot:
             # TODO consider using a scrolled pane here...
             dia = VOAPlotWindow('pythonProp - ' + self.image_defs['title'], canvas, parent, dpi=self.dpi)
         return
-    
-    
+
+
     def on_draw(self, event):
         #print 'drawing'
         top = self.fig.subplotpars.top
@@ -296,8 +296,8 @@ class VOAP2PPlot:
         wspace = self.fig.subplotpars.wspace
 
         needs_adjusting = False
-        
-        # Calculate the area required at the top of the plot 
+
+        # Calculate the area required at the top of the plot
         # (Main title and subplot title)
         subplot_title_height = 0
         main_title_height = 0
@@ -307,38 +307,38 @@ class VOAP2PPlot:
                 bbox = subplot.title.get_window_extent()
                 transformed_bbox = bbox.inverse_transformed(self.fig.transFigure)
                 subplot_title_height = max(transformed_bbox.height, subplot_title_height)
-            
+
         #print 'title = ', self.fig.get_label()
-        
+
         bbox = self.main_title_label.get_window_extent()
-        main_title_height = bbox.inverse_transformed(self.fig.transFigure).height  
-        
+        main_title_height = bbox.inverse_transformed(self.fig.transFigure).height
+
         preferred_top_space = 1.25*(subplot_title_height + main_title_height)
 
         if ((1 - top) < preferred_top_space) or (((1 - top) - preferred_top_space)>0.11):
             top = 0.99 - preferred_top_space
             needs_adjusting = True
-         
-        if needs_adjusting:  
+
+        if needs_adjusting:
             #print 'adjusting'
             #todo if the colorbar dosn't exist, ignore this.
             self.fig.subplots_adjust(top = top, bottom = bottom, hspace = hspace, wspace = wspace)
-            self.cb_ax.set_position(self.get_cb_axes())  
+            self.cb_ax.set_position(self.get_cb_axes())
             self.fig.canvas.draw()
-            
+
         return False
-        
+
     def add_legend(self, ax):
         leg = ax.legend(('MUF', 'FOT'),ncol=1)
         leg.get_frame().set_alpha(0.75)
         return leg
-        
+
     def save_plot(self, canvas, filename=None):
         #canvas.print_figure(filename, dpi=150, facecolor='white', edgecolor='white')
         self.fig.savefig(filename, dpi=self.dpi, facecolor=self.fig.get_facecolor(), edgecolor='none')
 
     def get_cb_axes(self):
-        # an equivalent of get_tightbox would be really useful here...                
+        # an equivalent of get_tightbox would be really useful here...
         #bbox = self.subplots[0].get_window_extent()
         bbox = self.subplots[0].get_yaxis().get_clip_box()
         axis_upper_y = bbox.inverse_transformed(self.fig.transFigure).ymax
@@ -348,9 +348,9 @@ class VOAP2PPlot:
 
     #def percentFormat(x, pos):
     #    'The two args are the value and tick position'
-    #    return '%(percent)3d%% (%(days)d days)' % {'percent':x*100, 'days':x*30.0} 
+    #    return '%(percent)3d%% (%(days)d days)' % {'percent':x*100, 'days':x*30.0}
     def percent_format(self, x, pos):
-        return '%(percent)3d%%' % {'percent':x*100} 
+        return '%(percent)3d%%' % {'percent':x*100}
 
     def SNR_format(self, x, pos):
         return '%3ddB' % x
@@ -384,29 +384,29 @@ def main(data_file):
     parser = OptionParser(usage=_("%voaP2PPlot [options] file"), version="%voaP2PPlot 0.9")
 
     #tested ok
-    parser.add_option("-b", "--band", 
+    parser.add_option("-b", "--band",
         dest = "plot_bands",
         choices = ['1', '2', '3'],
         help = _("Display a band plan indicated by the integer 1, 2 or 3 (e.g. 1:SWL 2:UK AMATEUR BANDS 3:KSA AMATEUR BANDS)"))
 
     parser.add_option("-c", "--contour",
-        dest="plot_contours", 
-        default=False, 
+        dest="plot_contours",
+        default=False,
         action="store_true",
         help=_("Print contour lines on the plot"))
 
-    parser.add_option("-f", "--freqmax", 
-        dest = "y_max", 
+    parser.add_option("-f", "--freqmax",
+        dest = "y_max",
         default = '30.0',
         help=_("Maximum frequency for the Y axis"))
 
-    parser.add_option("-g", "--group", 
-        dest="plotGroups", 
+    parser.add_option("-g", "--group",
+        dest="plotGroups",
         default='1',
         help=_("Group(s) to plot. e.g '-g 1,3,5,6'. (default = 1)"))
-    
-    parser.add_option("-k", "--background", 
-        dest="face_colour", 
+
+    parser.add_option("-k", "--background",
+        dest="face_colour",
         default='white',
         help=_("Specify the colour of the background. Any legal HTML color specification is supported e.g '-k red', '-k #eeefff', (default = white)"))
 
@@ -414,21 +414,21 @@ def main(data_file):
         dest = "plot_label",
         default = "",
         help = _("A text label, printed in the main title block"))
-        
-    parser.add_option("-m", "--cmap", 
-        dest="color_map", 
+
+    parser.add_option("-m", "--cmap",
+        dest="color_map",
         default='jet',
         choices = [ 'autumn', 'bone', 'cool', 'copper', 'gray', \
                 'hot', 'hsv', 'jet', 'pink', 'spring','summer', 'winter' ],
         help=_("COLOURMAP - may be one of 'autumn', 'bone', 'cool', 'copper', 'gray', 'hot', 'hsv', 'jet', 'pink', 'spring', 'summer', 'winter'.  Default = 'jet'"))
 
-    parser.add_option("-o", "--outfile", 
+    parser.add_option("-o", "--outfile",
         dest="save_file",
         help="Save to FILE.", metavar="FILE")
 
     parser.add_option("-q", "--quiet",
         dest="run_quietly",
-        action="store_true",  
+        action="store_true",
         default=False,
         help=_("Process quietly (don't display plot on the screen)"))
 
@@ -437,24 +437,24 @@ def main(data_file):
         default=150,
         help=_("Dots per inch (dpi) of saved file."))
 
-    parser.add_option("-t", "--datatype", 
-        dest="data_type", 
+    parser.add_option("-t", "--datatype",
+        dest="data_type",
         default=1,
         help=_("Image type 0:None 1:MUFday 2:REL 3:SNR 4:S DBW (default = 1)"))
 
 
-    parser.add_option("-z", "--timezone", 
-        dest="time_zone", 
+    parser.add_option("-z", "--timezone",
+        dest="time_zone",
         default=0,
         help=_("Time zone (integer, default = 0)"))
-        
+
     (options, args) = parser.parse_args()
-    
+
     if options.data_type:
         if not VOAP2PPlot.IMG_TYPE_DICT.has_key(int(options.data_type)):
             print _("Unrecognised plot type: Defaulting to MUF days")
             options.data_type = 1
-            
+
     if options.plot_bands:
         if int(options.plot_bands) == 1: bands = VOAP2PPlot.SWL_BANDS
         elif int(options.plot_bands) == 2: bands = VOAP2PPlot.UK_BANDS
@@ -467,7 +467,7 @@ def main(data_file):
         if options.y_max == 'a':
             plot_max_freq = VOAP2PPlot.AUTOSCALE
         else:
-            try:    
+            try:
                 plot_max_freq = float(options.y_max)
             except:
                 print _("-f arguments must be either 'a' or a decimal in the range 5.0 - 30.0")
@@ -514,11 +514,11 @@ def main(data_file):
 #    if len(plot_groups) == 1:
 #        print "%d group has been selected: " % (len(plot_groups)), plot_groups
 #    else:
-#        print "%d groups have been selected: " % (len(plot_groups)), plot_groups    
-    
-    plot = VOAP2PPlot(data_file, 
-                    data_type = int(options.data_type), 
-                    plot_groups = plot_groups, 
+#        print "%d groups have been selected: " % (len(plot_groups)), plot_groups
+
+    plot = VOAP2PPlot(data_file,
+                    data_type = int(options.data_type),
+                    plot_groups = plot_groups,
                     plot_contours = options.plot_contours,
                     face_colour = options.face_colour,
                     plot_label = options.plot_label,
@@ -538,5 +538,3 @@ if __name__ == "__main__":
         print 'voaP2PPlot error: No data file specified'
         print 'voaP2PPlot [options] filename'
         sys.exit(1)
-      
-
