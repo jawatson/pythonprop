@@ -440,63 +440,38 @@ class VOAFile:
         else:
             _sign = '+' if (time_zone >= 0) else ''
             hour_str = "%02d00 UTC%s%s : " % (hour, _sign, time_zone)
-        theSSN = str(self.ssns[int(field)])
-
-        theLat = self.lat_as_string(self.txlat) # "%.2f" % (self.txlat)
-        theLon = self.lon_as_string(self.txlon) # "%.2f" % (self.txlon)
-        siteLocation = self.txlabel + ' (' + theLat + ', ' + theLon + '), '
 
         if (self.txPower >= 1.0):
-            thePower = "%.2f kW" % (self.txPower)
+            _power = "%.2f kW" % (self.txPower)
         else:
-            thePower = "%.0f W" % ((self.txPower)*1000)
-
+            _power = "%.0f W" % ((self.txPower)*1000)
 
         ## some output stuff below to put on top of the coverage map --jpe
     	if self.RSN == 24:
-    		theMode = "CW"
+    		_traffic = "CW"
     	elif self.RSN == 38:
-    		theMode = "SSB"
+    		_traffic = "SSB"
     	elif self.RSN == 49:
-    		theMode = "AM"
+    		_traffic = "AM"
     	elif self.RSN == 17:
-    		theMode = "ROS"
-    	else: theMode = str(self.RSN) # "N/A"
+    		_traffic = "ROS"
+        else:
+            _traffic = ""
+    	_mode = ("{:d}dB/Hz {:s}".format(self.RSN, _traffic)).strip() # "N/A"
 
-    	print "****************************************"
-        print "encoding: " + sys.getdefaultencoding()
-        print "siteLocation:" + type(siteLocation).__name__
-        print "_month:" + type(_month).__name__
-        print "hour_str:" + type(hour_str).__name__
-
-        print "thePower:" + type(thePower).__name__
-        print "theSSN:" + type(theSSN).__name__
-        print "theMode:" + type(theMode).__name__
-
-
-        if (plot_type == 'MUF'):
+    	if (plot_type == 'MUF'):
             return siteLocation + _month + ', ' + hour_str + ', ' + thePower + ', SSN ' + theSSN
             #return hour_str + _month+ ' : SSN ' + theSSN + ' : ' +thePower
         else:
-            # Add the frequency to the data string
-            theFrequency = "%.3f MHz" % self.frequencies[int(field)]
-            print "theFrequency:" + type(theFrequency).__name__
-            site_description = siteLocation + \
-                    unicode(_month, "utf-8") + u', ' + \
-                    unicode(hour_str, "utf-8") + u', ' + \
-                    unicode(theFrequency, "utf-8") + u', ' + \
-                    unicode(thePower, "utf-8") + \
-                    u', SSN ' + unicode(theSSN, "utf-8") + \
-                    u', Mode: ' + unicode(theMode, "utf-8")
-            print "site_description:" + type(site_description).__name__
-            print "****************************************"
-            print self.txlabel
-            print "****************************************"
-
-            site_description = """{location} ({lat}, {lon}) {time}""".format(location=self.txlabel,
+            site_description = """{location} ({lat}, {lon}) {hour} {month} {frequency:.3f}MHz {power} SSN:{ssn} {mode}""".format(location=self.txlabel,
                                 lat=self.lat_as_string(self.txlat),
                                 lon=self.lon_as_string(self.txlon),
-                                time=self.get_daynight_datetime(int(field)).strftime("%H:00 %b"))
+                                hour=hour_str,
+                                month=_month,
+                                frequency=self.frequencies[int(field)],
+                                power=_power,
+                                ssn=self.ssns[int(field)],
+                                mode=_mode)
             return site_description
 
 
