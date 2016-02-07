@@ -577,20 +577,22 @@ class VOAFile:
         return voa_str
 
     def lat_as_string(self, lat):
+        #degree_sign= u'\N{DEGREE SIGN}'
         if lat > 90.0 : lat = 90.0
         if lat < -90.0 : lat = -90.0
         lat_sign = 'N'
         if lat < 0.0:
             lat_sign = 'S'
-        return "%5.2f%s" % (abs(lat), lat_sign)
+        return "{:.2f}{:s}".format(abs(lat), lat_sign)
 
     def lon_as_string(self, lon):
+        #degree_sign= u'\N{DEGREE SIGN}'
         if lon > 180.0 : lon = 180.0
         if lon < -180.0 : lon = -180.0
         lon_sign = 'E'
         if lon < 0.0:
             lon_sign = 'W'
-        return "%6.2f%s" % (abs(lon), lon_sign)
+        return "{:.2f}{:s}".format(abs(lon), lon_sign)
 
     # http://mail.python.org/pipermail/tutor/2007-October/057571.html
     def strcompress(self, mystring):
