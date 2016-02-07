@@ -73,7 +73,7 @@ class VOAFile:
         self.pcentrelabel = ''
         self.pcentrelat = 0.0
         self.pcentrelon = 0.0
-        self.txlabel = u''
+        self.txlabel = ''
         self.txlat = 0.0
         self.txlon = 0.0
         self.txPower = 0.0
@@ -490,6 +490,13 @@ class VOAFile:
                     u', Mode: ' + unicode(theMode, "utf-8")
             print "site_description:" + type(site_description).__name__
             print "****************************************"
+            print self.txlabel
+            print "****************************************"
+
+            site_description = """{location} ({lat}, {lon}) {time}""".format(location=self.txlabel,
+                                lat=self.lat_as_string(self.txlat),
+                                lon=self.lon_as_string(self.txlon),
+                                time=self.get_daynight_datetime(int(field)).strftime("%H:00 %b"))
             return site_description
 
 
@@ -526,7 +533,7 @@ class VOAFile:
         f.write('Parameter:DBU      0\n')
         f.write('Parameter:SNRxx    0\n')
         f.write('Parameter:REL      0\n')
-        tmpStr= "Transmit :%10s%10s%18sShort\n" % (self.lat_as_string(self.txlat), self.lon_as_string(self.txlon), unicode(self.txlabel, "utf-8"))
+        tmpStr= "Transmit :%10s%10s%21sShort\n" % (self.lat_as_string(self.txlat), self.lon_as_string(self.txlon), self.txlabel)
         f.write(tmpStr)
 
         tmpStr= "Area     :%10.1f%10.1f%10.1f%10.1f\n" % \
