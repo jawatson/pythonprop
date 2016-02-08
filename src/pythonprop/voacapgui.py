@@ -554,7 +554,6 @@ class VOACAP_GUI():
         should be called everytime any of the prerequisites are modified.
         """
         valid = self.is_ssn_valid() and self.is_tx_site_data_valid() and self.is_rx_site_data_valid()
-        print "P2P first step is ", valid
         if self.p2pcircuitckb.get_active():
             table_model = self.p2pfreq_tv.get_model()
             if (table_model):
