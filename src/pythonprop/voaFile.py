@@ -27,8 +27,8 @@ import sys
 import string
 import math
 import os.path
-from hamlocation import *
-from voaAreaRect import *
+from .hamlocation import *
+from .voaAreaRect import *
 import calendar as cal
 
 DEBUG = False
@@ -115,20 +115,20 @@ class VOAFile:
                     self.llcrnrlat = float(line[31:40])
                     self.urcrnrlon = float(line[21:30])
                     self.urcrnrlat = float(line[41:50])
-                    if DEBUG: print self.llcrnrlon, self.llcrnrlat, self.urcrnrlon, self.urcrnrlat
+                    if DEBUG: print(self.llcrnrlon, self.llcrnrlat, self.urcrnrlon, self.urcrnrlat)
                 elif line.startswith("Gridsize"):
                     self.gridsize = int(line[11:16])
-                    if DEBUG: print "Gridsize = ", self.gridsize
-                    if PROJECTION.has_key(int(line[19:20])):
+                    if DEBUG: print("Gridsize = ", self.gridsize)
+                    if int(line[19:20]) in PROJECTION:
                         self.projection = PROJECTION[int(line[19:20])]
-                    if DEBUG: print "Projection = ", self.projection
+                    if DEBUG: print("Projection = ", self.projection)
                 elif line.startswith("Pcenter"):
                     self.pcentrelabel = line[27:47].strip()
-                    if DEBUG: print "PCentre = ", self.pcentrelabel
+                    if DEBUG: print("PCentre = ", self.pcentrelabel)
                     self.pcentrelat = self.parse_lat_lon(line[11:20])
-                    if DEBUG: print "PCentre Lat = ", self.pcentrelat
+                    if DEBUG: print("PCentre Lat = ", self.pcentrelat)
                     self.pcentrelon = self.parse_lat_lon(line[21:30])
-                    if DEBUG: print "PCentre Lon = ", self.pcentrelon
+                    if DEBUG: print("PCentre Lon = ", self.pcentrelon)
                 elif line.startswith("System"):
                     self.XNOISE = int(line[11:15].strip())
                     self.AMIND = float(line[16:25].strip())
@@ -143,11 +143,11 @@ class VOAFile:
                     self.PSC4 = float(line[11:15].strip())
                 elif line.startswith("Transmit"):
                     self.txlabel = line[30:50].strip()
-                    if DEBUG: print "Tx. = ", self.txlabel
+                    if DEBUG: print("Tx. = ", self.txlabel)
                     self.txlat = self.parse_lat_lon(line[10:20])
-                    if DEBUG: print self.txlat
+                    if DEBUG: print(self.txlat)
                     self.txlon = self.parse_lat_lon(line[20:30])
-                    if DEBUG: print self.txlon
+                    if DEBUG: print(self.txlon)
                 elif line.startswith("Tx Ants"):
                     self.txPower = float(line[49:60].strip())
                     self.txBearing = float(line[40:46].strip())
@@ -157,22 +157,22 @@ class VOAFile:
                     self.rxAntenna = self.strcompress(line[10:33].strip())
                 elif line.startswith("Hours    :"):
                     self.utcs = []
-                    file_times = string.split(line[10:len(line)])
+                    file_times = str.split(line[10:len(line)])
                     for time in file_times:
                         self.utcs.append(int(time))
                 elif line.startswith("Ssns     :"):
                     self.ssns = []
-                    file_ssns = string.split(line[10:len(line)])
+                    file_ssns = str.split(line[10:len(line)])
                     for ssn in file_ssns:
                         self.ssns.append(int(ssn))
                 elif line.startswith("Months   :"):
                     self.monthDays = []
-                    file_months = string.split(line[10:len(line)])
+                    file_months = str.split(line[10:len(line)])
                     for month in file_months:
                         self.monthDays.append(float(month))
                 elif line.startswith("Freqs    :"):
                     self.frequencies = []
-                    file_freqs = string.split(line[10:len(line)])
+                    file_freqs = str.split(line[10:len(line)])
                     for freq in file_freqs:
                         self.frequencies.append(float(freq))
 
@@ -180,10 +180,10 @@ class VOAFile:
 # run correctly on python 2.4.  They have been uncommented now that python
 # 2.5 is more widely used.
         except IOError:
-            print "Error opening/reading file ", fn
+            print("Error opening/reading file ", fn)
             sys.exit(1)
         finally:
-            if DEBUG: print "Closing the file"
+            if DEBUG: print("Closing the file")
             voaFile.close()
 
     def get_gridsize(self):    return self.gridsize
@@ -233,7 +233,7 @@ class VOAFile:
             num_plots = self.monthDays.index(0.0)
         except (ValueError):
             num_plots = len(self.monthDays)
-        if DEBUG: print "number of plots = ", num_plots
+        if DEBUG: print("number of plots = ", num_plots)
         return num_plots
 
 
@@ -447,19 +447,19 @@ class VOAFile:
             _power = "%.0f W" % ((self.txPower)*1000)
 
         ## some output stuff below to put on top of the coverage map --jpe
-    	if self.RSN == 24:
-    		_traffic = "CW"
-    	elif self.RSN == 38:
-    		_traffic = "SSB"
-    	elif self.RSN == 49:
-    		_traffic = "AM"
-    	elif self.RSN == 17:
-    		_traffic = "ROS"
+        if self.RSN == 24:
+            _traffic = "CW"
+        elif self.RSN == 38:
+            _traffic = "SSB"
+        elif self.RSN == 49:
+            _traffic = "AM"
+        elif self.RSN == 17:
+            _traffic = "ROS"
         else:
             _traffic = ""
-    	_mode = ("{:d}dB/Hz {:s}".format(self.RSN, _traffic)).strip() # "N/A"
+        _mode = ("{:d}dB/Hz {:s}".format(self.RSN, _traffic)).strip() # "N/A"
 
-    	if (plot_type == 'MUF'):
+        if (plot_type == 'MUF'):
             return  """{location} ({lat}, {lon}) {hour} {month} {power} SSN:{ssn} {mode}""".format(location=self.txlabel,
                                 lat=self.lat_as_string(self.txlat),
                                 lon=self.lon_as_string(self.txlon),
@@ -507,7 +507,7 @@ class VOAFile:
 
     def write_file(self):
         #f = open(self.filename, 'wt')
-        f = codecs.open(self.filename, "wt", "utf-8")
+        f = codecs.open(self.filename, "w", "utf-8")
         f.write('Model    :VOACAP\n')
         f.write('Colors   :Black    :Blue     :Ignore   :Ignore   :Red      :Black with shading\n')
         f.write('Cities   :Receive.cty\n')
@@ -564,13 +564,13 @@ class VOAFile:
 
     def parse_lat_lon(self, l_str):
         l = 0.0
-        if DEBUG: print "l_str = ", l_str
+        if DEBUG: print("l_str = ", l_str)
         l_str = l_str.strip()
         if ((l_str.endswith('S')) or (l_str.endswith('W'))):
             l = 0 - float(l_str[:-1])
         else:
             l = float(l_str[:-1])
-        if DEBUG: print "Lat/Lon = ", l
+        if DEBUG: print("Lat/Lon = ", l)
         return l
 
     def get_description(self):

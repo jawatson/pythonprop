@@ -84,7 +84,7 @@ class VOAAreaRect:
     def get_lat_delta(self): return self.ne_lat - self.sw_lat
     
     def get_formatted_string(self):
-        return u"(%i\N{DEGREE SIGN}N, %i\N{DEGREE SIGN}E), (%i\N{DEGREE SIGN}N, %i\N{DEGREE SIGN}E)" \
+        return "(%i\N{DEGREE SIGN}N, %i\N{DEGREE SIGN}E), (%i\N{DEGREE SIGN}N, %i\N{DEGREE SIGN}E)" \
         			% (int(round(self.sw_lat)), int(round(self.sw_lon)), int(round(self.ne_lat)), int(round(self.ne_lon)))
     def get_formatted_ne_latitude(self):
         return "%.2f" % self.ne_lat

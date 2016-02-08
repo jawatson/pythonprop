@@ -71,7 +71,7 @@ class VOATextFileViewDialog:
         try:
             self.text_buffer.set_text(open(self.file, "r").read().replace('\f',''))
         except:
-            print _('Failed to read file: '), self.file
+            print(_('Failed to read file: '), self.file)
 
         #Create event dictionay and connect it
 #        event_dic = { "on_map_eventbox_button_release_event" : self.set_location_from_map,
@@ -100,6 +100,6 @@ class VOATextFileViewDialog:
         for name in names:
             widget = self.wTree.get_object(name)
             if widget is None:
-                raise ValueError,_("Widget '%s' not found") % name
+                raise ValueError(_("Widget '%s' not found") % name)
             setattr(self, name, widget)
 

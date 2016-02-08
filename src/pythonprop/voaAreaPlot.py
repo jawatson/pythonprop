@@ -59,11 +59,11 @@ import numpy as np
 from optparse import OptionParser
 #import pylab as P
 
-from voaAreaRect import *
-from voaFile import *
-from hamlocation import *
-from voaPlotWindow import *
-from sun import *
+from .voaAreaRect import *
+from .voaFile import *
+from .hamlocation import *
+from .voaPlotWindow import *
+from .sun import *
 """
 try:
     import gi
@@ -140,7 +140,7 @@ class VOAAreaPlot:
         plot_parameters.parse_file()
 
         if (plot_parameters.get_projection() != 'cyl'):
-            print _("Error: Only lat/lon (type 1) input files are supported")
+            print(_("Error: Only lat/lon (type 1) input files are supported"))
             sys.exit(1)
 
         grid = plot_parameters.get_gridsize()
@@ -224,7 +224,7 @@ class VOAAreaPlot:
 
         self.num_cols = int(math.ceil(float(self.number_of_subplots)/float(self.num_rows)))
         self.fig=Figure()
-        self.main_title_label = self.fig.suptitle(unicode(self.image_defs['title'],'utf-8'), fontsize=self.main_title_fontsize)
+        self.main_title_label = self.fig.suptitle(str(self.image_defs['title']), fontsize=self.main_title_fontsize)
 
         if projection == 'ortho':
             self.show_subplot_frame = False
@@ -449,11 +449,11 @@ class VOAAreaPlot:
     presented at http://www.voacap.com/s-meter.html
     """
     def SMETER_format(self, x, pos):
-        print x
+        print(x)
         S_DICT = {-151.18:'S1', -145.15:'S2', -139.13:'S3', -133.11:'S4', -127.09:'S5', \
                     -121.07:'S6', -115.05:'S7', -109.03:'S8', -103.01:'S9', -93.01:'S9+10dB', \
                     -83.01:'S9+20dB', -73.01:'S9+30dB', -63.01:'S9+40dB', -53.01:'S9+50dB', -43.01:'S9+60dB'}
-        if S_DICT.has_key(x):
+        if x in S_DICT:
         	return '%s' % S_DICT[x]
             #return _('%(value)ddBW (%(s_value)s)') %{'value':x, 's_value':S_DICT[x]}
         else : return '%3d' % x
@@ -587,15 +587,15 @@ def main(in_file):
                                                 lon = float(tokens[0].strip()),
                                                 name = tokens[2].strip()))
         except:
-            print _("Error reading points of interest file: %s") % options.poi_file
-            print sys.exc_info()[0]
+            print(_("Error reading points of interest file: %s") % options.poi_file)
+            print(sys.exc_info()[0])
             points_of_interest = []
     else:
         points_of_interest = []
 
     if options.data_type:
-        if not VOAAreaPlot.IMG_TYPE_DICT.has_key(int(options.data_type)):
-            print _("Unrecognised plot type: Defaulting to MUF")
+        if int(options.data_type) not in VOAAreaPlot.IMG_TYPE_DICT:
+            print(_("Unrecognised plot type: Defaulting to MUF"))
             options.dataType = 1
 
     if options.vg_files:
@@ -604,7 +604,7 @@ def main(in_file):
             #'all' option see if the file exists and add it to the list
             for file_num in range (1, 13):
                 if os.path.exists(in_file+'.vg'+str(file_num)):
-                    print _("found: "),(in_file+'.vg'+str(file_num))
+                    print(_("found: "),(in_file+'.vg'+str(file_num)))
                     vg_files.append(file_num)
         else:
             try:
@@ -619,12 +619,12 @@ def main(in_file):
                     except:
                         vg_files.pop(i)
                 if len(vg_files) == 0:
-                    print _("Error reading vg files (1), resetting to '1'")
+                    print(_("Error reading vg files (1), resetting to '1'"))
                     vg_files = [1]
             except:
-                print _("Error reading vg files, resetting to '1'")
+                print(_("Error reading vg files, resetting to '1'"))
                 vg_files = [1]
-        print _("The following %d files have been selected: ") % (len(vg_files)), vg_files
+        print(_("The following %d files have been selected: ") % (len(vg_files)), vg_files)
 
     if options.timezone:
         time_zone = int(options.timezone)
@@ -640,7 +640,7 @@ def main(in_file):
                     projection = options.projection,
                     color_map = options.color_map,
                     face_colour = options.face_colour,
-                    plot_filled_contours = options.plot_filled_contours,                    
+                    plot_filled_contours = options.plot_filled_contours,
                     plot_contours = options.plot_contours,
                     plot_meridians = options.plot_meridians,
                     plot_parallels = options.plot_parallels,
@@ -656,6 +656,6 @@ if __name__ == "__main__":
     if len(sys.argv) >= 2:
         main(sys.argv[-1])
     else:
-        print 'voaAreaPlot error: No data file specified'
-        print 'voaAreaPlot [options] filename'
+        print('voaAreaPlot error: No data file specified')
+        print('voaAreaPlot [options] filename')
         sys.exit(1)

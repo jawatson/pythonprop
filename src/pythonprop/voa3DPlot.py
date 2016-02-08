@@ -57,8 +57,8 @@ from optparse import OptionParser
 import numpy as np
 #import pylab as P
 
-from voaOutFile import VOAOutFile
-from voaPlotWindow import VOAPlotWindow
+from .voaOutFile import VOAOutFile
+from .voaPlotWindow import VOAPlotWindow
 
 class VOA3DPlot:
     """Program to plot .out files produced by voacap in 3D"""
@@ -124,7 +124,7 @@ class VOA3DPlot:
             md.run()
             md.destroy()
             return
-        plot_groups = range(0, num_grp)
+        plot_groups = list(range(0, num_grp))
 
         self.subplots = []
         number_of_subplots = len(plot_groups)
@@ -264,8 +264,8 @@ def main(data_file):
     (options, args) = parser.parse_args()
     
     if options.data_type:
-        if not VOA3DPlot.IMG_TYPE_DICT.has_key(int(options.data_type)):
-            print "Unrecognised plot type: Defaulting to MUF days"
+        if int(options.data_type) not in VOA3DPlot.IMG_TYPE_DICT:
+            print("Unrecognised plot type: Defaulting to MUF days")
             options.data_type = 1
             
     
@@ -276,7 +276,7 @@ def main(data_file):
             try:    
                 plot_max_freq = float(options.y_max)
             except TypeError:
-                print "-f must be either 'a' or a float in the range 5.0 - 30.0"
+                print("-f must be either 'a' or a float in the range 5.0 - 30.0")
                 sys.exit(1)
             plot_max_freq = min(plot_max_freq, 30.0)
             plot_max_freq = max(plot_max_freq, 5.0)
@@ -306,11 +306,11 @@ def main(data_file):
                     except:
                         plot_groups.pop(i)
                 if len(plot_groups) == 0:
-                    print "Error reading plot_groups, resetting to '1'"
+                    print("Error reading plot_groups, resetting to '1'")
                     plot_groups = [0]
                 plot_groups.sort()
             except:
-                print "Error reading groups, resetting to '1'"
+                print("Error reading groups, resetting to '1'")
                 plot_groups = [1]
 
 
@@ -328,8 +328,8 @@ if __name__ == "__main__":
     if len(sys.argv) >= 2:
         main(sys.argv[-1])
     else:
-        print 'voa3DPlot error: No data file specified'
-        print 'voa3DPlot [options] filename'
+        print('voa3DPlot error: No data file specified')
+        print('voa3DPlot [options] filename')
         sys.exit(1)
 
       

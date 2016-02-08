@@ -1,5 +1,5 @@
 
-from __future__ import with_statement
+
 
 import sys, os, re
 
@@ -50,7 +50,7 @@ class templates:
 
 
     def get_names(self):
-        return self.ret_templates.keys()
+        return list(self.ret_templates.keys())
 
     def get_params(self):
         return ['area_templates_file',]
@@ -61,9 +61,9 @@ class templates:
         fd = None
         try:
             fd = open(os.path.expandvars(self.area_templates_file))
-        except Exception, X:
-            print _("Can't open template file <%(f)s> -> <%(p)s>.") % {'tf':self.area_templates_file,
-                        'p':os.path.expandvars(self.area_templates_file)}
+        except Exception as X:
+            print(_("Can't open template file <%(f)s> -> <%(p)s>.") % {'tf':self.area_templates_file,
+                        'p':os.path.expandvars(self.area_templates_file)})
             return -1
         if fd:
             lines = fd.readlines()
@@ -86,8 +86,8 @@ class templates:
                 y,m,u,f = line.split()    
                 try:
                     tup = (int(y),int(m),int(u),float(f)) 
-                except Exception, X:
-                    print _("Can't convert values: <%s>") % line
+                except Exception as X:
+                    print(_("Can't convert values: <%s>") % line)
                     # could be better to remove the entire template here...
                     continue
                 if templ_n:

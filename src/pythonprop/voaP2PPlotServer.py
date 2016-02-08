@@ -58,8 +58,8 @@ import matplotlib.transforms as mtransforms
 from matplotlib.figure import Figure
 from matplotlib.font_manager import FontProperties
 
-from voaOutFile import *
-from voaPlotWindow import *
+from .voaOutFile import *
+from .voaPlotWindow import *
 #from voaMultiPlot import *
 
 import pylab as P
@@ -134,7 +134,7 @@ class VOAP2PPlot:
     
         if plot_groups[0]=='a':            
             num_grp = self.df.get_number_of_groups()
-            plot_groups = range(0,num_grp)
+            plot_groups = list(range(0,num_grp))
 
         self.subplots = []
         number_of_subplots = len(plot_groups)
@@ -181,7 +181,7 @@ class VOAP2PPlot:
         
         self.num_cols = int(math.ceil(float(number_of_subplots)/float(self.num_rows)))  
         self.fig=Figure(figsize=(7,6.5))
-        self.main_title_label = self.fig.suptitle(plot_label+unicode(self.image_defs['title'],'utf-8'), fontsize=self.main_title_fontsize)
+        self.main_title_label = self.fig.suptitle(plot_label+str(self.image_defs['title'],'utf-8'), fontsize=self.main_title_fontsize)
 
         for chan_grp in plot_groups:
             (group_name, group_info, fot, muf, hpf, image_buffer) = self.df.get_group_data(chan_grp)
@@ -215,7 +215,7 @@ class VOAP2PPlot:
                 y_ticks.append(y_tick_value)   
  
             #The line below has been modified to omit plottinf the fot
-            ax.plot(range(0, 25), muf,'r-')
+            ax.plot(list(range(0, 25)), muf,'r-')
             ax.set_ylim([2, y_max])
 
             ax.set_xticks(self.x_axes_ticks)
@@ -337,7 +337,7 @@ class VOAP2PPlot:
         S_DICT = {-151:'S1', -145:'S2', -139:'S3', -133:'S4', -127:'S5', \
                     -121:'S6', -115:'S7', -109:'S8', -103:'S9', -93:'S9+10dB', \
                     -83:'S9+20dB', -73:'S9+30dB', -63:'S9+40dB', -53:'S9+50dB', -43:'S9+60dB'}
-        if S_DICT.has_key(x):
+        if x in S_DICT:
             return _('%(value)ddBW (%(s_value)s)') %{'value':x, 's_value':S_DICT[x]}
         else : return '%3d' % x
 
@@ -421,8 +421,8 @@ def main(data_file):
     (options, args) = parser.parse_args()
     
     if options.data_type:
-        if not VOAP2PPlot.IMG_TYPE_DICT.has_key(int(options.data_type)):
-            print _("Unrecognised plot type: Defaulting to MUF days")
+        if int(options.data_type) not in VOAP2PPlot.IMG_TYPE_DICT:
+            print(_("Unrecognised plot type: Defaulting to MUF days"))
             options.data_type = 1
             
     if options.plot_bands:
@@ -440,7 +440,7 @@ def main(data_file):
             try:    
                 plot_max_freq = float(options.y_max)
             except:
-                print _("-f arguments must be either 'a' or a decimal in the range 5.0 - 30.0")
+                print(_("-f arguments must be either 'a' or a decimal in the range 5.0 - 30.0"))
                 os._exit(1)
             plot_max_freq = min(plot_max_freq, 30.0)
             plot_max_freq = max(plot_max_freq, 5.0)
@@ -449,7 +449,7 @@ def main(data_file):
         try:
             options.dpi=int(options.dpi)
         except:
-            print "failed to read dpi"
+            print("failed to read dpi")
             options.dpi=150
 
     if options.time_zone:
@@ -475,11 +475,11 @@ def main(data_file):
                     except:
                         plot_groups.pop(i)
                 if len(plot_groups) == 0:
-                    print _("Error reading plot_groups, resetting to '1'")
+                    print(_("Error reading plot_groups, resetting to '1'"))
                     plot_groups = [0]
                 plot_groups.sort()
             except:
-                print _("Error groups, resetting to '1'")
+                print(_("Error groups, resetting to '1'"))
                 plot_groups = [1]
 #    if len(plot_groups) == 1:
 #        print "%d group has been selected: " % (len(plot_groups)), plot_groups
@@ -504,8 +504,8 @@ if __name__ == "__main__":
     if len(sys.argv) >= 2:
         main(sys.argv[-1])
     else:
-        print 'voaP2PPlot error: No data file specified'
-        print 'voaP2PPlot [options] filename'
+        print('voaP2PPlot error: No data file specified')
+        print('voaP2PPlot [options] filename')
         sys.exit(1)
 
       

@@ -65,9 +65,9 @@ gettext.bindtextdomain(GETTEXT_DOMAIN, LOCALE_PATH)
 gettext.textdomain(GETTEXT_DOMAIN)
 
 
-from voaOutFile import VOAOutFile
-from voaP2PPlot import VOAP2PPlot
-from voa3DPlot import VOA3DPlot
+from .voaOutFile import VOAOutFile
+from .voaP2PPlot import VOAP2PPlot
+from .voa3DPlot import VOA3DPlot
 
 class VOAP2PPlotGUI:
     """GUI to create VOAArea Input Files"""
@@ -145,7 +145,7 @@ class VOAP2PPlotGUI:
 
         d = { 0 : _('All Plots'),}
         l = in_file.get_group_titles()
-        d.update(zip(range(1, len(l)+1), l))
+        d.update(list(zip(list(range(1, len(l)+1)), l)))
         self.populate_combo(self.group_combobox, d, 'key')
                 
         event_dic = { "on_dialog_destroy" : self.quit_application, 
@@ -186,7 +186,7 @@ class VOAP2PPlotGUI:
  
     def populate_combo(self, cb, d, sort_by='value'):
         _model = Gtk.ListStore(GObject.TYPE_STRING, GObject.TYPE_STRING) 
-        items = d.items()
+        items = list(d.items())
         if sort_by == 'value':
             items = [(v, k) for (k, v) in items]
             items.sort()
@@ -207,7 +207,7 @@ class VOAP2PPlotGUI:
         for name in names:
             widget = self.wTree.get_object(name)
             if widget is None:
-                raise ValueError, _("Widget '%s' not found") % name
+                raise ValueError(_("Widget '%s' not found") % name)
             setattr(self, name, widget)
             
             
@@ -223,7 +223,7 @@ class VOAP2PPlotGUI:
         
 if __name__ == "__main__":
     if (len(sys.argv) != 2):
-        print _('Usage: voaP2PPlotgui file_to_plot.out')
+        print(_('Usage: voaP2PPlotgui file_to_plot.out'))
         sys.exit(2)
     app = VOAP2PPlotGUI(sys.argv[-1])
     Gtk.main()

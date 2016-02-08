@@ -94,14 +94,14 @@ def ffind(path, shellglobs=None, namefs=None, relative=True):
                 matched = []
                 for pattern in shellglobs:
                     filterf = lambda s: fnmatch.fnmatchcase(s, pattern)
-                    matched.extend(filter(filterf, files))
+                    matched.extend(list(filter(filterf, files)))
                 fileList.extend(['%s%s%s' % (dir, os.sep, f) for f in matched])
             else:
                 fileList.extend(['%s%s%s' % (dir, os.sep, f) for f in files])
-        if not relative: fileList = map(os.path.abspath, fileList)
+        if not relative: fileList = list(map(os.path.abspath, fileList))
         if namefs: 
-            for ff in namefs: fileList = filter(ff, fileList)
-    except Exception, e: raise ScriptError(str(e))
+            for ff in namefs: fileList = list(filter(ff, fileList))
+    except Exception as e: raise ScriptError(str(e))
     return(fileList)
 
 def ffindgrep(path, regexl, shellglobs=None, namefs=None, 
@@ -146,9 +146,9 @@ def ffindgrep(path, regexl, shellglobs=None, namefs=None,
         # first compile the regular expressions
         ffuncs = []
         for redata in regexl:
-            if type(redata) == types.StringType:
+            if type(redata) == bytes:
                 ffuncs.append(re.compile(redata).search)
-            elif type(redata) == types.TupleType:
+            elif type(redata) == tuple:
                 ffuncs.append(re.compile(*redata).search)
         # now grep in the files found
         for file in fileList:
@@ -157,11 +157,11 @@ def ffindgrep(path, regexl, shellglobs=None, namefs=None,
             fcontent = fhandle.read()
             fhandle.close()
             # split file content in lines
-            if linenums: lines = zip(itertools.count(1), fcontent.splitlines())
+            if linenums: lines = list(zip(itertools.count(1), fcontent.splitlines()))
             else: lines = fcontent.splitlines()
             for ff in ffuncs:
-                if linenums: lines = filter(lambda t: ff(t[1]), lines)
-                else: lines = filter(ff, lines)
+                if linenums: lines = [t for t in lines if ff(t[1])]
+                else: lines = list(filter(ff, lines))
                 # there's no point in applying the remaining regular
                 # expressions if we don't have any matching lines any more
                 if not lines: break
@@ -173,7 +173,7 @@ def ffindgrep(path, regexl, shellglobs=None, namefs=None,
                         result[file] = '\n'.join(["%d:%s" % t for t in lines])
                     else:
                         result[file] = '\n'.join(map(str, lines))
-    except Exception, e: raise ScriptError(str(e))
+    except Exception as e: raise ScriptError(str(e))
     return(result)
 
 def freplace(path, regexl, shellglobs=None, namefs=None, bext='.bak'):
@@ -244,7 +244,7 @@ def freplace(path, regexl, shellglobs=None, namefs=None, bext='.bak'):
                 fhandle.write(text)
                 fhandle.close()
                 filesChanged += 1
-    except Exception, e: raise ScriptError(str(e))
+    except Exception as e: raise ScriptError(str(e))
 
     # return the number of files that had some of their content changed
     return(filesChanged)
@@ -254,7 +254,7 @@ def printr(results):
     prints the results of ffind()/ffindgrep() in a manner similar to
     the UNIX find utility
     """
-    if type(results) == types.DictType:
+    if type(results) == dict:
         for f in sorted(results.keys()):
             sys.stdout.write("%s\n%s\n" % (results[f],f))
     else:

@@ -22,7 +22,7 @@ from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg as FigureCan
 import matplotlib.dates as mdates
 import matplotlib.mlab as mlab
 
-from ssnFetch import *
+from .ssnFetch import *
 
 class VOASSNThumb:
 

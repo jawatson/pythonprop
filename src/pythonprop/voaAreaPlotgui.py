@@ -64,8 +64,8 @@ gettext.bindtextdomain(GETTEXT_DOMAIN, LOCALE_PATH)
 gettext.textdomain(GETTEXT_DOMAIN)
 
 
-from voaFile import *
-from voaAreaPlot import *
+from .voaFile import *
+from .voaAreaPlot import *
 
 
 class VOAAreaPlotGUI:
@@ -162,7 +162,7 @@ class VOAAreaPlotGUI:
         _color_map = self.cmap_combobox.get_model().get_value(self.cmap_combobox.get_active_iter(), 0)
         _data_type = self.type_combobox.get_model().get_value(self.type_combobox.get_active_iter(), 0)
         if self.group_combobox.get_active() == 0:
-        	_vg_files = range(1,self.num_plots+1)
+        	_vg_files = list(range(1,self.num_plots+1))
         else:
         	_vg_files = [self.group_combobox.get_active()]
         _time_zone = self.tz_spinbutton.get_value_as_int()
@@ -182,7 +182,7 @@ class VOAAreaPlotGUI:
 
     def populate_combo(self, cb, d, sort_by='value'):
         _model = Gtk.ListStore(GObject.TYPE_STRING, GObject.TYPE_STRING)
-        items = d.items()
+        items = list(d.items())
         if sort_by == 'value':
             items = [(v, k) for (k, v) in items]
             items.sort()
@@ -203,7 +203,7 @@ class VOAAreaPlotGUI:
         for name in names:
             widget = self.wTree.get_object(name)
             if widget is None:
-                raise ValueError, _("Widget '%s' not found") % name
+                raise ValueError(_("Widget '%s' not found") % name)
             setattr(self, name, widget)
 
 
@@ -219,7 +219,7 @@ class VOAAreaPlotGUI:
 
 if __name__ == "__main__":
     if (len(sys.argv) != 2):
-        print _('Usage: voaAreaPlotgui file_to_plot.voa')
+        print(_('Usage: voaAreaPlotgui file_to_plot.voa'))
         sys.exit(2)
     app = VOAAreaPlotGUI(sys.argv[-1])
     Gtk.main()

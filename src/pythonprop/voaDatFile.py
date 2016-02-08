@@ -53,7 +53,7 @@ import sys
 import textwrap
 
 #from voaLocation import *
-from hamlocation import *
+from .hamlocation import *
 
 DEBUG = False
 
@@ -322,7 +322,7 @@ class VOADatFile:
             f.write('QUIT\n')
             f.write('\n')
         else:
-            print "Invalid data file format specified."
+            print("Invalid data file format specified.")
         f.close()
         
     def get_group_description(self, group):   

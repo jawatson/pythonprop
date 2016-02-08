@@ -28,8 +28,8 @@ import sys
 import itertools
 import cairo
 
-from hamlocation import *
-from treefilebrowser import *
+from .hamlocation import *
+from .treefilebrowser import *
 
 try:
     import gi
@@ -42,8 +42,8 @@ class VOASiteChooser:
     
     """GUI to select tx/rx locations fromVOAArea Input Files"""
 
-    lcase_letters = map(chr, range(97, 123))
-    ucase_letters = map(chr, range(65, 91))
+    lcase_letters = list(map(chr, list(range(97, 123))))
+    ucase_letters = list(map(chr, list(range(65, 91))))
     
     def __init__(self, location=HamLocation(), map_size=(), itshfbc_path = '', parent=None, datadir=""):
         self.datadir = datadir
@@ -201,12 +201,12 @@ class VOASiteChooser:
     def populate_locator_combos(self):
         #todo check that this is actually required, combos are also being 
         #populated in the .ui file
-        self.populate_combo(self.locator_combo1, map(chr, range(65, 83)))
-        self.populate_combo(self.locator_combo2, map(chr, range(65, 83)))
-        self.populate_combo(self.locator_combo3, map(chr, range(48, 58)))
-        self.populate_combo(self.locator_combo4, map(chr, range(48, 58)))
-        self.populate_combo(self.locator_combo5, map(chr, range(97, 121)))
-        self.populate_combo(self.locator_combo6, map(chr, range(97, 121)))
+        self.populate_combo(self.locator_combo1, list(map(chr, list(range(65, 83)))))
+        self.populate_combo(self.locator_combo2, list(map(chr, list(range(65, 83)))))
+        self.populate_combo(self.locator_combo3, list(map(chr, list(range(48, 58)))))
+        self.populate_combo(self.locator_combo4, list(map(chr, list(range(48, 58)))))
+        self.populate_combo(self.locator_combo5, list(map(chr, list(range(97, 121)))))
+        self.populate_combo(self.locator_combo6, list(map(chr, list(range(97, 121)))))
         
         
     def populate_combo(self, cb, list):
@@ -333,8 +333,8 @@ class VOASiteChooser:
                                 row.append((line[column[1]:column[2]]).strip())
                             self.geo_model.append(row)       
                         except:
-                            print 'Failed to read line: ', line
-                            print 'with error ',sys.exc_info()
+                            print('Failed to read line: ', line)
+                            print('with error ',sys.exc_info())
                 f.close()
                 self.geo_tv.set_model(self.geo_model)
         except:
@@ -400,6 +400,6 @@ class VOASiteChooser:
         for name in names:
             widget = self.wTree.get_object(name)
             if widget is None:
-                raise ValueError, _("Widget '%s' not found") % name
+                raise ValueError(_("Widget '%s' not found") % name)
             setattr(self, name, widget)
 

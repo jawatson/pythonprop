@@ -49,7 +49,7 @@ class VOAMeth26Out:
         if os.path.isfile(self.filename):
             self.parse_file()
         else:
-            print "Unable to find file: ", self.filename
+            print("Unable to find file: ", self.filename)
         return
 
     """
@@ -68,19 +68,19 @@ class VOAMeth26Out:
         return self.fot_list[group]
 
     def get_FOT_as_tuples(self, group=0, tz=0):
-        return zip(self.gmt_list[group], self.fot_list[group])
+        return list(zip(self.gmt_list[group], self.fot_list[group]))
 
     def get_HPF(self, group=0, tz=0):
         return self.hpf_list[group]
 
     def get_HPF_as_tuples(self, group=0, tz=0):
-        return zip(self.gmt_list[group], self.hpf_list[group])
+        return list(zip(self.gmt_list[group], self.hpf_list[group]))
 
     def get_MUF(self, group=0, tz=0):
         return self.muf_list[group]
 
     def get_MUF_as_tuples(self, group=0, tz=0):
-        return zip(self.gmt_list[group], self.muf_list[group])
+        return list(zip(self.gmt_list[group], self.muf_list[group]))
 
     def get_number_groups(self):
         return len(self.gmt_list)
@@ -116,11 +116,11 @@ class VOAMeth26Out:
                             self.muf_list[group_number].append(muf) 
 
         except IOError:
-            print _("Error opening/reading file "), self.filename
+            print(_("Error opening/reading file "), self.filename)
             sys.exit(1)
         finally:
             if not self.quiet:
-                print "Closing: ", self.filename            
+                print("Closing: ", self.filename)            
 
 ## Used for testing only
 def main(argv):
@@ -128,9 +128,9 @@ def main(argv):
     inputfile = ""
     try:
         opts, args = getopt.getopt(argv, "hi:", ["ifile="])
-    except getopt.error, msg:
-        print msg
-        print "for help use --help"
+    except getopt.error as msg:
+        print(msg)
+        print("for help use --help")
         sys.exit(2)
     # process options
     for o, a in opts:
@@ -139,10 +139,10 @@ def main(argv):
 
     of = VOAMeth26Out(inputfile)
     for group in range(0, of.get_number_groups()):
-        print "***"
-        print of.get_MUF(group=group)
+        print("***")
+        print(of.get_MUF(group=group))
         for group in range(0, of.get_MUF(group=group)):
-            print of.get_MUF(group)  
+            print(of.get_MUF(group))  
 
 if __name__ == "__main__":
     main(sys.argv[1:])

@@ -45,7 +45,7 @@ if Gtk.pygtk_version < (2, 0):
 try:
     from os import path as ospath
     import os
-    import scriptutil
+    from . import scriptutil
     #import dircache
 except:
     raise SystemExit
@@ -101,7 +101,7 @@ class TreeFileBrowser():
         elif property.name == 'path':
             return self.root
         else:
-            raise AttributeError, _('unknown property %s') % property.name
+            raise AttributeError(_('unknown property %s') % property.name)
     
     def do_set_property(self, property, value):
         """ GObject set_property method """
@@ -114,7 +114,7 @@ class TreeFileBrowser():
         elif property.name == 'path':
             self.root = value
         else:
-            raise AttributeError, _('unknown property %s') % property.name
+            raise AttributeError(_('unknown property %s') % property.name)
     
     def get_view(self):
         return self.view
@@ -240,7 +240,7 @@ class TreeFileBrowser():
             
             # Check if the dir is in the same path as the desired root
             long = len(roottree)
-            for i in range(long):
+            for i in range(int):
                 if  roottree[i] != dirtree[i]: return False
             
             # End checking
@@ -342,8 +342,8 @@ class TreeFileBrowser():
         try:
             icon = icon_theme.load_icon("gnome-fs-directory", Gtk.IconSize.MENU, 0)
             return icon
-        except GObject.GError, exc:
-            print _("Can't load icon"), exc
+        except GObject.GError as exc:
+            print(_("Can't load icon"), exc)
             return None
     
     
@@ -354,8 +354,8 @@ class TreeFileBrowser():
         try:
             icon = icon_theme.load_icon("gnome-fs-directory-accept", Gtk.IconSize.MENU, 0)
             return icon
-        except GObject.GError, exc:
-            print _("Can't load icon"), exc
+        except GObject.GError as exc:
+            print(_("Can't load icon"), exc)
             return None
         
         
@@ -366,8 +366,8 @@ class TreeFileBrowser():
         try:
             icon = icon_theme.load_icon("text-x-generic", Gtk.IconSize.MENU, 0)
             return icon
-        except GObject.GError, exc:
-            print _("Can't load icon"), exc
+        except GObject.GError as exc:
+            print(_("Can't load icon"), exc)
             return None
 
 

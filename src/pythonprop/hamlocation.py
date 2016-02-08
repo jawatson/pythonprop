@@ -29,7 +29,7 @@ class HamLocation:
 
     lon = 0.0
     lat = 0.0
-    name = u''
+    name = ''
     locator = ''
     
     SHORT_PATH = 0
@@ -40,10 +40,10 @@ class HamLocation:
     
     #The following two lists are used fro mapping characters
     #to numbers in locator calculations
-    lcase_letters = map(chr, range(97, 123))
-    ucase_letters = map(chr, range(65, 91))
+    lcase_letters = list(map(chr, list(range(97, 123))))
+    ucase_letters = list(map(chr, list(range(65, 91))))
 
-    def __init__(self, lat=0.0, lon=0.0, name=u'', locator=''):
+    def __init__(self, lat=0.0, lon=0.0, name='', locator=''):
         self.name = name
         self.lat = lat
         self.lon = lon

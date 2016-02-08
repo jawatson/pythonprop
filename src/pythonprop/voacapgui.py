@@ -20,7 +20,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-from __future__ import with_statement
+
 import sys
 import os
 import datetime
@@ -29,12 +29,12 @@ import time
 import re
 
 import pkgutil
-import templates
+from . import templates
 
 from dateutil.relativedelta import relativedelta
 from calendar import monthrange
 
-from ConfigParser import *
+from configparser import *
 
 from mpl_toolkits.basemap import Basemap
 from mpl_toolkits.mplot3d import Axes3D
@@ -47,8 +47,8 @@ try:
     from gi.repository import GdkPixbuf
     from gi.repository import Gtk
 except ImportError as exc:
-    print "Error: failed to import gi module ({})".format(exc)
-    print "Check that the python-gi module is installed"
+    print(("Error: failed to import gi module ({})".format(exc)))
+    print ("Check that the python-gi module is installed")
     sys.exit(1)
 
 
@@ -80,18 +80,18 @@ gettext.bindtextdomain(GETTEXT_DOMAIN, LOCALE_PATH)
 gettext.textdomain(GETTEXT_DOMAIN)
 
 
-from voaTextFileViewDialog import *
-from voaDatFile import *
-from voaDefaults import *
-from voaSiteChooser import *
-from voaP2PPlot import *
-from voaP2PPlotgui import *
-from voaAreaPlotgui import *
-from ssnFetch import *
-from voaSSNThumb import *
-from voaFile import *
-from voaAreaChooser import *
-from voaAntennaChooser import *
+from .voaTextFileViewDialog import *
+from .voaDatFile import *
+from .voaDefaults import *
+from .voaSiteChooser import *
+from .voaP2PPlot import *
+from .voaP2PPlotgui import *
+from .voaAreaPlotgui import *
+from .ssnFetch import *
+from .voaSSNThumb import *
+from .voaFile import *
+from .voaAreaChooser import *
+from .voaAntennaChooser import *
 
 class VOACAP_GUI():
     __gtype_name__ = 'PythonProp'
@@ -237,7 +237,7 @@ class VOACAP_GUI():
         try:
             self.ssn_repo = SSNFetch(parent = self.main_window, save_location = self.ssn_path, s_bar=self.statusbar)
         except NoSSNData as e:
-            print e.value
+            print((e.value))
             self.quit_application(None)
         _min, _max = self.ssn_repo.get_data_range()
         self.p2pyearspinbutton.set_range(float(_min), float(_max))
@@ -355,7 +355,7 @@ class VOACAP_GUI():
         for name in names:
             widget = self.builder.get_object(name)
             if widget is None:
-                raise ValueError, "Widget '%s' not found" % name
+                raise ValueError("Widget '%s' not found" % name)
             setattr(self, name, widget)
 
 
@@ -475,65 +475,65 @@ class VOACAP_GUI():
                                         config.getfloat('area','ne_lat'),
                                         config.getfloat('area','ne_lon'))
             self.area_label.set_text(self.area_rect.get_formatted_string())
-        except Exception, X:
-            print 'Error reading the user prefs: %s - %s' % (Exception, X)
+        except Exception as X:
+            print('Error reading the user prefs: %s - %s' % (Exception, X))
 
     def save_user_prefs(self):
 
         config = ConfigParser()
         # voaSiteChooser map size
         config.add_section('site chooser')
-        config.set('site chooser', 'map_width', self.site_chooser_map_size[0])
-        config.set('site chooser', 'map_height', self.site_chooser_map_size[1])
+        config.set('site chooser', 'map_width', str(self.site_chooser_map_size[0]))
+        config.set('site chooser', 'map_height', str(self.site_chooser_map_size[1]))
         # voaAreaChooser map size
         config.add_section('area chooser')
-        config.set('area chooser', 'map_width', self.area_chooser_map_size[0])
-        config.set('area chooser', 'map_height', self.area_chooser_map_size[1])
+        config.set('area chooser', 'map_width', str(self.area_chooser_map_size[0]))
+        config.set('area chooser', 'map_height', str(self.area_chooser_map_size[1]))
         # voaAreaChooser map size
         if self.antenna_chooser_size:
             config.add_section('antenna chooser')
-            config.set('antenna chooser', 'width', self.antenna_chooser_size[0])
-            config.set('antenna chooser', 'height', self.antenna_chooser_size[1])
+            config.set('antenna chooser', 'width', str(self.antenna_chooser_size[0]))
+            config.set('antenna chooser', 'height', str(self.antenna_chooser_size[1]))
         # Tx Site Parameters
         config.add_section('tx site')
         config.set('tx site', 'name', self.tx_site_entry.get_text())
-        config.set('tx site', 'lat', self.tx_lat_spinbutton.get_value())
-        config.set('tx site', 'lon', self.tx_lon_spinbutton.get_value())
+        config.set('tx site', 'lat', str(self.tx_lat_spinbutton.get_value()))
+        config.set('tx site', 'lon', str(self.tx_lon_spinbutton.get_value()))
         config.set('tx site', 'antenna', self.tx_antenna_entry.get_text())
-        config.set('tx site', 'bearing', self.tx_bearing_spinbutton.get_value())
-        config.set('tx site', 'power', self.tx_power_spinbutton.get_value())
+        config.set('tx site', 'bearing', str(self.tx_bearing_spinbutton.get_value()))
+        config.set('tx site', 'power', str(self.tx_power_spinbutton.get_value()))
         # Rx Site Parameters
         config.add_section('rx site')
         config.set('rx site', 'name', self.rx_site_entry.get_text())
-        config.set('rx site', 'lat', self.rx_lat_spinbutton.get_value())
-        config.set('rx site', 'lon', self.rx_lon_spinbutton.get_value())
+        config.set('rx site', 'lat', str(self.rx_lat_spinbutton.get_value()))
+        config.set('rx site', 'lon', str(self.rx_lon_spinbutton.get_value()))
         config.set('rx site', 'antenna', self.rx_antenna_entry.get_text())
-        config.set('rx site', 'bearing', self.rx_bearing_spinbutton.get_value())
+        config.set('rx site', 'bearing', str(self.rx_bearing_spinbutton.get_value()))
         # Ionospheric Parameters
-        config.set('DEFAULT', 'foe', self.foe_spinbutton.get_value())
-        config.set('DEFAULT', 'fof1', self.fof1_spinbutton.get_value())
-        config.set('DEFAULT', 'fof2', self.fof2_spinbutton.get_value())
-        config.set('DEFAULT', 'foes', self.foes_spinbutton.get_value())
-        config.set('DEFAULT', 'model', self.model_combo.get_active())
-        config.set('DEFAULT', 'path', self.path_combo.get_active())
+        config.set('DEFAULT', 'foe', str(self.foe_spinbutton.get_value()))
+        config.set('DEFAULT', 'fof1', str(self.fof1_spinbutton.get_value()))
+        config.set('DEFAULT', 'fof2', str(self.fof2_spinbutton.get_value()))
+        config.set('DEFAULT', 'foes', str(self.foes_spinbutton.get_value()))
+        config.set('DEFAULT', 'model', str(self.model_combo.get_active()))
+        config.set('DEFAULT', 'path', str(self.path_combo.get_active()))
         # System parameters
-        config.set('DEFAULT','mm_noise', self.mm_noise_spinbutton.get_value())
-        config.set('DEFAULT','min_toa', self.min_toa_spinbutton.get_value())
-        config.set('DEFAULT','required_reliability', self.reliability_spinbutton.get_value())
-        config.set('DEFAULT','required_snr', self.snr_spinbutton.get_value())
-        config.set('DEFAULT','mpath', self.mpath_spinbutton.get_value())
-        config.set('DEFAULT','delay', self.delay_spinbutton.get_value())
+        config.set('DEFAULT','mm_noise', str(self.mm_noise_spinbutton.get_value()))
+        config.set('DEFAULT','min_toa', str(self.min_toa_spinbutton.get_value()))
+        config.set('DEFAULT','required_reliability', str(self.reliability_spinbutton.get_value()))
+        config.set('DEFAULT','required_snr', str(self.snr_spinbutton.get_value()))
+        config.set('DEFAULT','mpath', str(self.mpath_spinbutton.get_value()))
+        config.set('DEFAULT','delay', str(self.delay_spinbutton.get_value()))
         # area parameters
         config.add_section('area')
-        config.set('area','gridsize', self.gridsizespinbutton.get_value_as_int())
-        config.set('area','year', self.areayearspinbutton.get_value_as_int())
-        config.set('area','month', self.monthspinbutton.get_value_as_int())
-        config.set('area','utc', self.utcspinbutton.get_value_as_int())
-        config.set('area','frequency', self.freqspinbutton.get_value())
-        config.set('area','sw_lat', self.area_rect.sw_lat)
-        config.set('area','sw_lon', self.area_rect.sw_lon)
-        config.set('area','ne_lat', self.area_rect.ne_lat)
-        config.set('area','ne_lon', self.area_rect.ne_lon)
+        config.set('area','gridsize', str(self.gridsizespinbutton.get_value_as_int()))
+        config.set('area','year', str(self.areayearspinbutton.get_value_as_int()))
+        config.set('area','month', str(self.monthspinbutton.get_value_as_int()))
+        config.set('area','utc', str(self.utcspinbutton.get_value_as_int()))
+        config.set('area','frequency', str(self.freqspinbutton.get_value()))
+        config.set('area','sw_lat', str(self.area_rect.sw_lat))
+        config.set('area','sw_lon', str(self.area_rect.sw_lon))
+        config.set('area','ne_lat', str(self.area_rect.ne_lat))
+        config.set('area','ne_lon', str(self.area_rect.ne_lon))
         config.set('area','templates_file', self.area_templates_file if self.area_templates_file else '')
 
         with open(self.prefs_path, 'w') as configfile:
@@ -928,11 +928,10 @@ class VOACAP_GUI():
         # Revised module loading thanks to the following link
         # http://stackoverflow.com/questions/3365740/how-to-import-all-submodules
         for loader, module_name, is_pkg in  pkgutil.walk_packages(templates.__path__):
-
             try:
                 t_o = loader.find_module(module_name).load_module(module_name).templates(self.main_window)
-            except Exception, X:
-                print (" Failed to import module %s %s ") % (module_name, X)
+            except Exception as X:
+                print((" Failed to import module %s %s ") % (module_name, X))
                 continue
 
             # set module parameters
@@ -940,12 +939,12 @@ class VOACAP_GUI():
             for p in ps:
                 try:
                     t_o.__dict__[p] = self.__dict__[p]
-                except Exception, X:
-                    print _("Fail to set property %s in template %s: %s") % (p, f, X)
+                except Exception as X:
+                    print(_("Fail to set property %s in template %s: %s") % (p, f, X))
             # make the module get ready for use later
             ret = t_o.load()
             if ret:
-                print _("Can't load() template module %s") % f
+                print(_("Can't load() template module %s") % f)
                 continue
 
             for tname in t_o.get_names():
@@ -1317,7 +1316,7 @@ be processed, all other entries will be ignored.  Please delete some entries.'))
         t_o = model.get_value(model.get_iter(active), 1)
         model = self.area_tv.get_model()
         if t_o.set_ini(model):
-            print "Can't initialize module %s" % t_n
+            print("Can't initialize module %s" % t_n)
             return
         if t_o.run(): return
         try:
@@ -1473,7 +1472,7 @@ all other entries will be ignored.'))
                 dialog.run()
                 dialog.destroy()
 
-            print "executing vocapl..."
+            print("executing vocapl...")
 #            os.system('voacapl ~/itshfbc area calc pyArea.voa')
 #            print  os.path.join(os.path.expanduser("~"), 'itshfbc')
             ret = os.spawnlp(os.P_WAIT, 'voacapl', 'voacapl', os.path.join(os.path.expanduser("~"), 'itshfbc'), "area", "calc",  "pyArea.voa")
@@ -1484,7 +1483,7 @@ all other entries will be ignored.'))
                 dialog.run()
                 dialog.destroy()
                 return -1
-            print "done voacapl"
+            print("done voacapl")
 
             s = os.path.join(os.path.expanduser("~"), 'itshfbc','areadata','pyArea.voa')
             graph = VOAAreaPlotGUI(s, parent=self.main_window, exit_on_close=False, datadir=self.datadir)
@@ -1585,13 +1584,13 @@ all other entries will be ignored.'))
                     graph = VOAP2PPlotGUI(self.itshfbc_path+os.sep+'run'+os.sep+output_filename,
                         parent=self.main_window, exit_on_close=False, datadir=self.datadir)
                     graph.quit_application()
-            except OSError, e:
-                    print "Voacapl execution failed:", e
+            except OSError as e:
+                    print("Voacapl execution failed:", e)
 
 
     def show_yelp(self, widget):
         #subprocess.call(["yelp", os.path.join(self.datadir, "help", "C", "voacapgui.xml")])
-		Gtk.show_uri(None, "ghelp:voacapgui", Gdk.CURRENT_TIME)
+        Gtk.show_uri(None, "ghelp:voacapgui", Gdk.CURRENT_TIME)
 
     def show_about_dialog(self, widget):
         about = Gtk.AboutDialog(parent=self.main_window,
@@ -1660,13 +1659,13 @@ all other entries will be ignored.'))
         sys.exit(0)
 
     def run(self, argv):
-        print "run"
+        print("run")
         self.connect('activate', self.on_activate)
         return super(VOACAP_GUI, self).run(argv)
 
 def main(argv, datadir="", pythonprop_version="dev"):
     if not datadir:
-        print "no datadir defined, using current dir"
+        print("no datadir defined, using current dir")
         datadir = os.path.dirname(os.path.realpath(sys.argv[0]))
     app = VOACAP_GUI(datadir=datadir, pythonprop_version=pythonprop_version)
     try:

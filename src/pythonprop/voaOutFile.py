@@ -49,7 +49,7 @@ class VOAOutFile:
         if os.path.isfile(self.filename):
             self.parse_file()
         else:
-            print "Unable to find file: ", self.filename
+            print("Unable to find file: ", self.filename)
         return
 
     def parse_file(self):
@@ -64,7 +64,7 @@ class VOAOutFile:
         try:
             self.out_file = codecs.open(self.filename, "r", "utf-8")
             if not self.quiet:
-                print "Opening: ", self.filename 
+                print("Opening: ", self.filename) 
             #Initialise the variables here in case the input file
             #doesn't contain any 'COMMENT GROUP cards
             #Thanks to Dhivya Raj for spotting this bug
@@ -72,8 +72,8 @@ class VOAOutFile:
             _muf = np.zeros(25, float)
             _hpf = np.zeros(25, float)                    
             _image_buffer = np.zeros([29, 25], float)
-            _group_name = u''
-            _group_info = u''
+            _group_name = ''
+            _group_info = ''
             
             for line in self.out_file:
                 _group_match = self.group_pattern.search(line) #start a new group
@@ -88,8 +88,8 @@ class VOAOutFile:
                         #down to here is repeated.... sort this out before release
                         self.groups.append((_group_name, _group_info, _fot, _muf, _hpf, _image_buffer))
 
-                    _group_name = u''
-                    _group_info = u''
+                    _group_name = ''
+                    _group_info = ''
                     #_utc = range(0, 25)
 
                     _fot = np.zeros(25, float)
@@ -101,9 +101,9 @@ class VOAOutFile:
                     _group_name = (_group_match.group(1)+': '+_group_match.group(2)).strip()
                     # Wind forward two lines and read in the description
                     for i in np.arange(0,2):
-                        self.out_file.next()
+                        next(self.out_file)
                     for i in np.arange(0,6):
-                        _group_info = _group_info + self.out_file.next()
+                        _group_info = _group_info + next(self.out_file)
                                 
                 if line.find("FREQ") == 67:
                     lastFreqLine = line
@@ -141,17 +141,17 @@ class VOAOutFile:
 
         # The following lines require Python 2.5
         except IOError:
-            print _("Error opening/reading file "), self.filename
+            print(_("Error opening/reading file "), self.filename)
             sys.exit(1)
         finally:
             if not self.quiet:
-                print "Closing: ", self.filename
+                print("Closing: ", self.filename)
                 
         if _current_group == -1:   
-            print "****************************************************"
-            print "Warning: No COMMENT GROUP cards found in input file."
-            print "Please refer to the manpage for correct file format."
-            print "****************************************************"
+            print("****************************************************")
+            print("Warning: No COMMENT GROUP cards found in input file.")
+            print("Please refer to the manpage for correct file format.")
+            print("****************************************************")
 
     def get_number_of_groups(self):
         return len(self.groups)

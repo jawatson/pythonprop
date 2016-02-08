@@ -9,5 +9,3 @@ class templates(mod.templates):
     def __init__(self, parent):
         mod.templates.__init__(self, parent)
         mod.templates.iter = 12
-
-
