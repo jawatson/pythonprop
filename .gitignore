@@ -5,7 +5,28 @@ __pycache__/
 # C extensions
 *.so
 
+# Pythonprop Specific
+src/voa3DPlot
+src/voaAreaPlot
+src/voaAreaPlotgui
+src/voaP2PPlot
+src/voaP2PPlotServer
+src/voaP2PPlotgui
+src/voacapgui
+autom4te.cache/
+config.status
+configure
+docs/user/help/voacapgui.pdf
+gnome-doc-utils.make
+install-sh
+py-compile
+
+
 # Distribution / packaging
+Makefile
+Makefile.in
+*.gz
+*.m4
 .Python
 env/
 build/
