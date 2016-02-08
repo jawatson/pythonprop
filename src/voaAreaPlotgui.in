@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 sys.path.insert(1, '@pythondir@')
@@ -7,7 +7,7 @@ from pythonprop import voaAreaPlotgui
 
 if __name__ == "__main__":
     if (len(sys.argv) != 2):
-        print _('Usage: voaAreaPlotgui file_to_plot.voa')
+        print ('Usage: voaAreaPlotgui file_to_plot.voa')
         sys.exit(2)
     voaAreaPlotgui.VOAAreaPlotGUI(sys.argv[-1], datadir='@pkgdatadir@')
 

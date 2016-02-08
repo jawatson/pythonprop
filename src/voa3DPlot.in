@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 sys.path.insert(1, '@pythondir@')
@@ -9,6 +9,6 @@ if __name__ == "__main__":
     if len(sys.argv) >= 2:
         voa3DPlot.main(sys.argv[-1])
     else:
-        print 'voa3DPlot error: No data file specified'
-        print 'voa3DPlot [options] filename'
+        print ('voa3DPlot error: No data file specified')
+        print ('voa3DPlot [options] filename')
         sys.exit(1)
