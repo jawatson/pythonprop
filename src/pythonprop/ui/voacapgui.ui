@@ -1938,7 +1938,6 @@
                               <object class="GtkComboBox" id="model_combo">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="button_sensitivity">off</property>
                               </object>
                               <packing>
                                 <property name="left_attach">5</property>
