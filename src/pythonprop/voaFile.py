@@ -460,7 +460,15 @@ class VOAFile:
     	_mode = ("{:d}dB/Hz {:s}".format(self.RSN, _traffic)).strip() # "N/A"
 
     	if (plot_type == 'MUF'):
-            return siteLocation + _month + ', ' + hour_str + ', ' + thePower + ', SSN ' + theSSN
+            return  """{location} ({lat}, {lon}) {hour} {month} {power} SSN:{ssn} {mode}""".format(location=self.txlabel,
+                                lat=self.lat_as_string(self.txlat),
+                                lon=self.lon_as_string(self.txlon),
+                                hour=hour_str,
+                                month=_month,
+                                power=_power,
+                                ssn=self.ssns[int(field)],
+                                mode=_mode)
+            #return siteLocation + _month + ', ' + hour_str + ', ' + thePower + ', SSN ' + theSSN
             #return hour_str + _month+ ' : SSN ' + theSSN + ' : ' +thePower
         else:
             site_description = """{location} ({lat}, {lon}) {hour} {month} {frequency:.3f}MHz {power} SSN:{ssn} {mode}""".format(location=self.txlabel,
