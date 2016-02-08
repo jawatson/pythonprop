@@ -120,6 +120,7 @@ class VOAAreaPlot:
                     color_map = 'jet',
                     face_colour = "white",
                     time_zone = 0,
+                    plot_filled_contours = False,
                     plot_contours = False,
                     plot_center = 't',
                     plot_meridians = True,
@@ -292,7 +293,7 @@ class VOAAreaPlot:
             points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
             colMap.set_under(color ='k', alpha=0.0)
 
-            if (True):
+            if (plot_filled_contours):
                 im = m.contourf(x, y, points, self.image_defs['y_labels'],
                     cmap = colMap,
                     vmin=self.image_defs['min'],
@@ -487,7 +488,13 @@ def main(in_file):
         default='t',
         choices = [ 'p', 't'],
         help = _("Defines the plot centre on circular (e.g. ortho) plots.  Ignored on cylindrical plots.  Valid values are 't' (Tx. Site), 'p' (PCenter).  Default is 't'"))
-    #tested ok
+
+    parser.add_option("-f", "--filled-contours",
+        dest = "plot_filled_contours",
+        action = "store_true",
+        default = False,
+        help = _("Produces a filled contour plot.") )
+
     parser.add_option("-i", "--meridian",
         dest="plot_meridians",
         action="store_true",
@@ -633,6 +640,7 @@ def main(in_file):
                     projection = options.projection,
                     color_map = options.color_map,
                     face_colour = options.face_colour,
+                    plot_filled_contours = options.plot_filled_contours,                    
                     plot_contours = options.plot_contours,
                     plot_meridians = options.plot_meridians,
                     plot_parallels = options.plot_parallels,

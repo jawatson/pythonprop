@@ -172,7 +172,7 @@ class VOAAreaPlotGUI:
                         vg_files = _vg_files,
                         time_zone = _time_zone,
                         color_map = _color_map,
-                        plot_contours = self.contour_checkbutton.get_active(),
+                        plot_filled_contours = self.contour_checkbutton.get_active(),
                         plot_meridians = self.meridians_checkbutton.get_active(),
                         plot_parallels = self.parallels_checkbutton.get_active(),
                         plot_nightshade = self.greyline_checkbutton.get_active(),
