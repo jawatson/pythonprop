@@ -159,7 +159,6 @@ class VOAAreaPlot:
         imageBuf = np.zeros([grid, grid], float)
 
         area_rect = plot_parameters.get_area_rect()
-        print area_rect.get_formatted_string()
 
         # The checks ought to be performed in the area_rect.
         # Do a few basic sanity checks #
@@ -255,7 +254,6 @@ class VOAAreaPlot:
                     #if value > self.image_defs[3] : value = self.image_defs[3]
                     points[int(line[3:6])-1][int(line[0:3])-1] = value
             vgFile.close()
-            print points[0][0]
 
             m = Basemap(\
                 llcrnrlon=area_rect.get_sw_lon(), llcrnrlat=area_rect.get_sw_lat(),\
