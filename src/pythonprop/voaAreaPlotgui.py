@@ -17,7 +17,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
 import sys
@@ -70,10 +70,10 @@ from voaAreaPlot import *
 
 class VOAAreaPlotGUI:
     """Graphical front end to the voaAreaPlot application"""
-    
-    # set the users itshfdata directory.  
+
+    # set the users itshfdata directory.
     # todo mofify to suit windows as well...
-    # itshfbc_path = os.path.expanduser("~")+os.sep+'itshfbc' 
+    # itshfbc_path = os.path.expanduser("~")+os.sep+'itshfbc'
 
     plot_type_d = { 1: _('MUFday'),
                     2: _('Reliability'),
@@ -93,12 +93,12 @@ class VOAAreaPlotGUI:
               'spring': _('spring'),
               'summer': _('summer'),
               'winter': _('winter')}
-    
+
     def __init__(self, data_source_filename, parent=None, exit_on_close = True, datadir=""):
         self.datadir = datadir
         self.exit_on_close = exit_on_close
         #self.uifile = os.path.join(os.path.realpath(os.path.dirname(sys.argv[0])), "voaAreaPlotgui.ui")
-        self.parent = parent                                
+        self.parent = parent
         if self.parent:
             self.ui_file = os.path.join(self.datadir, "ui", "voaAreaPlotDialog.ui")
         # todo this should be gtk_builder_new_from_file
@@ -108,9 +108,9 @@ class VOAAreaPlotGUI:
         self.wTree = Gtk.Builder()
         self.wTree.add_from_file(self.ui_file)
 
-        self.get_objects("dialog", "type_combobox", "group_combobox", 
-                        "tz_spinbutton", "cmap_combobox", "contour_checkbutton", 
-                        "greyline_checkbutton", "parallels_checkbutton", 
+        self.get_objects("dialog", "type_combobox", "group_combobox",
+                        "tz_spinbutton", "cmap_combobox", "contour_checkbutton",
+                        "greyline_checkbutton", "parallels_checkbutton",
                         "meridians_checkbutton")
         if self.parent:
             self.dialog.set_transient_for(self.parent)
@@ -145,11 +145,11 @@ class VOAAreaPlotGUI:
         d = { 0 : _('All Plots'),}
         for i in range(1,self.num_plots+1): d[i] = str(i)
         self.populate_combo(self.group_combobox, d, 'key')
-                
-        event_dic = { "on_dialog_destroy" : self.quit_application, 
+
+        event_dic = { "on_dialog_destroy" : self.quit_application,
                       "on_cancel_button_clicked" : self.quit_application,
                       "on_ok_button_clicked" : self.run_plot}
-        self.wTree.connect_signals(event_dic)   
+        self.wTree.connect_signals(event_dic)
         if self.parent:
             self.dialog.run()
         else:
@@ -174,14 +174,14 @@ class VOAAreaPlotGUI:
                         color_map = _color_map,
                         plot_contours = self.contour_checkbutton.get_active(),
                         plot_meridians = self.meridians_checkbutton.get_active(),
-                        plot_parallels = self.parallels_checkbutton.get_active(), 
-                        plot_terminator = self.greyline_checkbutton.get_active(),
+                        plot_parallels = self.parallels_checkbutton.get_active(),
+                        plot_nightshade = self.greyline_checkbutton.get_active(),
                         parent = plot_parent)
         #self.dialog.run()
 
-        
+
     def populate_combo(self, cb, d, sort_by='value'):
-        _model = Gtk.ListStore(GObject.TYPE_STRING, GObject.TYPE_STRING) 
+        _model = Gtk.ListStore(GObject.TYPE_STRING, GObject.TYPE_STRING)
         items = d.items()
         if sort_by == 'value':
             items = [(v, k) for (k, v) in items]
@@ -196,27 +196,27 @@ class VOAAreaPlotGUI:
         cb.pack_start(cell, True)
         cb.add_attribute(cell, 'text', 1)
         #cb.set_wrap_width(20)
-        cb.set_active(0)    
-        
-                    
+        cb.set_active(0)
+
+
     def get_objects(self, *names):
         for name in names:
             widget = self.wTree.get_object(name)
             if widget is None:
                 raise ValueError, _("Widget '%s' not found") % name
             setattr(self, name, widget)
-            
-            
+
+
     def quit_application(self, *args):
         self.dialog.destroy()
-        #only emit main_quit if we're running as a standalone app   
+        #only emit main_quit if we're running as a standalone app
         #todo do we need to do anyother clean-up here if we're _not_
-        #running as a standalone app    
+        #running as a standalone app
         if self.exit_on_close:
-            Gtk.main_quit 
+            Gtk.main_quit
             sys.exit(0)
-        
-        
+
+
 if __name__ == "__main__":
     if (len(sys.argv) != 2):
         print _('Usage: voaAreaPlotgui file_to_plot.voa')

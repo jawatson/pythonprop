@@ -34,7 +34,6 @@ import templates
 from dateutil.relativedelta import relativedelta
 from calendar import monthrange
 
-
 from ConfigParser import *
 
 from mpl_toolkits.basemap import Basemap
@@ -44,10 +43,11 @@ try:
     import gi
     gi.require_version("Gtk", "3.0")
     from gi.repository import GObject
+    gi.require_version('GdkPixbuf', '2.0')
     from gi.repository import GdkPixbuf
     from gi.repository import Gtk
 except ImportError as exc:
-    print "Error: failed to import settings module ({})".format(exc)
+    print "Error: failed to import gi module ({})".format(exc)
     print "Check that the python-gi module is installed"
     sys.exit(1)
 

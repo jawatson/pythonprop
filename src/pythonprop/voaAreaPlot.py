@@ -124,7 +124,7 @@ class VOAAreaPlot:
                     plot_center = 't',
                     plot_meridians = True,
                     plot_parallels = True,
-                    plot_terminator = True,
+                    plot_nightshade = True,
                     resolution = 'c',
                     points_of_interest = [],
                     save_file = '',
@@ -159,6 +159,7 @@ class VOAAreaPlot:
         imageBuf = np.zeros([grid, grid], float)
 
         area_rect = plot_parameters.get_area_rect()
+        print area_rect.get_formatted_string()
 
         # The checks ought to be performed in the area_rect.
         # Do a few basic sanity checks #
@@ -172,11 +173,11 @@ class VOAAreaPlot:
         #    sys.exit(1)
 
         points = np.zeros([grid,grid], float)
-        lons = np.zeros(grid*grid, float)
-        lats = np.zeros(grid*grid, float)
+        #longitudes = np.zeros(grid*grid, float)
+        #latitudes = np.zeros(grid*grid, float)
 
-        lons = np.arange(area_rect.get_sw_lon(), area_rect.get_ne_lon()+0.001,(area_rect.get_ne_lon()-area_rect.get_sw_lon())/float(grid-1))
-        lats = np.arange(area_rect.get_sw_lat(), area_rect.get_ne_lat()+0.001,(area_rect.get_ne_lat()-area_rect.get_sw_lat())/float(grid-1))
+        longitudes = np.arange(area_rect.get_sw_lon(), area_rect.get_ne_lon()+0.001,(area_rect.get_ne_lon()-area_rect.get_sw_lon())/float(grid-1))
+        latitudes = np.arange(area_rect.get_sw_lat(), area_rect.get_ne_lat()+0.001,(area_rect.get_ne_lat()-area_rect.get_sw_lat())/float(grid-1))
 
         colString = 'matplotlib.cm.'+color_map
         colMap = eval(colString)
@@ -254,8 +255,9 @@ class VOAAreaPlot:
                     #if value > self.image_defs[3] : value = self.image_defs[3]
                     points[int(line[3:6])-1][int(line[0:3])-1] = value
             vgFile.close()
+            print points[0][0]
 
-            map = Basemap(\
+            m = Basemap(\
                 llcrnrlon=area_rect.get_sw_lon(), llcrnrlat=area_rect.get_sw_lat(),\
                 urcrnrlon=area_rect.get_ne_lon(), urcrnrlat=area_rect.get_ne_lat(),\
                 projection=projection,\
@@ -264,25 +266,43 @@ class VOAAreaPlot:
                 resolution=resolution,
                 ax=ax)
 
-            map.drawcoastlines(color='black')
-            map.drawcountries(color='grey')
-            map.drawmapboundary(color='black', linewidth=1.0)
+            m.drawcoastlines(color='black')
+            m.drawcountries(color='grey')
+            m.drawmapboundary(color='black', linewidth=1.0)
 
-            X,Y = np.meshgrid(lons, lats)
-            points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
+            """
+            warped = ma.zeros((grid, grid),float)
+            warped, warped_lon, warped_lat = map.transform_scalar(points,lons,lats,grid,grid, returnxy=True, checkbounds=False, masked=True)
+            warped = warped.filled(self.image_defs['min']-1.0)
 
             colMap.set_under(color ='k', alpha=0.0)
 
+            im = map.imshow(warped,
+                cmap=colMap,
+                extent = (-180, 180, -90, 90),
+                origin = 'lower',
+                norm = P.Normalize(clip = False,
+                vmin=self.image_defs['min'],
+                vmax=self.image_defs['max']))
+            """
+
+            # make 2-d grid of lons, lats
+            lons, lats  = np.meshgrid(longitudes,latitudes)
+            # compute native x,y coordinates of grid.
+            x, y = m(lons, lats)
+
+            points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
+            colMap.set_under(color ='k', alpha=0.0)
+
             if (True):
-                im = map.contourf(X, Y, points, self.image_defs['y_labels'],
-                    latlon=True,
+                im = m.contourf(x, y, points, self.image_defs['y_labels'],
                     cmap = colMap,
                     vmin=self.image_defs['min'],
                     vmax=self.image_defs['max'] )
                 plot_contours = True
-                
+
             else:
-                im = map.imshow(points,
+                im = m.imshow(points,
                     cmap=colMap,
                     extent = (-180, 180, -90, 90),
                     origin = 'lower',
@@ -294,8 +314,8 @@ class VOAAreaPlot:
             #######################
             # Plot greyline
             #######################
-            if plot_terminator:
-                map.nightshade(plot_parameters.get_daynight_datetime(vg_files[plot_ctr]-1))
+            if plot_nightshade:
+                m.nightshade(plot_parameters.get_daynight_datetime(vg_files[plot_ctr]-1))
 
 
             ##########################
@@ -303,7 +323,7 @@ class VOAAreaPlot:
             ##########################
             for location in self.points_of_interest:
                 if area_rect.contains(location.get_latitude(), location.get_longitude()):
-                    xpt,ypt = map(location.get_longitude(),location.get_latitude())
+                    xpt,ypt = m(location.get_longitude(),location.get_latitude())
                     ax.plot([xpt],[ypt],'ro')
                     ax.text(xpt+100000,ypt+100000,location.get_name())
 
@@ -315,9 +335,9 @@ class VOAAreaPlot:
                 else:
                     meridians = np.arange(-180, 240.0, 60.0)
                 if ((projection == 'ortho')    or (projection == 'vandg')):
-                    map.drawmeridians(meridians)
+                    m.drawmeridians(meridians)
                 else:
-                    map.drawmeridians(meridians,labels=[1,1,0,1])
+                    m.drawmeridians(meridians,labels=[1,1,0,1])
 
             if plot_parallels:
                 if (area_rect.get_lat_delta() <= 90.0):
@@ -325,13 +345,13 @@ class VOAAreaPlot:
                 else:
                     parallels = np.arange(-90.0, 120.0, 30.0)
                 if ((projection == 'ortho')    or (projection == 'vandg')):
-                    map.drawparallels(parallels)
+                    m.drawparallels(parallels)
                 else:
-                    map.drawparallels(parallels,labels=[1,1,0,1])
+                    m.drawparallels(parallels,labels=[1,1,0,1])
+
 
             if plot_contours:
-                ct = map.contour(X, Y, points, self.image_defs['y_labels'],
-                    latlon=True,
+                ct = m.contour(x, y, points, self.image_defs['y_labels'],
                     linestyles='solid',
                     linewidths=0.5,
                     colors='k',
@@ -485,39 +505,41 @@ def main(in_file):
         action="store_true",
         default=False,
         help=_("Plot meridians."))
-    #tested ok
+
     parser.add_option("-m", "--cmap",
         dest = "color_map",
         default = 'jet',
         choices = [ 'autumn', 'bone', 'cool', 'copper', 'gray', \
                 'hot', 'hsv', 'jet', 'pink', 'spring','summer', 'winter' ],
         help=_("COLOURMAP - may be one of 'autumn', 'bone', 'cool', 'copper', 'gray', 'hot', 'hsv', 'jet', 'pink', 'spring', 'summer', 'winter'.  Default = 'jet'"))
-    #tested ok
+
     parser.add_option("-n", "--interest",
         dest = "poi_file",
         default = '',
         help = "poi_file is a text file with points to plot on the map.")
+
     parser.add_option("-o", "--outfile",
         dest="save_file",
         help="Save to FILE.", metavar="FILE")
-    #tested ok
+
     parser.add_option("-p", "--projection",
         dest="projection",
         default = 'cyl',
         choices = ['cyl', 'mill', 'sinu', 'ortho', 'eqdc', 'robin', 'moll', 'tmerc', 'vandg'],
         help=_("PROJECTION - may be one of 'cyl' = Cylindrical Equidistant (default), 'mill' = Miller Cylindrical, 'sinu' = Sinusoidal, 'ortho' = Orthographic, 'eqdc' = Equidistant Conic, 'robin' = Robinson, 'moll' = Mollweide, 'tmerc' = Transverse Mercator."))
+
     parser.add_option("-q", "--quiet",
         dest="run_quietly",
         action="store_true",
         default=False,
         help=_("Process quietly (don't display plot on the screen)"))
-    #tested ok
+
     parser.add_option("-r", "--resolution",
         dest="resolution",
         default = 'c',
         choices = ['c', 'l', 'i', 'h', 'f'],
         help=_("RESOLUTION - may be one of 'c' (crude), 'l' (low), 'i' (intermediate), 'h' (high), 'f' (full)"))
-    # tested ok
+
 
     parser.add_option("-s", "--size",
         dest="dpi",
@@ -525,7 +547,7 @@ def main(in_file):
         help=_("Dots per inch (dpi) of saved file."))
 
     parser.add_option("-t", "--terminator",
-        dest="plot_terminator",
+        dest="plot_nightshade",
         action="store_true",
         default = False,
         help=_("Plot day/night regions on map"))
@@ -606,8 +628,6 @@ def main(in_file):
     else :
         time_zone = 0
 
-    #todo ortho doesn't work with the day/night terminator
-
     VOAAreaPlot(in_file,
                     vg_files = vg_files,
                     time_zone = time_zone,
@@ -618,7 +638,7 @@ def main(in_file):
                     plot_contours = options.plot_contours,
                     plot_meridians = options.plot_meridians,
                     plot_parallels = options.plot_parallels,
-                    plot_terminator = options.plot_terminator,
+                    plot_nightshade = options.plot_nightshade,
                     resolution = options.resolution,
                     points_of_interest = points_of_interest,
                     save_file = options.save_file,
