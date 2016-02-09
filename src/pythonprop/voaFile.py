@@ -31,7 +31,7 @@ from .hamlocation import *
 from .voaAreaRect import *
 import calendar as cal
 
-DEBUG = False
+DEBUG = True
 
 PROJECTION= {0:'aeqd', 1:'cyl'}
 
@@ -516,7 +516,7 @@ class VOAFile:
         f.write('Parameter:DBU      0\n')
         f.write('Parameter:SNRxx    0\n')
         f.write('Parameter:REL      0\n')
-        tmpStr= "Transmit :%10s%10s%21sShort\n" % (self.lat_as_string(self.txlat), self.lon_as_string(self.txlon), self.txlabel)
+        tmpStr= "Transmit :%10s%10s%20s Short\n" % (self.lat_as_string(self.txlat), self.lon_as_string(self.txlon), self.txlabel)
         f.write(tmpStr)
 
         tmpStr= "Area     :%10.1f%10.1f%10.1f%10.1f\n" % \
