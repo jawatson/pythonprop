@@ -325,7 +325,6 @@ class VOACAP_GUI():
             return -1
 
 
-
     def populate_combo(self, cb, model):
         cb.set_model(model)
         cell = Gtk.CellRendererText()
@@ -476,8 +475,8 @@ class VOACAP_GUI():
         except Exception as X:
             print('Error reading the user prefs: %s - %s' % (Exception, X))
 
-    def save_user_prefs(self):
 
+    def save_user_prefs(self):
         config = ConfigParser()
         # voaSiteChooser map size
         config.add_section('site chooser')
@@ -536,6 +535,7 @@ class VOACAP_GUI():
 
         with open(self.prefs_path, 'w') as configfile:
             config.write(configfile)
+
 
     def update_run_button_status(self, widget):
         """
@@ -620,6 +620,19 @@ class VOACAP_GUI():
 #        self.update_ssn_data_label()
         self.ssn_file_data_label.set_text(self.ssn_repo.get_file_data())
         #self.write_ssns(self.ssn_repo.get_ssn_list())
+        self.scroll_ssn_tv_to_current_year()
+
+
+    def scroll_ssn_tv_to_current_year(self):
+        # scroll to the current year
+        iter = self.ssn_repo.get_iter_first()
+        while iter:
+            if self.ssn_repo.get_value(iter, self.ssn_tv_idx_year) == str(datetime.datetime.today().year):
+                path = self.ssn_repo.get_path(iter)
+                self.ssn_tv.set_cursor(path)
+                self.ssn_tv.scroll_to_cell(path, None)
+                break
+            iter = self.ssn_repo.iter_next(iter)
 
 
     def update_ssn_data_label(self):
@@ -1367,16 +1380,7 @@ be processed, all other entries will be ignored.  Please delete some entries.'))
         _th = ssn_thumb.get_thumb()
         _th.show()
         self.ssn_plot_box.pack_start(_th, True, True, 0)
-
-        # scroll to the current year
-        iter = self.ssn_repo.get_iter_first()
-        while iter:
-            if self.ssn_repo.get_value(iter, self.ssn_tv_idx_year) == str(datetime.datetime.today().year):
-                path = self.ssn_repo.get_path(iter)
-                self.ssn_tv.set_cursor(path)
-                self.ssn_tv.scroll_to_cell(path, None)
-                break
-            iter = self.ssn_repo.iter_next(iter)
+        self.scroll_ssn_tv_to_current_year()
 
 
     def nb_switch_page(self, *args):
