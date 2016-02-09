@@ -185,27 +185,25 @@ class VOACAP_GUI():
 
         col_cm_t = [GObject.TYPE_UINT, GObject.TYPE_STRING]
         self.circuit_method_model = Gtk.ListStore(*col_cm_t)
-        [ self.circuit_method_model.append( [i, label]) for i, label in [
-                 (0, _("Select method to run")),
-                (30, _("Method 30 (Smoothed LP/SP Model)")),
-                (25, _("Method 25 (All Modes SP Model)")),
-                (22, _("Method 22 (Forced SP Model)")),
-                (21, _("Method 21 (Forced LP Model)")),
-                (20, _("Method 20 (Complete System Performance)")),
-                (15, _("Method 15 (Tx. &amp; Rx. Antenna Pattern)")),
-                (14, _("Method 14 (Rx. Antenna Pattern)")),
-                (13, _("Method 13 (Tx. Antenna Pattern)")),
-                 (9, _("Method 9 (HPF-MUF-FOT Text Graph)"))
+        [ self.circuit_method_model.append([i, label]) for i, label in [
+                (30, _("30: Smoothed LP/SP Model")),
+                (25, _("25: All Modes SP Model")),
+                (22, _("22: Forced SP Model")),
+                (21, _("21: Forced LP Model")),
+                (20, _("20: Complete System Performance")),
+                (15, _("15: Tx. &amp; Rx. Antenna Pattern")),
+                (14, _("14: Rx. Antenna Pattern")),
+                (13, _("13: Tx. Antenna Pattern")),
+                 (9, _("9: HPF-MUF-FOT Text Graph"))
                  ]]
 
         col_gm_t = [GObject.TYPE_UINT, GObject.TYPE_STRING]
         self.graphic_method_model = Gtk.ListStore(*col_gm_t)
         [ self.graphic_method_model.append([i, label]) for i, label in [
-            (0, _("Select method to run")),
-            (30, _("Method 30 (Smoothed LP/SP Model)")),
-            (22, _("Method 22 (Forced SP Model)")),
-            (21, _("Method 21 (Forced LP Model)")),
-            (20, _("Method 20 (Complete System Performance)")) ]]
+            (30, _("30: Smoothed LP/SP Model")),
+            (22, _("22: Forced SP Model")),
+            (21, _("21: Forced LP Model")),
+            (20, _("20: Complete System Performance")) ]]
 
 
         self.main_window.resize(self.main_window_size[0], self.main_window_size[1])
