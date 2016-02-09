@@ -176,8 +176,8 @@ class VOAAreaPlot:
         #longitudes = np.zeros(grid*grid, float)
         #latitudes = np.zeros(grid*grid, float)
 
-        longitudes = np.arange(area_rect.get_sw_lon(), area_rect.get_ne_lon()+0.001,(area_rect.get_ne_lon()-area_rect.get_sw_lon())/float(grid-1))
-        latitudes = np.arange(area_rect.get_sw_lat(), area_rect.get_ne_lat()+0.001,(area_rect.get_ne_lat()-area_rect.get_sw_lat())/float(grid-1))
+        lons = np.arange(area_rect.get_sw_lon(), area_rect.get_ne_lon()+0.001,(area_rect.get_ne_lon()-area_rect.get_sw_lon())/float(grid-1))
+        lats = np.arange(area_rect.get_sw_lat(), area_rect.get_ne_lat()+0.001,(area_rect.get_ne_lat()-area_rect.get_sw_lat())/float(grid-1))
 
         colString = 'matplotlib.cm.'+color_map
         colMap = eval(colString)
@@ -269,32 +269,17 @@ class VOAAreaPlot:
             m.drawcountries(color='grey')
             m.drawmapboundary(color='black', linewidth=1.0)
 
-            """
-            warped = ma.zeros((grid, grid),float)
-            warped, warped_lon, warped_lat = map.transform_scalar(points,lons,lats,grid,grid, returnxy=True, checkbounds=False, masked=True)
-            warped = warped.filled(self.image_defs['min']-1.0)
-
-            colMap.set_under(color ='k', alpha=0.0)
-
-            im = map.imshow(warped,
-                cmap=colMap,
-                extent = (-180, 180, -90, 90),
-                origin = 'lower',
-                norm = P.Normalize(clip = False,
-                vmin=self.image_defs['min'],
-                vmax=self.image_defs['max']))
-            """
-
             # make 2-d grid of lons, lats
-            lons, lats  = np.meshgrid(longitudes,latitudes)
+            lons, lats  = np.meshgrid(lons, lats)
             # compute native x,y coordinates of grid.
-            x, y = m(lons, lats)
+            #x, y = m(lons, lats)
 
             points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
             colMap.set_under(color ='k', alpha=0.0)
 
             if (plot_filled_contours):
-                im = m.contourf(x, y, points, self.image_defs['y_labels'],
+                im = m.contourf(lons, lats, points, self.image_defs['y_labels'],
+                    latlon=True,
                     cmap = colMap,
                     vmin=self.image_defs['min'],
                     vmax=self.image_defs['max'] )
@@ -309,6 +294,14 @@ class VOAAreaPlot:
                     vmin=self.image_defs['min'],
                     vmax=self.image_defs['max']))
 
+            if plot_contours:
+                ct = m.contour(lons, lats, points, self.image_defs['y_labels'],
+                    latlon=True,
+                    linestyles='solid',
+                    linewidths=0.5,
+                    colors='k',
+                    vmin=self.image_defs['min'],
+                    vmax=self.image_defs['max'] )
 
             #######################
             # Plot greyline
@@ -348,14 +341,6 @@ class VOAAreaPlot:
                 else:
                     m.drawparallels(parallels,labels=[1,1,0,1])
 
-
-            if plot_contours:
-                ct = m.contour(x, y, points, self.image_defs['y_labels'],
-                    linestyles='solid',
-                    linewidths=0.5,
-                    colors='k',
-                    vmin=self.image_defs['min'],
-                    vmax=self.image_defs['max'] )
 
             #add a title
             title_str = plot_parameters.get_plot_description_string(vg_files[plot_ctr]-1, self.image_defs['plot_type'], time_zone)
