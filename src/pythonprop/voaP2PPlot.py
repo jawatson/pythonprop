@@ -250,14 +250,24 @@ class VOAP2PPlot:
             self.subplot_title_label = ax.set_title(title_str, multialignment='left', **self.mono_font)
 
             if (self.data_type > 0):
-                im = ax.imshow(image_buffer, interpolation='bicubic',
-                    extent=(0, 24, 2, y_max), origin = 'lower', cmap=color_map,
-                    alpha = 0.95,
-                    norm = matplotlib.colors.Normalize(clip = False,
-                    vmin=self.image_defs['min'],
-                    vmax=self.image_defs['max']))
+                plot_filled_contours = True
+                if (plot_filled_contours):
+                    im = ax.contourf(image_buffer,
+                        self.image_defs['y_labels'],
+                        extent=(0, 24, 2, y_max),
+                        cmap=color_map)
+                    plot_contours =True
+                else:
+                    im = ax.imshow(image_buffer, interpolation='bicubic',
+                        extent=(0, 24, 2, y_max),
+                        origin = 'lower',
+                        cmap=color_map,
+                        alpha = 0.95,
+                        norm = matplotlib.colors.Normalize(clip = False,
+                        vmin=self.image_defs['min'],
+                        vmax=self.image_defs['max']))
                 if plot_contours:
-                    ax.contour(image_buffer, self.image_defs['y_labels'], extent=(0, 24, 2, y_max), linewidths=1.0, colors='k', alpha=0.6)
+                    ax.contour(image_buffer, self.image_defs['y_labels'][1:], extent=(0, 24, 2, y_max), linewidths=1.0, colors='k', alpha=0.6)
 
             if plot_bands:
                 for a,b in plot_bands:
