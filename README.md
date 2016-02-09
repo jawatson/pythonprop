@@ -10,7 +10,44 @@ version to be released using the PyGTK bindings.
 
 From v0.16, the application uses the GTK3 compatible PyGobject library.
 
-#Installation
+#Installation (Python 3)
+From version v.20, the application uses Python 3.  New users are encouraged to
+use Python 3 where ever possible.
+
+The application requires the following dependancies;
+* python3-matplotlib
+* python3-basemap
+* python3-matplotlib-gtk3
+* python3-cairocffi
+* rarian-compat
+* gnome-doc-utils
+* pkg-config
+* yelp
+
+
+These can be installed on Fedora 23 with the following command;
+
+    $ sudo dnf install yelp python3-gi python3-gi-cairo rarian-compat \
+      gnome-doc-utils pkg-config python3-dateutil python3-mpltoolkits.basemap \
+      python3-cairocffi python3-matplotlib-gtk3
+
+Debian / Ubuntu users can install these dependancies with the following command;
+
+    $ sudo apt-get install yelp python3-gi python3-gi-cairo rarian-compat \
+      gnome-doc-utils pkg-config python3-dateutil python3-mpltoolkits.basemap \
+      python3-cairocffi python3-matplotlib-gtk3
+
+The following commands will install the pythonProp tools from the .tar.gz file.
+
+    $ ./configure
+    $ make
+    $ sudo make install 
+
+Typing 'voacapgui' from the command line or the Gnome desktop will start the main application.
+
+
+#Installation (Python 2)
+New users are encouraged to use Python 3 (see above).  No further Python 2 updates are planned.
 
 ##User Install
 The inclusion of Gnome documentation from v0.16 onwards requires a few additional 
@@ -24,8 +61,7 @@ The application itself requires a few python dependancies;
 * basemap
 * python-matplotlib-gtk3
 
-These can be installed on Fedora 23 with the 
-following command;
+These can be installed on Fedora 23 with the following command;
 
     $ sudo yum install rarian-compat gnome-doc-utils pkgconfig python-basemap python-matplotlib-gtk3
 
@@ -53,5 +89,5 @@ The following command will create the build structure from a fresh svn checkout;
 
 ##Running the Applictation
 The application may be started by typing 'voacapgui' at the command line. v0.16
-includes a .desktop file allowing the applictaion to be started from the system
+includes a .desktop file allowing the application to be started from the system
 application launcher.
