@@ -1,3 +1,6 @@
 make color bar same height as plot on area plots
 put a frame around the ssn box
 save a save button to the circuit viewer
+update man page to reflect filled contour
+expose filled contour on p2p
+use shiftdata to produce millermaps etc.
