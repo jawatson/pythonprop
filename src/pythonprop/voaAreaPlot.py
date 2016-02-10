@@ -33,6 +33,7 @@
 # Try and delete the frame on ortho plots
 # All defaults should be defined in the same way, in the same place
 # The matplotlib AxesGrid toolkit is a collection of helper classes to ease displaying multiple images in matplotlib. The AxesGrid toolkit is distributed with matplotlib source. DOH!
+import os
 import re
 import sys
 import math
@@ -51,31 +52,17 @@ import matplotlib.colors as colors
 from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg
 from matplotlib.figure import Figure
 from matplotlib.font_manager import FontProperties
-#from numpy import ma #for warping
 from matplotlib.ticker import FuncFormatter
 import numpy as np
 
-
 from optparse import OptionParser
-#import pylab as P
 
-from .voaAreaRect import *
-from .voaFile import *
-from .hamlocation import *
+from .voaAreaRect import VOAAreaRect
+from .voaFile import VOAFile
+from .hamlocation import HamLocation
 from .voaPlotWindow import *
-from .sun import *
-"""
-try:
-    import gi
-    gi.require_version("Gtk", "3.0")
-    from gi.repository import GObject
-except:
-    pass
-try:
-    from gi.repository import Gtk
-except:
-    sys.exit(1)
-"""
+#from .sun import *
+
 
 import gettext
 import locale
@@ -93,8 +80,6 @@ gettext.bindtextdomain(GETTEXT_DOMAIN, LOCALE_PATH)
 gettext.textdomain(GETTEXT_DOMAIN)
 lang = gettext.translation(GETTEXT_DOMAIN, LOCALE_PATH, languages=langs, fallback=True)
 lang.install()
-
-
 
 class VOAAreaPlot:
 
@@ -230,7 +215,6 @@ class VOAAreaPlot:
             self.show_subplot_frame = False
 
         for plot_ctr in range(self.number_of_subplots):
-            #ax = self.fig.add_subplot(plot_ctr)
             ax = self.fig.add_subplot(self.num_rows,
                     self.num_cols,
                     plot_ctr+1,
@@ -256,46 +240,59 @@ class VOAAreaPlot:
                     points[int(line[3:6])-1][int(line[0:3])-1] = value
             vgFile.close()
 
-            m = Basemap(\
-                llcrnrlon=area_rect.get_sw_lon(), llcrnrlat=area_rect.get_sw_lat(),\
-                urcrnrlon=area_rect.get_ne_lon(), urcrnrlat=area_rect.get_ne_lat(),\
-                projection=projection,\
-                lat_0=plot_centre_location.get_latitude(),\
-                lon_0=plot_centre_location.get_longitude(),\
-                resolution=resolution,
-                ax=ax)
+            if projection in ('cyl', 'mill', 'gall'):
+                m_args = {"llcrnrlon":area_rect.get_sw_lon(),
+                    "llcrnrlat":area_rect.get_sw_lat(),
+                    "urcrnrlon":area_rect.get_ne_lon(),
+                    "urcrnrlat":area_rect.get_ne_lat()}
+
+            if projection in ('robin', 'vandg', 'sinu', 'mbtfpq', 'eck4',
+                            'kav7', 'moll', 'hammer', 'cass', 'poly', 'gnom',
+                            'laea', 'aeqd', 'cea', 'merc'):
+                m_args = {"lat_0":plot_centre_location.get_latitude(),
+                    "lon_0":plot_centre_location.get_longitude()}
+                if projection in ('cea', 'merc'):
+                    m_args['lat_ts']=0
+
+            print (m_args)
+            m = Basemap(ax=ax, projection=projection, resolution=resolution, **m_args)
 
             m.drawcoastlines(color='black')
             m.drawcountries(color='grey')
             m.drawmapboundary(color='black', linewidth=1.0)
 
-            # make 2-d grid of lons, lats
-            lons, lats  = np.meshgrid(lons, lats)
-            # compute native x,y coordinates of grid.
-            #x, y = m(lons, lats)
-
-            points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
-            colMap.set_under(color ='k', alpha=0.0)
+            #points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
+            #colMap.set_under(color ='k', alpha=0.0)
 
             if (plot_filled_contours):
+                # make 2-d grid of lons, lats
+                lons, lats  = np.meshgrid(lons, lats)
                 im = m.contourf(lons, lats, points, self.image_defs['y_labels'],
                     latlon=True,
-                    cmap = colMap,
-                    vmin=self.image_defs['min'],
-                    vmax=self.image_defs['max'] )
+                    cmap = colMap)
                 plot_contours = True
 
             else:
-                im = m.imshow(points,
-                    cmap=colMap,
-                    extent = (-180, 180, -90, 90),
+                # transform to nx x ny regularly spaced 5km native projection grid
+                nx = 360#int((m.xmax-m.xmin)/360.)+1
+                print("m.xmax={:.2f}".format(m.xmax))
+                print("m.xmin={:.2f}".format(m.xmin))
+                print(nx)
+                ny = 180#int((m.ymax-m.ymin)/360.)+1
+                print("m.ymax={:.2f}".format(m.ymax))
+                print("m.ymin={:.2f}".format(m.ymin))
+                print(ny)
+                dat = m.transform_scalar(points,lons,lats,nx,ny,masked=True)
+                im = m.imshow(dat,
+                    cmap = colMap,
                     origin = 'lower',
+                    alpha = 0.8,
                     norm = colors.Normalize(clip = False,
-                    vmin=self.image_defs['min'],
-                    vmax=self.image_defs['max']))
+                    vmin = self.image_defs['min'],
+                    vmax = self.image_defs['max']))
 
             if plot_contours:
-                ct = m.contour(lons, lats, points, self.image_defs['y_labels'],
+                ct = m.contour(lons, lats, points, self.image_defs['y_labels'][1:],
                     latlon=True,
                     linestyles='solid',
                     linewidths=0.5,
@@ -510,13 +507,15 @@ def main(in_file):
 
     parser.add_option("-o", "--outfile",
         dest="save_file",
-        help="Save to FILE.", metavar="FILE")
+        help="Save to FILE.",
+        metavar="FILE")
 
     parser.add_option("-p", "--projection",
         dest="projection",
         default = 'cyl',
-        choices = ['cyl', 'mill', 'sinu', 'ortho', 'eqdc', 'robin', 'moll', 'tmerc', 'vandg'],
-        help=_("PROJECTION - may be one of 'cyl' = Cylindrical Equidistant (default), 'mill' = Miller Cylindrical, 'sinu' = Sinusoidal, 'ortho' = Orthographic, 'eqdc' = Equidistant Conic, 'robin' = Robinson, 'moll' = Mollweide, 'tmerc' = Transverse Mercator."))
+        choices = ['cyl', 'mill', 'gall', 'robin', 'vandg', 'sinu', 'mbtfpq',
+                    'eck4', 'kav7', 'moll', 'hammer', 'cass', 'poly', 'gnom',
+                    'laea', 'aeqd', 'cea', 'merc'])
 
     parser.add_option("-q", "--quiet",
         dest="run_quietly",
