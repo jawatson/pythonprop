@@ -162,8 +162,8 @@ class VOAAreaPlot:
         #latitudes = np.zeros(grid*grid, float)
 
         lons = np.arange(area_rect.get_sw_lon(), area_rect.get_ne_lon()+0.001,(area_rect.get_ne_lon()-area_rect.get_sw_lon())/float(grid-1))
+        lons[-1] = min(180.0, lons[-1])
         lats = np.arange(area_rect.get_sw_lat(), area_rect.get_ne_lat()+0.001,(area_rect.get_ne_lat()-area_rect.get_sw_lat())/float(grid-1))
-
         colString = 'matplotlib.cm.'+color_map
         colMap = eval(colString)
 
@@ -247,14 +247,13 @@ class VOAAreaPlot:
                     "urcrnrlat":area_rect.get_ne_lat()}
 
             if projection in ('robin', 'vandg', 'sinu', 'mbtfpq', 'eck4',
-                            'kav7', 'moll', 'hammer', 'cass', 'poly', 'gnom',
+                            'kav7', 'moll', 'hammer', 'gnom',
                             'laea', 'aeqd', 'cea', 'merc'):
                 m_args = {"lat_0":plot_centre_location.get_latitude(),
                     "lon_0":plot_centre_location.get_longitude()}
                 if projection in ('cea', 'merc'):
                     m_args['lat_ts']=0
 
-            print (m_args)
             m = Basemap(ax=ax, projection=projection, resolution=resolution, **m_args)
 
             m.drawcoastlines(color='black')
@@ -267,6 +266,7 @@ class VOAAreaPlot:
             if (plot_filled_contours):
                 # make 2-d grid of lons, lats
                 lons, lats  = np.meshgrid(lons, lats)
+                points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
                 im = m.contourf(lons, lats, points, self.image_defs['y_labels'],
                     latlon=True,
                     cmap = colMap)
