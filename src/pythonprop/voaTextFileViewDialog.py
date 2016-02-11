@@ -96,15 +96,27 @@ class VOATextFileViewDialog:
             Gtk.FileChooserAction.SAVE,
             (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
             Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
-
         #self.add_filters(dialog)
-
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            file = open(dialog.get_filename(), "w")
-            file.write(self.results_text)
-            file.close()
+            try:
+                file = open(dialog.get_filename(), "w")
+                file.write(self.results_text)
+                file.close()
+                success_dialog = Gtk.MessageDialog(self.parent, 0, Gtk.MessageType.INFO,
+                    Gtk.ButtonsType.OK, "File Saved")
+                success_dialog.format_secondary_text(
+                    "File saved as {:s}.".format(file.name))
+                success_dialog.run()
+                success_dialog.destroy()
+            except:
+                error_dialog = Gtk.MessageDialog(self.parent, 0, Gtk.MessageType.ERROR,
+                    Gtk.ButtonsType.CANCEL, "Error")
+                error_dialog.format_secondary_text(
+                    "Error saving data to {:s}".format(file.name))
+                error_dialog.run()
+                error_dialog.destroy()
         elif response == Gtk.ResponseType.CANCEL:
             pass
-            
+
         dialog.destroy()
