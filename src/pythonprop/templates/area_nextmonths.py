@@ -32,7 +32,7 @@ class templates:
             self.current_year = y
             self.current_month = m
             self.current_utc = u if u else 12
-            self.current_freq = float(f) if f > 3 else 3.0
+            self.current_freq = float(f) if float(f) > 3 else 3.0
 
 
     def run(self):
@@ -102,4 +102,3 @@ class templates:
             cur = cur + delta
             tups.append((cur.year, cur.month, utc, freq))
         self.ret_templates[self.name] = tups
-
