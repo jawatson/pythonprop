@@ -5,9 +5,6 @@ VOACAP Utilities
 Pythonprop is a collection of scripts to provide a wrapper to the VOACAP HF
 propagation prediction engine.
 
-The current stable GTK2 release is version 0.13 which will be the last
-version to be released using the PyGTK bindings.  
-
 From v0.16, the application uses the GTK3 compatible PyGobject library.
 
 #Installation (Python 3)
@@ -27,9 +24,9 @@ The application requires the following dependancies;
 
 These can be installed on Fedora 23 with the following command;
 
-    $ sudo dnf install yelp rarian-compat \
-      gnome-doc-utils pkgconfig python3-dateutil python3-basemap \
-      python3-cairocffi python3-matplotlib-gtk3
+    $ sudo dnf install yelp rarian-compat gnome-doc-utils \
+      pkgconfig python3-dateutil python3-basemap \
+      python3-cairocffi python3-cffi python3-matplotlib-gtk3
 
 Debian / Ubuntu users can install these dependencies with the following command;
 
