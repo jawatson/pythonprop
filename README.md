@@ -2,17 +2,17 @@
 VOACAP Utilities
 
 #PythonProp
-Pythonprop is a collection of scripts to provide a wrapper to the VOACAP HF 
+Pythonprop is a collection of scripts to provide a wrapper to the VOACAP HF
 propagation prediction engine.
 
-The current stable GTK2 release is version 0.13 which will be the last 
+The current stable GTK2 release is version 0.13 which will be the last
 version to be released using the PyGTK bindings.  
 
 From v0.16, the application uses the GTK3 compatible PyGobject library.
 
 #Installation (Python 3)
 From version v.20, the application uses Python 3.  New users are encouraged to
-use Python 3 where ever possible.
+use Python 3.
 
 The application requires the following dependancies;
 * python3-matplotlib
@@ -27,11 +27,11 @@ The application requires the following dependancies;
 
 These can be installed on Fedora 23 with the following command;
 
-    $ sudo dnf install yelp python3-gi python3-gi-cairo rarian-compat \
-      gnome-doc-utils pkg-config python3-dateutil python3-mpltoolkits.basemap \
+    $ sudo dnf install yelp rarian-compat \
+      gnome-doc-utils pkgconfig python3-dateutil python3-basemap \
       python3-cairocffi python3-matplotlib-gtk3
 
-Debian / Ubuntu users can install these dependancies with the following command;
+Debian / Ubuntu users can install these dependencies with the following command;
 
     $ sudo apt-get install yelp python3-gi python3-gi-cairo rarian-compat \
       gnome-doc-utils pkg-config python3-dateutil python3-mpltoolkits.basemap \
@@ -40,8 +40,7 @@ Debian / Ubuntu users can install these dependancies with the following command;
 The following commands will install the pythonProp tools from the .tar.gz file.
 
     $ ./configure
-    $ make
-    $ sudo make install 
+    $ sudo make install
 
 Typing 'voacapgui' from the command line or the Gnome desktop will start the main application.
 
@@ -50,7 +49,7 @@ Typing 'voacapgui' from the command line or the Gnome desktop will start the mai
 New users are encouraged to use Python 3 (see above).  No further Python 2 updates are planned.
 
 ##User Install
-The inclusion of Gnome documentation from v0.16 onwards requires a few additional 
+The inclusion of Gnome documentation from v0.16 onwards requires a few additional
 dependencies;
 * rarian-compat
 * gnome-doc-utils
@@ -65,7 +64,7 @@ These can be installed on Fedora 23 with the following command;
 
     $ sudo yum install rarian-compat gnome-doc-utils pkgconfig python-basemap python-matplotlib-gtk3
 
-Debian / Ubuntu users can install these dependancies with the following command;
+Debian / Ubuntu users can install these dependencies with the following command;
 
     $ sudo apt-get install rarian-compat gnome-doc-utils pkg-config python-mpltoolkits.basemap
 
@@ -73,7 +72,7 @@ The following commands will install the pythonProp tools from the .tar.gz file.
 
     $ ./configure
     $ make
-    $ sudo make install 
+    $ sudo make install
 
 Typing 'voacapgui' from the command line or the Gnome desktop will start the main application.
 
