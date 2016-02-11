@@ -63,8 +63,6 @@ from .voaAreaRect import VOAAreaRect
 from .voaFile import VOAFile
 from .hamlocation import HamLocation
 from .voaPlotWindow import *
-#from .sun import *
-
 
 import gettext
 import locale
@@ -370,6 +368,7 @@ class VOAAreaPlot:
         for t in self.cb_ax.get_yticklabels():
             t.set_fontsize(colorbar_fontsize)
 
+        #self.fig.tight_layout()
         canvas = FigureCanvasGTK3Agg(self.fig)
         self.fig.canvas.mpl_connect('draw_event', self.on_draw)
         canvas.show()
@@ -398,7 +397,6 @@ class VOAAreaPlot:
 
         bbox = self.main_title_label.get_window_extent()
         main_title_bbox = bbox.inverse_transformed(self.fig.transFigure)
-
 
         _preferred_top_space = 1.25*(subplot_title_bbox.height + main_title_bbox.height)
         _actual_top_space = 1-top
@@ -548,7 +546,7 @@ def main(in_file):
         dest="plot_nightshade",
         action="store_true",
         default = False,
-        help=_("Plot day/night regions on map"))
+        help=_("Plot day/night regions on the map"))
 
     parser.add_option("-v", "--vg_files",
         dest = "vg_files",
