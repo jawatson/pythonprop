@@ -49,9 +49,11 @@ from gi.repository import Gtk
 #matplotlib.use('GTK3Agg')
 
 import matplotlib.colors as colors
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg
 from matplotlib.figure import Figure
 from matplotlib.font_manager import FontProperties
+
 from matplotlib.ticker import FuncFormatter
 import numpy as np
 
@@ -157,13 +159,6 @@ class VOAAreaPlot:
         #    print "-180 < Latitude < 180.0, -90 < Longitude < 90"
         #    sys.exit(1)
 
-        points = np.zeros([grid,grid], float)
-        #longitudes = np.zeros(grid*grid, float)
-        #latitudes = np.zeros(grid*grid, float)
-
-        lons = np.arange(area_rect.get_sw_lon(), area_rect.get_ne_lon()+0.001,(area_rect.get_ne_lon()-area_rect.get_sw_lon())/float(grid-1))
-        lons[-1] = min(180.0, lons[-1])
-        lats = np.arange(area_rect.get_sw_lat(), area_rect.get_ne_lat()+0.001,(area_rect.get_ne_lat()-area_rect.get_sw_lat())/float(grid-1))
         colString = 'matplotlib.cm.'+color_map
         colMap = eval(colString)
 
@@ -214,7 +209,14 @@ class VOAAreaPlot:
         if projection == 'ortho':
             self.show_subplot_frame = False
 
-        for plot_ctr in range(self.number_of_subplots):
+        for plot_ctr, vg_file in enumerate(vg_files):
+            points = np.zeros([grid,grid], float)
+
+            lons = np.arange(area_rect.get_sw_lon(), area_rect.get_ne_lon()+0.001,(area_rect.get_ne_lon()-area_rect.get_sw_lon())/float(grid-1))
+            lons[-1] = min(180.0, lons[-1])
+            lats = np.arange(area_rect.get_sw_lat(), area_rect.get_ne_lat()+0.001,(area_rect.get_ne_lat()-area_rect.get_sw_lat())/float(grid-1))
+            lats[-1] = min(90.0, lats[-1])
+
             ax = self.fig.add_subplot(self.num_rows,
                     self.num_cols,
                     plot_ctr+1,
@@ -224,8 +226,8 @@ class VOAAreaPlot:
             self.subplots.append(ax)
 
             ax.label_outer()
-            #print "opening: ",(in_file+'.vg'+str(vg_files[plot_ctr]))
-            vgFile = open(in_file+'.vg'+str(vg_files[plot_ctr]))
+            #print "opening: ",(in_file+'.vg'+str(vg_file))
+            vgFile = open(in_file+'.vg'+str(vg_file))
             pattern = re.compile(r"[a-z]+")
 
             for line in vgFile:
@@ -351,7 +353,14 @@ class VOAAreaPlot:
         # Add a colorbar on the right hand side, aligned with the
         # top of the uppermost plot and the bottom of the lowest
         # plot.
-        self.cb_ax = self.fig.add_axes(self.get_cb_axes())
+        # create an axes on the right side of ax. The width of cax will be 5%
+        # of ax and the padding between cax and ax will be fixed at 0.05 inch.
+        if self.number_of_subplots > 1:
+            self.cb_ax = self.fig.add_axes(self.get_cb_axes())
+        else:
+            divider = make_axes_locatable(ax)
+            self.cb_ax = divider.append_axes("right", size="5%", pad=0.05)
+
         self.fig.colorbar(im, cax=self.cb_ax,
                     orientation='vertical',
                     ticks=self.image_defs['y_labels'],
