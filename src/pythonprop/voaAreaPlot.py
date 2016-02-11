@@ -105,7 +105,7 @@ class VOAAreaPlot:
                     color_map = 'jet',
                     face_colour = "white",
                     time_zone = 0,
-                    plot_filled_contours = False,
+                    filled_contours = False,
                     plot_contours = False,
                     plot_center = 't',
                     plot_meridians = True,
@@ -263,7 +263,7 @@ class VOAAreaPlot:
             #points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
             #colMap.set_under(color ='k', alpha=0.0)
 
-            if (plot_filled_contours):
+            if (filled_contours):
                 # make 2-d grid of lons, lats
                 lons, lats  = np.meshgrid(lons, lats)
                 points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
@@ -478,7 +478,7 @@ def main(in_file):
         choices = [ 'p', 't'],
         help = _("Defines the plot centre on circular (e.g. ortho) plots.  Ignored on cylindrical plots.  Valid values are 't' (Tx. Site), 'p' (PCenter).  Default is 't'"))
 
-    parser.add_option("-f", "--filled-contours",
+    parser.add_option("--filled-contour",
         dest = "plot_filled_contours",
         action = "store_true",
         default = False,
@@ -631,7 +631,7 @@ def main(in_file):
                     projection = options.projection,
                     color_map = options.color_map,
                     face_colour = options.face_colour,
-                    plot_filled_contours = options.plot_filled_contours,
+                    filled_contours = options.plot_filled_contours,
                     plot_contours = options.plot_contours,
                     plot_meridians = options.plot_meridians,
                     plot_parallels = options.plot_parallels,

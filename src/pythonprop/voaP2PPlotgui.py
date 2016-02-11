@@ -17,13 +17,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
 import sys
 import os
 import datetime
-#import subprocess
 import gettext
 import locale
 
@@ -71,10 +70,10 @@ from .voa3DPlot import VOA3DPlot
 
 class VOAP2PPlotGUI:
     """GUI to create VOAArea Input Files"""
-    
-    # set the users itshfdata directory.  
+
+    # set the users itshfdata directory.
     # todo mofify to suit windows as well...
-    itshfbc_path = os.path.expanduser("~")+os.sep+'itshfbc' 
+    itshfbc_path = os.path.expanduser("~")+os.sep+'itshfbc'
 
 
     plot_type_d = { 0: _('None'),
@@ -96,7 +95,7 @@ class VOAP2PPlotGUI:
               'summer': _('summer'),
               'winter': _('winter')}
 
- 
+
     def __init__(self, data_source_filename, parent = None, exit_on_close = True,  datadir=""):
         self.datadir = datadir
         self.in_filename = data_source_filename
@@ -115,12 +114,16 @@ class VOAP2PPlotGUI:
         self.wTree = Gtk.Builder()
         self.wTree.add_from_file(self.ui_file)
 
-        self.get_objects("dialog", "type_combobox", "group_combobox", 
-                                "tz_spinbutton", "cmap_combobox")
+        self.get_objects("dialog",
+                "type_combobox",
+                "group_combobox",
+                "tz_spinbutton",
+                "contour_checkbutton",
+                "cmap_combobox")
         if self.parent:
             self.dialog.set_transient_for(self.parent)
-        
-        self.dialog.set_title(_("Plot Control")) 
+
+        self.dialog.set_title(_("Plot Control"))
 
         if in_file.get_number_of_groups() >= 2:
             self.plot_type_d[5] = _('3D: MUF')
@@ -147,8 +150,8 @@ class VOAP2PPlotGUI:
         l = in_file.get_group_titles()
         d.update(list(zip(list(range(1, len(l)+1)), l)))
         self.populate_combo(self.group_combobox, d, 'key')
-                
-        event_dic = { "on_dialog_destroy" : self.quit_application, 
+
+        event_dic = { "on_dialog_destroy" : self.quit_application,
                       "on_cancel_button_clicked" : self.quit_application,
                       "on_ok_button_clicked" : self.run_plot}
         self.wTree.connect_signals(event_dic)
@@ -162,8 +165,9 @@ class VOAP2PPlotGUI:
     def run_plot(self, widget):
 #        _color_map = self.cmap_list[self.cmap_combobox.get_active()]
 #        _data_type = self.type_combobox.get_active()
-        _color_map = self.cmap_combobox.get_model().get_value(self.cmap_combobox.get_active_iter(), 0)
         _data_type = int(self.type_combobox.get_model().get_value(self.type_combobox.get_active_iter(), 0))
+        _filled_contours = self.contour_checkbutton.get_active()
+        _color_map = self.cmap_combobox.get_model().get_value(self.cmap_combobox.get_active_iter(), 0)
         if self.group_combobox.get_active() == 0:
         	_plot_groups = ['a']
         else:
@@ -176,16 +180,17 @@ class VOAP2PPlotGUI:
                         plot_groups = _plot_groups,
                         time_zone = _time_zone,
                         color_map = _color_map,
+                        filled_contours = _filled_contours,
                         parent = plot_parent)
         else: # do a 3D plot
             plot = VOA3DPlot(self.in_filename,
                         color_map = _color_map,
                         parent = plot_parent)
         #self.dialog.run()
-        
- 
+
+
     def populate_combo(self, cb, d, sort_by='value'):
-        _model = Gtk.ListStore(GObject.TYPE_STRING, GObject.TYPE_STRING) 
+        _model = Gtk.ListStore(GObject.TYPE_STRING, GObject.TYPE_STRING)
         items = list(d.items())
         if sort_by == 'value':
             items = [(v, k) for (k, v) in items]
@@ -200,27 +205,27 @@ class VOAP2PPlotGUI:
         cb.pack_start(cell, True)
         cb.add_attribute(cell, 'text', 1)
         #cb.set_wrap_width(20)
-        cb.set_active(0)    
-       
-                    
+        cb.set_active(0)
+
+
     def get_objects(self, *names):
         for name in names:
             widget = self.wTree.get_object(name)
             if widget is None:
                 raise ValueError(_("Widget '%s' not found") % name)
             setattr(self, name, widget)
-            
-            
+
+
     def quit_application(self, *args):
         self.dialog.destroy()
-        #only emit main_quit if we're running as a standalone app   
+        #only emit main_quit if we're running as a standalone app
         #todo do we need to do anyother clean-up here if we're _not_
-        #running as a standalone app    
+        #running as a standalone app
         if self.exit_on_close:
-            Gtk.main_quit 
+            Gtk.main_quit
             sys.exit(0)
-        
-        
+
+
 if __name__ == "__main__":
     if (len(sys.argv) != 2):
         print(_('Usage: voaP2PPlotgui file_to_plot.out'))

@@ -109,6 +109,7 @@ class VOAP2PPlot:
                 color_map = 'jet',
                 plot_contours = False,
                 face_colour = "white",
+                filled_contours = False,
                 plot_label = "",
                 plot_bands = None,
                 time_zone = 0,
@@ -126,6 +127,7 @@ class VOAP2PPlot:
         self.run_quietly = run_quietly
         self.dpi=dpi
         self.face_colour = face_colour
+        self.plot_filled_contours = filled_contours
         self.df = VOAOutFile(data_file, time_zone=time_zone, data_type=self.data_type, quiet=run_quietly)
 
         self.image_defs = self.IMG_TYPE_DICT[self.data_type]
@@ -227,8 +229,7 @@ class VOAP2PPlot:
             self.subplot_title_label = ax.set_title(title_str, multialignment='left', **self.mono_font)
 
             if (self.data_type > 0):
-                plot_filled_contours = True
-                if (plot_filled_contours):
+                if (self.plot_filled_contours):
                     im = ax.contourf(image_buffer,
                         self.image_defs['y_labels'],
                         extent=(0, 24, 2, y_max),
@@ -388,6 +389,12 @@ def main(data_file):
         default = '30.0',
         help=_("Maximum frequency for the Y axis"))
 
+    parser.add_option("--filled-contour",
+        dest = "plot_filled_contours",
+        action = "store_true",
+        default = False,
+        help = _("Produces a filled contour plot.") )
+
     parser.add_option("-g", "--group",
         dest="plotGroups",
         default='1',
@@ -509,6 +516,7 @@ def main(data_file):
                     plot_groups = plot_groups,
                     plot_contours = options.plot_contours,
                     face_colour = options.face_colour,
+                    plot_filled_contours = options.plot_filled_contours,
                     plot_label = options.plot_label,
                     color_map=options.color_map,
                     time_zone = time_zone,
