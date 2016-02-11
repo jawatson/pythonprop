@@ -47,7 +47,7 @@ class VOATextFileViewDialog:
 
     file = ''
 
-# http://www.rexx.com/~dkuhlman/python_201/python_201.html#SECTION008210000000000000000
+    # http://www.rexx.com/~dkuhlman/python_201/python_201.html#SECTION008210000000000000000
     def __init__(self, file=None, datadir="", parent=None):
         self.file=file
         self.datadir=datadir
@@ -57,10 +57,7 @@ class VOATextFileViewDialog:
     def run(self):
         """This function will show the site selection dialog"""
 
-        #load the dialog from the glade file
-        #self.uifile = os.path.join(os.path.realpath(os.path.dirname(sys.argv[0])), "voaTextFileViewDialog.ui")
         self.ui_file = os.path.join(self.datadir, "ui", "voaTextFileViewDialog.ui")
-        #self.wTree = Gtk.Builder.new_from_file(self.ui_file)
         self.wTree = Gtk.Builder()
         self.wTree.add_from_file(self.ui_file)
 
@@ -69,35 +66,20 @@ class VOATextFileViewDialog:
                             "text_buffer",
                             "save_button",
                             "ok_button")
+        self.save_button.connect("clicked", self.on_save_clicked)
+
         self.text_file_view_dialog.set_transient_for(self.parent)
         self.text_view.modify_font(Pango.FontDescription("Luxi Mono 10"))
+        self.results_text = open(self.file, "r").read().replace('\f','')
 
         try:
-            self.text_buffer.set_text(open(self.file, "r").read().replace('\f',''))
+            self.text_buffer.set_text(self.results_text)
         except:
             print(_('Failed to read file: '), self.file)
 
-        #Create event dictionay and connect it
-#        event_dic = { "on_map_eventbox_button_release_event" : self.set_location_from_map,
-#                        "on_lat_entry_insert_text" : lat_validator.entry_insert_text,
-#                        "on_lon_entry_insert_text" : lon_validator.entry_insert_text,
-#                        "on_lat_entry_focus_out_event" : self.update_locator_ui,
-#                        "on_lon_entry_focus_out_event" : self.update_locator_ui}
-
-#        self.wTree.connect_signals(event_dic)
-
-        # The locator widgets need to be connected individually.  The handlerIDs are
-        # used to block signals when setting the loctaor widget programatically
-
-
         self.result = self.text_file_view_dialog.run()
         self.text_file_view_dialog.destroy()
-#        self.return_location.set_name(self.name_entry.get_text())
-#        self.return_location.set_latitude(float(self.lat_entry.get_text()))
-#        self.return_location.set_longitude(float(self.lon_entry.get_text()))
-#        return self.result,self.return_location
         return None
-
 
 
     def get_objects(self, *names):
@@ -106,3 +88,23 @@ class VOATextFileViewDialog:
             if widget is None:
                 raise ValueError(_("Widget '%s' not found") % name)
             setattr(self, name, widget)
+
+
+    def on_save_clicked(self, widget):
+        print("in the save dialog")
+        dialog = Gtk.FileChooserDialog("Please choose a file", self.parent,
+            Gtk.FileChooserAction.SAVE,
+            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+            Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+
+        #self.add_filters(dialog)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            file = open(dialog.get_filename(), "w")
+            file.write(self.results_text)
+            file.close()
+        elif response == Gtk.ResponseType.CANCEL:
+            pass
+            
+        dialog.destroy()
