@@ -43,11 +43,7 @@
 #
 # './voaP2PPlot.py -z 3 voacapx.out' Plots for a timezone of + 3 hours
 
-#from gi.repository import GObject
-#from gi.repository import Gtk
-
 import matplotlib
-#matplotlib.use('GTK3Agg')
 
 import sys
 import re
@@ -56,7 +52,6 @@ import math
 from optparse import OptionParser
 
 from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg
-#import matplotlib.backends.backend_gtk3agg as gtkagg
 import matplotlib.transforms as mtransforms
 from matplotlib.figure import Figure
 from matplotlib.font_manager import FontProperties
@@ -64,22 +59,6 @@ from matplotlib.ticker import FuncFormatter
 
 from .voaOutFile import *
 from .voaPlotWindow import *
-#from voaMultiPlot import *
-
-#import pylab as P
-
-#try:
-#    import gi
-#    gi.require_version("Gtk", "3.0")
-#    from gi.repository import GObject
-#except:
-#    pass
-#try:
-#    from gi.repository import Gtk
-#except:
-#    sys.exit(1)
-
-
 
 import gettext
 import locale
@@ -164,7 +143,6 @@ class VOAP2PPlot:
         matplotlib.rcParams['axes.edgecolor'] = 'gray'
         matplotlib.rcParams['axes.facecolor'] = 'white'
         matplotlib.rcParams['axes.grid'] = True
-        #matplotlib.rcParams['figure.facecolor'] = 'white'
         matplotlib.rcParams['legend.fancybox'] = True
         matplotlib.rcParams['legend.shadow'] = True
         matplotlib.rcParams['figure.subplot.hspace'] = 0.45
@@ -242,7 +220,6 @@ class VOAP2PPlot:
             ax.set_xticks(self.x_axes_ticks)
             ax.set_yticks(y_ticks)
 
-
             self.add_legend(ax)
             title_str = group_info.strip()
             if number_of_subplots > 1:
@@ -285,6 +262,8 @@ class VOAP2PPlot:
             for t in self.cb_ax.get_yticklabels():
                 t.set_fontsize(colorbar_fontsize)
 
+        # TODO tight_layout looks a neater way to layout the grid
+        #self.fig.tight_layout()
         canvas = FigureCanvasGTK3Agg(self.fig)
         self.fig.canvas.mpl_connect('draw_event', self.on_draw)
         canvas.show()
@@ -299,7 +278,6 @@ class VOAP2PPlot:
 
 
     def on_draw(self, event):
-        #print 'drawing'
         top = self.fig.subplotpars.top
         bottom = self.fig.subplotpars.bottom
         hspace = self.fig.subplotpars.hspace
