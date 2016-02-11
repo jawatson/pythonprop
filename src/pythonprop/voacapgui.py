@@ -80,7 +80,7 @@ gettext.bindtextdomain(GETTEXT_DOMAIN, LOCALE_PATH)
 gettext.textdomain(GETTEXT_DOMAIN)
 
 
-from .voaTextFileViewDialog import *
+from .voaTextFileViewDialog import VOATextFileViewDialog
 from .voaDatFile import *
 from .voaDefaults import *
 from .voaSiteChooser import *
@@ -1580,11 +1580,15 @@ all other entries will be ignored.'))
             try:
                 retcode = subprocess.call("voacapl -s " + voacapl_args, shell=True)
                 if run_type == 'c':
-                    result_dialog = VOATextFileViewDialog(file=self.itshfbc_path+os.sep+'run'+os.sep+output_filename, datadir=self.datadir)
+                    result_dialog = VOATextFileViewDialog(file=self.itshfbc_path+os.sep+'run'+os.sep+output_filename,
+                                datadir=self.datadir,
+                                parent=self.main_window)
                     return_code = result_dialog.run()
                 if run_type == 'g':
                     graph = VOAP2PPlotGUI(self.itshfbc_path+os.sep+'run'+os.sep+output_filename,
-                        parent=self.main_window, exit_on_close=False, datadir=self.datadir)
+                        parent=self.main_window,
+                        exit_on_close=False,
+                        datadir=self.datadir)
                     graph.quit_application()
             except OSError as e:
                     print("Voacapl execution failed:", e)
