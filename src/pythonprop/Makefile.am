@@ -15,7 +15,6 @@ pythonprop_PYTHON=	\
 	hamlocation.py \
 	scriptutil.py \
 	ssnFetch.py \
-	sun.py \
 	treefilebrowser.py \
 	voaAntennaChooser.py \
 	voaAreaChooser.py \
