@@ -133,11 +133,6 @@ class VOAP2PPlotGUI:
             self.win = Gtk.Dialog("Plot Control", self.parent)
             self.win.get_content_area().add(self.main_box)
 
-
-        #if self.parent:
-        #    self.dialog.set_transient_for(self.parent)
-
-
         if in_file.get_number_of_groups() >= 2:
             self.plot_type_d[5] = _('3D: MUF')
 
@@ -168,6 +163,8 @@ class VOAP2PPlotGUI:
                       "on_cancel_button_clicked" : self.quit_application,
                       "on_ok_button_clicked" : self.run_plot}
         self.wTree.connect_signals(event_dic)
+        self.type_combobox.connect("changed", self.on_type_combo_changed)
+
         self.win.connect('delete_event', self.quit_application)
         if self.parent:
             self.win.run()
@@ -219,6 +216,12 @@ class VOAP2PPlotGUI:
         cb.add_attribute(cell, 'text', 1)
         #cb.set_wrap_width(20)
         cb.set_active(0)
+
+    def on_type_combo_changed(self, widget):
+        selected_plot_type = int(self.type_combobox.get_model().get_value(self.type_combobox.get_active_iter(), 0))
+        is_data_plot = False if selected_plot_type in (0, 5) else True
+        self.contour_checkbutton.set_sensitive(is_data_plot)
+        self.cmap_combobox.set_sensitive(is_data_plot)
 
 
     def get_objects(self, *names):
