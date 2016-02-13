@@ -99,23 +99,24 @@ class VOAAreaPlotGUI:
         self.exit_on_close = exit_on_close
         #self.uifile = os.path.join(os.path.realpath(os.path.dirname(sys.argv[0])), "voaAreaPlotgui.ui")
         self.parent = parent
-        if self.parent:
-            self.ui_file = os.path.join(self.datadir, "ui", "voaAreaPlotDialog.ui")
-        # todo this should be gtk_builder_new_from_file
-        else:
-            self.ui_file = os.path.join(self.datadir, "ui", "voaAreaPlotWindow.ui")
+        self.ui_file = os.path.join(self.datadir, "ui", "voaAreaPlotBox.ui")
         #self.wTree = Gtk.Builder.new_from_file(self.ui_file)
         self.wTree = Gtk.Builder()
         self.wTree.add_from_file(self.ui_file)
 
-        self.get_objects("dialog", "type_combobox", "group_combobox",
+        self.get_objects("main_box", "type_combobox", "group_combobox",
                         "tz_spinbutton", "cmap_combobox", "contour_checkbutton",
                         "greyline_checkbutton", "parallels_checkbutton",
                         "meridians_checkbutton")
-        if self.parent:
-            self.dialog.set_transient_for(self.parent)
 
-        self.dialog.set_title(_("Plot Control"))
+        if not self.parent:
+            self.win = Gtk.Window()
+            self.win.set_title(_("Plot Control"))
+            self.win.add(self.main_box)
+        else:
+            self.win = Gtk.Dialog("Plot Control", self.parent)
+            self.win.get_content_area().add(self.main_box)
+
         self.populate_combo(self.type_combobox, self.plot_type_d, 'value')
         model = self.type_combobox.get_model()
         iter = model.get_iter_first()
@@ -151,9 +152,9 @@ class VOAAreaPlotGUI:
                       "on_ok_button_clicked" : self.run_plot}
         self.wTree.connect_signals(event_dic)
         if self.parent:
-            self.dialog.run()
+            self.win.run()
         else:
-            self.dialog.show_all()
+            self.win.show_all()
             Gtk.main()
 
     def run_plot(self, widget):
@@ -166,7 +167,7 @@ class VOAAreaPlotGUI:
         else:
         	_vg_files = [self.group_combobox.get_active()]
         _time_zone = self.tz_spinbutton.get_value_as_int()
-        plot_parent = self.parent if self.parent else self.dialog
+        plot_parent = self.parent if self.parent else self.win
         plot = VOAAreaPlot(self.in_filename,
                         data_type = _data_type,
                         vg_files = _vg_files,
@@ -177,7 +178,6 @@ class VOAAreaPlotGUI:
                         plot_parallels = self.parallels_checkbutton.get_active(),
                         plot_nightshade = self.greyline_checkbutton.get_active(),
                         parent = plot_parent)
-        #self.dialog.run()
 
 
     def populate_combo(self, cb, d, sort_by='value'):
@@ -208,7 +208,7 @@ class VOAAreaPlotGUI:
 
 
     def quit_application(self, *args):
-        self.dialog.destroy()
+        self.win.destroy()
         #only emit main_quit if we're running as a standalone app
         #todo do we need to do anyother clean-up here if we're _not_
         #running as a standalone app

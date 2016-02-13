@@ -4,8 +4,7 @@ ui_DATA = voacapgui.ui \
   voaAreaChooser.ui \
   voaSiteChooser.ui \
   voaAntennaChooser.ui \
-  voaAreaPlotDialog.ui \
-  voaAreaPlotWindow.ui \
+  voaAreaPlotBox.ui \
   voaTextFileViewDialog.ui \
   map.jpg \
   voacap.png 
