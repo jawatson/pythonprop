@@ -1,7 +1,6 @@
 uidir = $(pkgdatadir)/ui
 ui_DATA = voacapgui.ui \
-  voaP2PPlotDialog.ui \
-  voaP2PPlotWindow.ui \
+  voaP2PPlotBox.ui \
   voaAreaChooser.ui \
   voaSiteChooser.ui \
   voaAntennaChooser.ui \

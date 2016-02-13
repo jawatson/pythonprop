@@ -105,25 +105,38 @@ class VOAP2PPlotGUI:
         self.exit_on_close = exit_on_close
         #self.uifile = os.path.join(os.path.realpath(os.path.dirname(sys.argv[0])), "voaP2PPlotgui.ui")
         self.parent = parent
+        """
         if self.parent:
             self.ui_file = os.path.join(self.datadir, "ui", "voaP2PPlotDialog.ui")
         else:
+
             self.ui_file = os.path.join(self.datadir, "ui", "voaP2PPlotWindow.ui")
+        """
         #self.wTree = Gtk.Builder.new_from_file(self.ui_file)
+        self.ui_file = os.path.join(self.datadir, "ui", "voaP2PPlotBox.ui")
 
         self.wTree = Gtk.Builder()
         self.wTree.add_from_file(self.ui_file)
 
-        self.get_objects("dialog",
+        self.get_objects("main_box",
                 "type_combobox",
                 "group_combobox",
                 "tz_spinbutton",
                 "contour_checkbutton",
                 "cmap_combobox")
-        if self.parent:
-            self.dialog.set_transient_for(self.parent)
 
-        self.dialog.set_title(_("Plot Control"))
+        if not self.parent:
+            self.win = Gtk.Window()
+            self.win.set_title(_("Plot Control"))
+            self.win.add(self.main_box)
+        else:
+            self.win = Gtk.Dialog("Plot Control", self.parent)
+            self.win.get_content_area().add(self.main_box)
+
+
+        #if self.parent:
+        #    self.dialog.set_transient_for(self.parent)
+
 
         if in_file.get_number_of_groups() >= 2:
             self.plot_type_d[5] = _('3D: MUF')
@@ -155,11 +168,11 @@ class VOAP2PPlotGUI:
                       "on_cancel_button_clicked" : self.quit_application,
                       "on_ok_button_clicked" : self.run_plot}
         self.wTree.connect_signals(event_dic)
-        self.dialog.connect('delete_event', self.quit_application)
+        self.win.connect('delete_event', self.quit_application)
         if self.parent:
-            self.dialog.run()
+            self.win.run()
         else:
-            self.dialog.show_all()
+            self.win.show_all()
             Gtk.main()
 
     def run_plot(self, widget):
@@ -173,7 +186,7 @@ class VOAP2PPlotGUI:
         else:
         	_plot_groups = [int(self.group_combobox.get_model().get_value(self.group_combobox.get_active_iter(),0))-1]
         _time_zone = self.tz_spinbutton.get_value_as_int()
-        plot_parent = self.parent if self.parent else self.dialog
+        plot_parent = self.parent if self.parent else self.win
         if _data_type < 5:
             plot = VOAP2PPlot(self.in_filename,
                         data_type = _data_type,
@@ -217,7 +230,7 @@ class VOAP2PPlotGUI:
 
 
     def quit_application(self, *args):
-        self.dialog.destroy()
+        self.win.destroy()
         #only emit main_quit if we're running as a standalone app
         #todo do we need to do anyother clean-up here if we're _not_
         #running as a standalone app
