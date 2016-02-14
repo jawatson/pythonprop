@@ -237,8 +237,6 @@ class VOAAreaPlot:
                     # TODO Does this need to be normalised here if it's also being done in the plot?
                     value = max(self.image_defs['min'], value)
                     value = min(self.image_defs['max'], value)
-                    #if value < self.image_defs[2] : value = self.image_defs[2]
-                    #if value > self.image_defs[3] : value = self.image_defs[3]
                     points[int(line[3:6])-1][int(line[0:3])-1] = value
             vgFile.close()
 
@@ -276,6 +274,7 @@ class VOAAreaPlot:
 
             else:
                 # transform to nx x ny regularly spaced 5km native projection grid
+                #http://matplotlib.org/basemap/api/basemap_api.html#mpl_toolkits.basemap.Basemap.imshow
                 nx = 360#int((m.xmax-m.xmin)/360.)+1
                 print("m.xmax={:.2f}".format(m.xmax))
                 print("m.xmin={:.2f}".format(m.xmin))
@@ -284,10 +283,14 @@ class VOAAreaPlot:
                 print("m.ymax={:.2f}".format(m.ymax))
                 print("m.ymin={:.2f}".format(m.ymin))
                 print(ny)
-                dat = m.transform_scalar(points,lons,lats,nx,ny,masked=True)
+                dat = m.transform_scalar(points,
+                            lons,
+                            lats,
+                            nx,
+                            ny,
+                            masked=True)
                 im = m.imshow(dat,
                     cmap = colMap,
-                    origin = 'lower',
                     alpha = 0.8,
                     norm = colors.Normalize(clip = False,
                     vmin = self.image_defs['min'],
