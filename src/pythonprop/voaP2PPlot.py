@@ -51,6 +51,7 @@ import os
 import math
 from optparse import OptionParser
 
+import numpy as np
 from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg
 import matplotlib.transforms as mtransforms
 from matplotlib.figure import Figure
