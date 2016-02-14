@@ -57,8 +57,8 @@ from matplotlib.figure import Figure
 from matplotlib.font_manager import FontProperties
 from matplotlib.ticker import FuncFormatter
 
-from .voaOutFile import *
-from .voaPlotWindow import *
+from .voaOutFile import VOAOutFile
+from .voaPlotWindow import VOAPlotWindow
 
 import gettext
 import locale

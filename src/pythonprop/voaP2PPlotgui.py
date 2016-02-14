@@ -26,17 +26,8 @@ import datetime
 import gettext
 import locale
 
-try:
-    import gi
-    gi.require_version("Gtk", "3.0")
-    from gi.repository import GObject
-except:
-    pass
-try:
-    from gi.repository import Gtk
-except:
-    sys.exit(1)
-
+from gi.repository import GObject
+from gi.repository import Gtk
 
 GETTEXT_DOMAIN = 'voacapgui'
 LOCALE_PATH = os.path.join(os.path.realpath(os.path.dirname(sys.argv[0])), 'po')
