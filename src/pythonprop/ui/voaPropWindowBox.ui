@@ -56,19 +56,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkButton" id="print_button">
-            <property name="label">gtk-print</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <property name="use_stock">True</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="pack_type">end</property>
-            <property name="position">3</property>
-          </packing>
+          <placeholder/>
         </child>
       </object>
       <packing>
