@@ -517,7 +517,7 @@ def main(data_file):
                     plot_groups = plot_groups,
                     plot_contours = options.plot_contours,
                     face_colour = options.face_colour,
-                    plot_filled_contours = options.plot_filled_contours,
+                    filled_contours = options.plot_filled_contours,
                     plot_label = options.plot_label,
                     color_map=options.color_map,
                     time_zone = time_zone,
