@@ -58,6 +58,7 @@ from matplotlib.font_manager import FontProperties
 
 from matplotlib.ticker import FuncFormatter
 import numpy as np
+import numpy.ma as ma
 
 from optparse import OptionParser
 
@@ -240,17 +241,18 @@ class VOAAreaPlot:
                     points[int(line[3:6])-1][int(line[0:3])-1] = value
             vgFile.close()
 
+            m_args={}
             if projection in ('cyl', 'mill', 'gall'):
-                m_args = {"llcrnrlon":area_rect.get_sw_lon(),
+                m_args.update({"llcrnrlon":area_rect.get_sw_lon(),
                     "llcrnrlat":area_rect.get_sw_lat(),
                     "urcrnrlon":area_rect.get_ne_lon(),
-                    "urcrnrlat":area_rect.get_ne_lat()}
+                    "urcrnrlat":area_rect.get_ne_lat()})
 
             if projection in ('robin', 'vandg', 'sinu', 'mbtfpq', 'eck4',
                             'kav7', 'moll', 'hammer', 'gnom',
                             'laea', 'aeqd', 'cea', 'merc'):
-                m_args = {"lat_0":plot_centre_location.get_latitude(),
-                    "lon_0":plot_centre_location.get_longitude()}
+                m_args.update({"lat_0":plot_centre_location.get_latitude(),
+                    "lon_0":plot_centre_location.get_longitude()})
                 if projection in ('cea', 'merc'):
                     m_args['lat_ts']=0
 
@@ -262,39 +264,18 @@ class VOAAreaPlot:
 
             #points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
             #colMap.set_under(color ='k', alpha=0.0)
-
+            lons, lats  = np.meshgrid(lons, lats)
+            points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
             if (filled_contours):
-                # make 2-d grid of lons, lats
-                lons, lats  = np.meshgrid(lons, lats)
-                points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
                 im = m.contourf(lons, lats, points, self.image_defs['y_labels'],
                     latlon=True,
                     cmap = colMap)
                 plot_contours = True
-
             else:
-                # transform to nx x ny regularly spaced 5km native projection grid
-                #http://matplotlib.org/basemap/api/basemap_api.html#mpl_toolkits.basemap.Basemap.imshow
-                nx = 360#int((m.xmax-m.xmin)/360.)+1
-                print("m.xmax={:.2f}".format(m.xmax))
-                print("m.xmin={:.2f}".format(m.xmin))
-                print(nx)
-                ny = 180#int((m.ymax-m.ymin)/360.)+1
-                print("m.ymax={:.2f}".format(m.ymax))
-                print("m.ymin={:.2f}".format(m.ymin))
-                print(ny)
-                dat = m.transform_scalar(points,
-                            lons,
-                            lats,
-                            nx,
-                            ny,
-                            masked=True)
-                im = m.imshow(dat,
+                im = m.pcolormesh(lons, lats, points,
+                    latlon=True,
                     cmap = colMap,
-                    alpha = 0.8,
-                    norm = colors.Normalize(clip = False,
-                    vmin = self.image_defs['min'],
-                    vmax = self.image_defs['max']))
+                    shading='gouraud')
 
             if plot_contours:
                 ct = m.contour(lons, lats, points, self.image_defs['y_labels'][1:],
