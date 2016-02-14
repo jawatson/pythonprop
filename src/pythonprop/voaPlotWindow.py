@@ -17,56 +17,105 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
-# 
+#
 # todo consider using a scrolled pane here...
 # add buttons to move between plots
 # double clicking an all plot should zoom in to an individual plot
-try:
-    import gi
-    gi.require_version("Gtk", "3.0")
-    from gi.repository import GObject
-except:
-    pass
-try:
-    from gi.repository import Gtk
-except:
-    sys.exit(1)
+
+import os
+import sys
+from gi.repository import GObject
+from gi.repository import Gtk
 
 class VOAPlotWindow():
 
+    PLOT_RESPONSE_PRINT = 100
+    PLOT_RESPONSE_SAVE = 101
+    PLOT_RESPONSE_CLOSE = 102
+
     def __init__(self, title, canvas, parent=None, dpi=150):
         self.dpi = dpi
-        self._dia = Gtk.Dialog(title, parent=parent, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT)
-        self._dia.add_buttons(Gtk.STOCK_SAVE, Gtk.ResponseType.OK, Gtk.STOCK_CLOSE, Gtk.ResponseType.NONE)
-        self._dia.vbox.pack_start(canvas, True, True, 0)
-        self._dia.set_default_size(700, 600)
-        self._dia.show()
+        self.parent = parent
+        self.canvas = canvas
 
-        _response = None
-        while _response != Gtk.ResponseType.NONE and _response != Gtk.ResponseType.DELETE_EVENT:
-            _response = self._dia.run()
-            if _response == Gtk.ResponseType.OK:
-                _chooser = Gtk.FileChooserDialog(_("Save Image..."),
-                                        parent,
-                                        Gtk.FileChooserAction.SAVE,
-                                        (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
-                _filter = Gtk.FileFilter()
-                _filter.set_name("PNG Images")
-                _filter.add_mime_type("image/png")
-                _filter.add_pattern("*.png")
-                _chooser.add_filter(_filter)
-                _save_response = _chooser.run()
-                if _save_response == Gtk.ResponseType.OK:
-                    save_file = _chooser.get_filename()
-                    if not save_file.endswith('.png'):
-                        save_file = save_file + '.png'
-                    self.save_plot(canvas, save_file)
-                _chooser.destroy()
-        self._dia.destroy()
-        
-        
+        if not self.parent:
+            self.win = Gtk.Window()
+
+            self.ui_file = os.path.join('/usr/local/share/pythonprop', "ui", "voaPropWindowBox.ui")
+            self.wTree = Gtk.Builder()
+            self.wTree.add_from_file(self.ui_file)
+            self.get_objects("main_box", "print_button", "save_button", "close_button")
+
+            self.main_box.pack_end(self.canvas, True, True, 0)
+            self.win.add(self.main_box)
+
+            self.print_button.connect("clicked", self.print_button_clicked)
+            self.save_button.connect("clicked", self.save_button_clicked)
+            self.close_button.connect("clicked", self.close_button_clicked)
+            self.win.connect("delete-event", Gtk.main_quit)
+
+            self.win.set_default_size(700, 600)
+            self.win.show_all()
+            Gtk.main()
+        else:
+            print("we have a parent")
+            self.win = Gtk.Dialog(title, parent=self.parent, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT)
+            self.win.add_buttons(Gtk.STOCK_PRINT, self.PLOT_RESPONSE_PRINT,
+                            Gtk.STOCK_SAVE, self.PLOT_RESPONSE_SAVE,
+                            Gtk.STOCK_CLOSE, self.PLOT_RESPONSE_CLOSE)
+            self.win.vbox.pack_start(self.canvas, True, True, 0)
+            self.win.set_default_size(700, 600)
+            #self.win.set_transient_for(self.parent)
+            self.win.show()
+            response = None
+            while response != self.PLOT_RESPONSE_CLOSE and response != Gtk.ResponseType.DELETE_EVENT:
+                response = self.win.run()
+                if response == self.PLOT_RESPONSE_SAVE:
+                    self.save_button_clicked(None)
+                elif response == self.PLOT_RESPONSE_PRINT:
+                    self.print_button_clicked(None)
+            self.close_button_clicked(None)
+
+
+    def print_button_clicked(self, widget):
+        pass
+
+    def close_button_clicked(self, widget):
+        self.win.destroy()
+        if not self.parent:
+            Gtk.main_quit
+            sys.exit(0)
+
+
+    def save_button_clicked(self, widget):
+        plot_parent = self.parent if self.parent else self.win
+
+        chooser = Gtk.FileChooserDialog(_("Save Image..."),
+                plot_parent,
+                Gtk.FileChooserAction.SAVE,
+                (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
+        filter = Gtk.FileFilter()
+        filter.set_name("PNG Images")
+        filter.add_mime_type("image/png")
+        filter.add_pattern("*.png")
+        chooser.add_filter(filter)
+        save_response = chooser.run()
+        if save_response == Gtk.ResponseType.OK:
+            save_file = chooser.get_filename()
+            if not save_file.endswith('.png'):
+                save_file = save_file + '.png'
+            self.save_plot(self.canvas, save_file)
+        chooser.destroy()
+
+
     def save_plot(self, canvas, filename=None):
         canvas.print_figure(filename, dpi=self.dpi, facecolor='white', edgecolor='white')
 
+    def get_objects(self, *names):
+        for name in names:
+            widget = self.wTree.get_object(name)
+            if widget is None:
+                raise ValueError(_("Widget '%s' not found") % name)
+            setattr(self, name, widget)
