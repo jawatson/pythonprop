@@ -106,3 +106,6 @@ application launcher.
 
 ##Release 0.23
 * Migrate mapping to cartopy
+
+##Release 0.24
+* Investigate running voacapl in a seperate thread to provide some form of visual progress indicator.
