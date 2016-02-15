@@ -260,7 +260,7 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="row_spacing">6</property>
-                            <property name="column_spacing">6</property>
+                            <property name="column_spacing">12</property>
                             <property name="column_homogeneous">True</property>
                             <child>
                               <object class="GtkButton" id="tx_site_button">
@@ -475,7 +475,7 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="row_spacing">6</property>
-                            <property name="column_spacing">6</property>
+                            <property name="column_spacing">12</property>
                             <property name="column_homogeneous">True</property>
                             <child>
                               <object class="GtkButton" id="rx_site_button">
@@ -677,7 +677,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="row_spacing">6</property>
-                        <property name="column_spacing">6</property>
+                        <property name="column_spacing">12</property>
                         <child>
                           <object class="GtkLabel" id="label3">
                             <property name="visible">True</property>
@@ -930,7 +930,7 @@
                           </object>
                           <packing>
                             <property name="left_attach">2</property>
-                            <property name="top_attach">8</property>
+                            <property name="top_attach">7</property>
                           </packing>
                         </child>
                         <child>
@@ -946,7 +946,7 @@
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
-                            <property name="top_attach">8</property>
+                            <property name="top_attach">7</property>
                           </packing>
                         </child>
                         <child>
@@ -958,7 +958,7 @@
                           </object>
                           <packing>
                             <property name="left_attach">0</property>
-                            <property name="top_attach">8</property>
+                            <property name="top_attach">7</property>
                           </packing>
                         </child>
                         <child>
@@ -994,7 +994,7 @@
                           </object>
                           <packing>
                             <property name="left_attach">4</property>
-                            <property name="top_attach">9</property>
+                            <property name="top_attach">8</property>
                           </packing>
                         </child>
                         <child>
@@ -1009,7 +1009,7 @@
                           </object>
                           <packing>
                             <property name="left_attach">4</property>
-                            <property name="top_attach">8</property>
+                            <property name="top_attach">7</property>
                           </packing>
                         </child>
                         <child>
@@ -1024,7 +1024,7 @@
                           </object>
                           <packing>
                             <property name="left_attach">4</property>
-                            <property name="top_attach">13</property>
+                            <property name="top_attach">12</property>
                           </packing>
                         </child>
                         <child>
@@ -1035,7 +1035,7 @@
                           </object>
                           <packing>
                             <property name="left_attach">3</property>
-                            <property name="top_attach">13</property>
+                            <property name="top_attach">12</property>
                           </packing>
                         </child>
                         <child>
@@ -1047,7 +1047,7 @@
                           </object>
                           <packing>
                             <property name="left_attach">2</property>
-                            <property name="top_attach">13</property>
+                            <property name="top_attach">12</property>
                           </packing>
                         </child>
                         <child>
@@ -1067,24 +1067,9 @@
                           </object>
                           <packing>
                             <property name="left_attach">3</property>
-                            <property name="top_attach">8</property>
+                            <property name="top_attach">7</property>
                             <property name="height">5</property>
                           </packing>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
                         </child>
                         <child>
                           <placeholder/>
@@ -1219,8 +1204,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="row_spacing">6</property>
-                        <property name="column_spacing">6</property>
-                        <property name="row_homogeneous">True</property>
+                        <property name="column_spacing">12</property>
                         <child>
                           <object class="GtkLabel" id="area_year_label">
                             <property name="visible">True</property>
@@ -2012,6 +1996,7 @@
               <object class="GtkFrame" id="ssn_tab_main_frame">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="margin_right">12</property>
                 <property name="border_width">12</property>
                 <property name="label_xalign">0</property>
                 <property name="shadow_type">none</property>
