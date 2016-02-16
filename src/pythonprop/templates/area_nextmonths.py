@@ -13,7 +13,7 @@ class templates:
         self.current_month = None
         self.current_year = None
         self.current_utc = 12
-        self.current_freq = 3.0
+        self.current_freq = 10.0
         self.iter = None
 
     def get_names(self):
@@ -32,7 +32,7 @@ class templates:
             self.current_year = y
             self.current_month = m
             self.current_utc = u if u else 12
-            self.current_freq = float(f) if float(f) > 3 else 3.0
+            self.current_freq = float(f) if float(f) > 10 else 10.0
 
 
     def run(self):

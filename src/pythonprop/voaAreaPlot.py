@@ -601,7 +601,7 @@ def main(in_file):
             except:
                 print(_("Error reading vg files, resetting to '1'"))
                 vg_files = [1]
-        print(_("The following %d files have been selected: ") % (len(vg_files)), vg_files)
+        #print(_("The following %d files have been selected: ") % (len(vg_files)), vg_files)
 
     if options.timezone:
         time_zone = int(options.timezone)
