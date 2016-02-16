@@ -35,6 +35,8 @@ import sys
 import os
 from gi.repository import Pango
 
+from .voaOutFilePrinter import VOAOutFilePrinter
+
 try:
     import gi
     gi.require_version("Gtk", "3.0")
@@ -74,8 +76,10 @@ class VOATextFileViewDialog:
                             "text_view",
                             "text_buffer",
                             "save_button",
+                            "print_button",
                             "ok_button")
         self.save_button.connect("clicked", self.on_save_clicked)
+        self.print_button.connect("clicked", self.on_print_clicked)
 
         self.text_file_view_dialog.set_transient_for(self.parent)
         self.text_view.modify_font(Pango.FontDescription("Luxi Mono 10"))
@@ -98,9 +102,13 @@ class VOATextFileViewDialog:
                 raise ValueError(_("Widget '%s' not found") % name)
             setattr(self, name, widget)
 
+    def on_print_clicked(self, widget):
+        print("Doing the print")
+        p = VOAOutFilePrinter(self.file)
+        p.run(parent=self.parent)
+
 
     def on_save_clicked(self, widget):
-        print("in the save dialog")
         dialog = Gtk.FileChooserDialog("Please choose a file", self.parent,
             Gtk.FileChooserAction.SAVE,
             (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
