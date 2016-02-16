@@ -36,6 +36,10 @@ class PrintingApp:
     HEADER_HEIGHT = 10 * 72 / 25.4
     HEADER_GAP = 3 * 72 / 25.4
 
+    """
+    The number of lines in a page are defined by the value of the 'LINEMAX'
+    parameter + 10 (for the header)
+    """
     def __init__(self):
         self.operation = Gtk.PrintOperation()
         print_data = {'filename': os.path.abspath(__file__),
