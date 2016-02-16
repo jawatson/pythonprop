@@ -22,6 +22,15 @@
 
 # Dialog box that displays the contents of a voacap circuit prediction
 
+"""
+Some useful printing references;
+
+http://askubuntu.com/questions/220350/how-to-add-a-print-dialog-to-an-application
+https://developer.gnome.org/gtk3/stable/GtkPrintUnixDialog.html
+http://nullege.com/codes/search/gi.repository.Gtk.PrintOperationAction.PRINT_DIALOG
+https://github.com/GNOME/pygobject/blob/master/demos/gtk-demo/demos/printing.py
+"""
+
 import sys
 import os
 from gi.repository import Pango
