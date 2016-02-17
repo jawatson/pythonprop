@@ -4,6 +4,9 @@
 #
 # Copyright (C) 2010 Red Hat, Inc., John (J5) Palmieri <johnp@redhat.com>
 #
+# The original file has been tailored to printing voacap output files
+# incorporating hard-coded page breaks.
+#
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
 # License as published by the Free Software Foundation; either
@@ -19,11 +22,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301
 # USA
 
-title = "Printing"
-description = """
-GtkPrintOperation offers a simple API to support printing in a cross-platform
-way.
-"""
+# The original version of this file may be found at;
+# https://github.com/GNOME/pygobject/blob/master/demos/gtk-demo/demos/printing.py
 
 import gi
 gi.require_version('PangoCairo', '1.0')
@@ -36,12 +36,7 @@ class VOAOutFilePrinter:
     HEADER_HEIGHT = 10 * 72 / 25.4
     HEADER_GAP = 3 * 72 / 25.4
 
-    """
-    The number of lines in a page are defined by the value of the 'LINEMAX'
-    parameter + 10 (for the header)
-    """
     def __init__(self, out_file_path):
-        print("inside the init")
         self.operation = Gtk.PrintOperation()
         print_data = {'filename': out_file_path,
                       'font_size': 10.0,
@@ -62,9 +57,14 @@ class VOAOutFilePrinter:
         dir = GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS)
         if dir is None:
             dir = GLib.get_home_dir()
-        ext = '.pdf'
-
-        uri = "file://{:s}/gtk-demo{:s}".format(dir, ext)
+        if settings.get(Gtk.PRINT_SETTINGS_OUTPUT_FILE_FORMAT) == 'ps':
+            ext = '.ps'
+        elif settings.get(Gtk.PRINT_SETTINGS_OUTPUT_FILE_FORMAT) == 'svg':
+            ext = '.svg'
+        else:
+            ext = '.pdf'
+        base_name = os.path.splitext(os.path.basename(out_file_path))[0]
+        uri = "file://{:s}/{:s}{:s}".format(dir, base_name, ext)
         settings.set(Gtk.PRINT_SETTINGS_OUTPUT_URI, uri)
         self.operation.set_print_settings(settings)
 
@@ -104,15 +104,11 @@ class VOAOutFilePrinter:
         operation.set_n_pages(print_data['num_pages'])
 
     def draw_page(self, operation, print_ctx, page_num, print_data):
-        print("page # {:d}".format(page_num))
         cr = print_ctx.get_cairo_context()
         width = print_ctx.get_width()
 
-        cr.rectangle(0, 0, width, self.HEADER_HEIGHT)
-        cr.set_source_rgb(0.8, 0.8, 0.8)
-        cr.fill_preserve()
-
-        cr.set_source_rgb(0, 0, 0)
+        cr.move_to(0, self.HEADER_HEIGHT)
+        cr.line_to(width, self.HEADER_HEIGHT)
         cr.set_line_width(1)
         cr.stroke()
 
@@ -128,8 +124,7 @@ class VOAOutFilePrinter:
             layout.set_ellipsize(Pango.EllipsizeMode.START)
             (text_width, text_height) = layout.get_pixel_size()
 
-        cr.move_to((width - text_width) / 2,
-                   (self.HEADER_HEIGHT - text_height) / 2)
+        cr.move_to(0, (self.HEADER_HEIGHT - text_height) / 2)
         PangoCairo.show_layout(cr, layout)
 
         page_str = "{:d}/{:d}".format(page_num + 1, print_data['num_pages'])
@@ -148,7 +143,6 @@ class VOAOutFilePrinter:
         layout.set_font_description(desc)
 
         cr.move_to(0, self.HEADER_HEIGHT + self.HEADER_GAP)
-        data_lines = print_data['lines']
         font_size = print_data['font_size']
 
         for line in (print_data['pages'][page_num]).split('\n'):

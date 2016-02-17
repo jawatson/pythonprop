@@ -24,6 +24,19 @@
 # add buttons to move between plots
 # double clicking an all plot should zoom in to an individual plot
 
+"""
+Some useful printing references;
+
+http://askubuntu.com/questions/220350/how-to-add-a-print-dialog-to-an-application
+https://developer.gnome.org/gtk3/stable/GtkPrintUnixDialog.html
+http://nullege.com/codes/search/gi.repository.Gtk.PrintOperationAction.PRINT_DIALOG
+https://github.com/GNOME/pygobject/blob/master/demos/gtk-demo/demos/printing.py
+
+printing pngs with python
+http://stackoverflow.com/questions/10983739/how-to-composite-multiple-png-into-a-single-png-using-gtk-cairo
+
+"""
+
 import os
 import sys
 from gi.repository import GObject

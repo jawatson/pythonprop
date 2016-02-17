@@ -48,11 +48,11 @@ except:
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-#matplotlib.use('GTK3Agg')
 
 import matplotlib.colors as colors
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg
+from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
+
 from matplotlib.figure import Figure
 from matplotlib.font_manager import FontProperties
 
@@ -355,7 +355,7 @@ class VOAAreaPlot:
             t.set_fontsize(colorbar_fontsize)
 
         #self.fig.tight_layout()
-        canvas = FigureCanvasGTK3Agg(self.fig)
+        canvas = FigureCanvas(self.fig)
         self.fig.canvas.mpl_connect('draw_event', self.on_draw)
         canvas.show()
 
@@ -521,7 +521,6 @@ def main(in_file):
         default = 'c',
         choices = ['c', 'l', 'i', 'h', 'f'],
         help=_("RESOLUTION - may be one of 'c' (crude), 'l' (low), 'i' (intermediate), 'h' (high), 'f' (full)"))
-
 
     parser.add_option("-s", "--size",
         dest="dpi",
