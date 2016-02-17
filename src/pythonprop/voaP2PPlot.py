@@ -119,7 +119,8 @@ class VOAP2PPlot:
                 save_file = '',
                 dpi=150,
                 parent = None,
-                user_bands=None):
+                user_bands=None,
+                datadir=None):
 
         """
         user_bands - a list of bands to be displayed.
@@ -279,7 +280,8 @@ class VOAP2PPlot:
                         canvas,
                         parent=parent,
                         png_source = self,
-                        dpi=self.dpi)
+                        dpi=self.dpi,
+                        datadir=datadir)
         return
 
 
@@ -379,7 +381,7 @@ class VOAP2PPlot:
         return tmp_str
 
 
-def main(data_file):
+def main(data_file, datadir=None):
     parser = OptionParser(usage=_("%voaP2PPlot [options] file"), version="%voaP2PPlot 0.9")
 
     #tested ok
@@ -534,7 +536,8 @@ def main(data_file):
                     plot_bands = bands,
                     run_quietly = options.run_quietly,
                     save_file = options.save_file,
-                    dpi = options.dpi)
+                    dpi = options.dpi,
+                    datadir=datadir)
 
 
 if __name__ == "__main__":

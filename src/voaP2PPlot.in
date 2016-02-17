@@ -7,7 +7,7 @@ from pythonprop import voaP2PPlot
 
 if __name__ == "__main__":
     if len(sys.argv) >= 2:
-        voaP2PPlot.main(sys.argv[-1])
+        voaP2PPlot.main(sys.argv[-1], datadir='@pkgdatadir@')
     else:
         print ('voaP2PPlot error: No data file specified')
         print ('voaP2PPlot [options] filename')
