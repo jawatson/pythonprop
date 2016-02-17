@@ -53,13 +53,11 @@ class VOAPlotWindow():
     def __init__(self,
             title,
             canvas,
-            png_source=None,
             parent=None,
             dpi=150,
             datadir=None):
         self.dpi = dpi
         self.parent = parent
-        self.png_source = png_source
         self.canvas = canvas
 
         if not self.parent:
@@ -90,7 +88,6 @@ class VOAPlotWindow():
                             Gtk.STOCK_CLOSE, self.PLOT_RESPONSE_CLOSE)
             self.win.vbox.pack_start(self.canvas, True, True, 0)
             self.win.set_default_size(700, 600)
-            #self.win.set_transient_for(self.parent)
             self.win.show()
             response = None
             while response != self.PLOT_RESPONSE_CLOSE and response != Gtk.ResponseType.DELETE_EVENT:
