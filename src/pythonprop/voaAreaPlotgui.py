@@ -24,6 +24,7 @@ import sys
 import os
 import datetime
 import subprocess
+import zipfile
 
 from mpl_toolkits.basemap import Basemap
 
@@ -90,7 +91,11 @@ class VOAAreaPlotGUI:
               'summer': _('summer'),
               'winter': _('winter')}
 
-    def __init__(self, data_source_filename, parent=None, exit_on_close = True, datadir=""):
+    def __init__(self, data_source_filename,
+            parent=None,
+            exit_on_close = True,
+            enable_save = False,
+            datadir=""):
         self.datadir = datadir
         self.exit_on_close = exit_on_close
         self.parent = parent
@@ -101,7 +106,14 @@ class VOAAreaPlotGUI:
         self.get_objects("main_box", "type_combobox", "group_combobox",
                         "tz_spinbutton", "cmap_combobox", "contour_checkbutton",
                         "greyline_checkbutton", "parallels_checkbutton",
-                        "meridians_checkbutton")
+                        "meridians_checkbutton", "save_button")
+
+        if not enable_save:
+            print("hiding the save button")
+            self.save_button.hide()
+        else:
+            self.save_button.connect("clicked", self.on_save_clicked)
+
 
         if not self.parent:
             self.win = Gtk.Window()
@@ -151,6 +163,34 @@ class VOAAreaPlotGUI:
         else:
             self.win.show_all()
             Gtk.main()
+
+    def on_save_clicked(self, widget):
+        print("Base filename: {:s}".format(self.in_filename))
+        print("Num plots {:d}".format(self.num_plots))
+        dialog = Gtk.FileChooserDialog("Save prediction data", self.win,
+            Gtk.FileChooserAction.SAVE,
+            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+             "Select", Gtk.ResponseType.OK))
+        dialog.set_default_size(800, 400)
+
+        response = dialog.run()
+
+        if response == Gtk.ResponseType.OK:
+            print("Select clicked")
+            print("Folder selected: " + dialog.get_filename())
+            save_fn = dialog.get_filename()
+        elif response == Gtk.ResponseType.CANCEL:
+            print("Cancel clicked")
+        dialog.destroy()
+        if response == Gtk.ResponseType.OK:
+            self.save_prediction_files(save_fn)
+
+
+    def save_prediction_files(self, filename):
+        vgz_file = zipfile.ZipFile(filename, "w")
+        fn = self.in_filename+'.voa'
+        vgz_file.write(fn, fn, zipfile.ZIP_DEFLATED)
+        vgz_file.close()
 
     def run_plot(self, widget):
         _color_map = self.cmap_combobox.get_model().get_value(self.cmap_combobox.get_active_iter(), 0)

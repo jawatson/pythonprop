@@ -1493,7 +1493,7 @@ all other entries will be ignored.'))
             self.statusbar.pop(self.area_context_id)
 
             s = os.path.join(os.path.expanduser("~"), 'itshfbc','areadata','pyArea.voa')
-            graph = VOAAreaPlotGUI(s, parent=self.main_window, exit_on_close=False, datadir=self.datadir)
+            graph = VOAAreaPlotGUI(s, parent=self.main_window, exit_on_close=False, enable_save=True, datadir=self.datadir)
             graph.quit_application()
 
         #P2P Predictions follow
