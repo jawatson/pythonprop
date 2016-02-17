@@ -26,6 +26,7 @@ pythonprop_PYTHON=	\
 	voaMultiPlot.py \
 	voaOutFile.py \
 	voaOutFilePrinter.py \
+	voaPlotFilePrinter.py \
 	voaPlotWindow.py \
 	voaSiteChooser.py \
 	voaSSNThumb.py \

@@ -42,15 +42,18 @@ import sys
 from gi.repository import GObject
 from gi.repository import Gtk
 
+from .voaPlotFilePrinter import VOAPlotFilePrinter
+
 class VOAPlotWindow():
 
     PLOT_RESPONSE_PRINT = 100
     PLOT_RESPONSE_SAVE = 101
     PLOT_RESPONSE_CLOSE = 102
 
-    def __init__(self, title, canvas, parent=None, dpi=150):
+    def __init__(self, title, canvas, png_source=None, parent=None, dpi=150):
         self.dpi = dpi
         self.parent = parent
+        self.png_source = png_source
         self.canvas = canvas
 
         if not self.parent:
@@ -59,12 +62,12 @@ class VOAPlotWindow():
             self.ui_file = os.path.join('/usr/local/share/pythonprop', "ui", "voaPropWindowBox.ui")
             self.wTree = Gtk.Builder()
             self.wTree.add_from_file(self.ui_file)
-            self.get_objects("main_box", "save_button", "close_button")
+            self.get_objects("main_box", "print_button", "save_button", "close_button")
 
             self.main_box.pack_end(self.canvas, True, True, 0)
             self.win.add(self.main_box)
 
-            #self.print_button.connect("clicked", self.print_button_clicked)
+            self.print_button.connect("clicked", self.print_button_clicked)
             self.save_button.connect("clicked", self.save_button_clicked)
             self.close_button.connect("clicked", self.close_button_clicked)
             self.win.connect("delete-event", Gtk.main_quit)
@@ -74,8 +77,8 @@ class VOAPlotWindow():
             Gtk.main()
         else:
             self.win = Gtk.Dialog(title, parent=self.parent, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT)
-            #Gtk.STOCK_PRINT, self.PLOT_RESPONSE_PRINT,
             self.win.add_buttons(
+                            Gtk.STOCK_PRINT, self.PLOT_RESPONSE_PRINT,
                             Gtk.STOCK_SAVE, self.PLOT_RESPONSE_SAVE,
                             Gtk.STOCK_CLOSE, self.PLOT_RESPONSE_CLOSE)
             self.win.vbox.pack_start(self.canvas, True, True, 0)
@@ -93,8 +96,8 @@ class VOAPlotWindow():
 
 
     def print_button_clicked(self, widget):
-        # https://github.com/davidmalcolm/pygobject/blob/master/demos/gtk-demo/demos/printing.py
-        pass
+        p = VOAPlotFilePrinter(self.canvas)
+        p.run(self.parent)
 
 
     def close_button_clicked(self, widget):
@@ -127,6 +130,7 @@ class VOAPlotWindow():
 
     def save_plot(self, canvas, filename=None):
         canvas.print_figure(filename, dpi=self.dpi, facecolor='white', edgecolor='white')
+
 
     def get_objects(self, *names):
         for name in names:

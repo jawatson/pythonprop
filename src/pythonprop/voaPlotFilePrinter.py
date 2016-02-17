@@ -25,20 +25,29 @@
 # The original version of this file may be found at;
 # https://github.com/GNOME/pygobject/blob/master/demos/gtk-demo/demos/printing.py
 
+""""
+printing pngs with python
+http://stackoverflow.com/questions/10983739/how-to-composite-multiple-png-into-a-single-png-using-gtk-cairo
+
+"""
+
 import gi
 gi.require_version('PangoCairo', '1.0')
-from gi.repository import Gtk, GLib, Pango, PangoCairo
+from gi.repository import Gtk, Gdk, GLib, Pango, PangoCairo
 import math
 import os
+# TODO which version of cairo...?
+import cairo
+from io import BytesIO
 
 
-class VOAOutFilePrinter:
-    HEADER_HEIGHT = 10 * 72 / 25.4
-    HEADER_GAP = 3 * 72 / 25.4
+class VOAPlotFilePrinter:
+    #HEADER_HEIGHT = 10 * 72 / 25.4
+    #HEADER_GAP = 3 * 72 / 25.4
 
-    def __init__(self, out_file_path):
+    def __init__(self, canvas):
         self.operation = Gtk.PrintOperation()
-        print_data = {'filename': out_file_path,
+        print_data = {'canvas': canvas,
                       'font_size': 10.0,
                       'lines': None,
                       'num_pages': 0
@@ -63,12 +72,14 @@ class VOAOutFilePrinter:
             ext = '.svg'
         else:
             ext = '.pdf'
-        base_name = os.path.splitext(os.path.basename(out_file_path))[0]
-        uri = "file://{:s}/{:s}{:s}".format(dir, base_name, ext)
+        #base_name = os.path.splitext(os.path.basename(out_file_path))[0]
+        uri = "file://{:s}/plot{:s}".format(dir, ext)
         settings.set(Gtk.PRINT_SETTINGS_OUTPUT_URI, uri)
         self.operation.set_print_settings(settings)
 
+
     def run(self, parent=None):
+
         result = self.operation.run(Gtk.PrintOperationAction.PRINT_DIALOG,
                     parent)
 
@@ -83,75 +94,42 @@ class VOAOutFilePrinter:
             dialog.run()
             dialog.destroy()
 
-        #Gtk.main_quit()
-
     def begin_print(self, operation, print_ctx, print_data):
-        height = print_ctx.get_height() - self.HEADER_HEIGHT - self.HEADER_GAP
-
-        file_path = print_data['filename']
-        if not os.path.isfile(file_path):
-            raise Exception("file not found: {:s}".format(file_path))
-
-        # in reality you should most likely not read the entire
-        # file into a buffer
-        source_file = open(file_path, 'r')
-        s = source_file.read()
-        print_data['pages'] = s.split('\f')
-        #print(print_data['pages'])
-
-        print_data['num_pages'] = len(print_data['pages'])
-
-        operation.set_n_pages(print_data['num_pages'])
+        png_buffer = BytesIO()
+        print_data['canvas'].print_figure(png_buffer, facecolor='white', edgecolor='white')
+        print_data['png_buffer'] = png_buffer
+        operation.set_n_pages(1)
 
     def draw_page(self, operation, print_ctx, page_num, print_data):
         cr = print_ctx.get_cairo_context()
         width = print_ctx.get_width()
-
-        cr.move_to(0, self.HEADER_HEIGHT)
-        cr.line_to(width, self.HEADER_HEIGHT)
-        cr.set_line_width(1)
-        cr.stroke()
-
-        layout = print_ctx.create_pango_layout()
-        desc = Pango.FontDescription('sans 12')
-        layout.set_font_description(desc)
-
-        layout.set_text(print_data['filename'], -1)
-        (text_width, text_height) = layout.get_pixel_size()
-
-        if text_width > width:
-            layout.set_width(width)
-            layout.set_ellipsize(Pango.EllipsizeMode.START)
-            (text_width, text_height) = layout.get_pixel_size()
-
-        cr.move_to(0, (self.HEADER_HEIGHT - text_height) / 2)
-        PangoCairo.show_layout(cr, layout)
-
-        page_str = "{:d}/{:d}".format(page_num + 1, print_data['num_pages'])
-        layout.set_text(page_str, -1)
-
-        layout.set_width(-1)
-        (text_width, text_height) = layout.get_pixel_size()
-        cr.move_to(width - text_width - 4,
-                   (self.HEADER_HEIGHT - text_height) / 2)
-        PangoCairo.show_layout(cr, layout)
+        height = print_ctx.get_height()
 
         layout = print_ctx.create_pango_layout()
 
-        desc = Pango.FontDescription('monospace')
-        desc.set_size(print_data['font_size'] * Pango.SCALE)
-        layout.set_font_description(desc)
+        print_data['png_buffer'].seek(0)
+        plot_surface = cairo.ImageSurface.create_from_png(print_data['png_buffer'])
+        # calculate proportional scaling
+        # Thanks to
+        # http://stackoverflow.com/questions/7145780/pycairo-how-to-resize-and-position-an-image
+        plot_height = plot_surface.get_height()
+        plot_width = plot_surface.get_width()
+        width_ratio = float(width) / float(plot_width)
+        height_ratio = float(height) / float(plot_height)
+        scale_xy = min(height_ratio, width_ratio)
+        cr.scale(scale_xy, scale_xy)
+        cr.set_source_surface(plot_surface)
+        cr.paint()
 
-        cr.move_to(0, self.HEADER_HEIGHT + self.HEADER_GAP)
-        font_size = print_data['font_size']
 
-        for line in (print_data['pages'][page_num]).split('\n'):
-            layout.set_text(line, -1)
-            PangoCairo.show_layout(cr, layout)
-            cr.rel_move_to(0, font_size)
+        PangoCairo.show_layout(cr, layout)
+        layout = print_ctx.create_pango_layout()
+
+
 
     def end_print(self, operation, print_ctx, print_data):
         pass
+        # delete the png here
 
 
 def main(demoapp=None):

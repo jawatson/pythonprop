@@ -271,12 +271,21 @@ class VOAP2PPlot:
         canvas.show()
 
         if save_file :
-            self.save_plot(canvas, save_file)
+            self.save_plot(save_file)
 
         if not self.run_quietly:
             # TODO consider using a scrolled pane here...
-            dia = VOAPlotWindow('pythonProp - ' + self.image_defs['title'], canvas, parent, dpi=self.dpi)
+            dia = VOAPlotWindow('pythonProp - ' + self.image_defs['title'],
+                        canvas,
+                        parent=parent,
+                        png_source = self,
+                        dpi=self.dpi)
         return
+
+
+    def get_png(self, id):
+        print("creating a png")
+        self.save_plot("test.png")
 
 
     def on_draw(self, event):
@@ -323,7 +332,7 @@ class VOAP2PPlot:
         leg.get_frame().set_alpha(0.75)
         return leg
 
-    def save_plot(self, canvas, filename=None):
+    def save_plot(self, filename=None):
         #canvas.print_figure(filename, dpi=150, facecolor='white', edgecolor='white')
         self.fig.savefig(filename, dpi=self.dpi, facecolor=self.fig.get_facecolor(), edgecolor='none')
 
