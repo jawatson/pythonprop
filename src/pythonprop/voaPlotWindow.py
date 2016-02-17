@@ -104,7 +104,8 @@ class VOAPlotWindow():
 
     def print_button_clicked(self, widget):
         p = VOAPlotFilePrinter(self.canvas)
-        p.run(self.parent)
+        print_parent = self.parent if self.parent else self.win
+        p.run(print_parent)
 
 
     def close_button_clicked(self, widget):
