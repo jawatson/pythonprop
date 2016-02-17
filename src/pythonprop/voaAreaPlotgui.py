@@ -71,10 +71,6 @@ from .voaAreaPlot import *
 class VOAAreaPlotGUI:
     """Graphical front end to the voaAreaPlot application"""
 
-    # set the users itshfdata directory.
-    # todo mofify to suit windows as well...
-    # itshfbc_path = os.path.expanduser("~")+os.sep+'itshfbc'
-
     plot_type_d = { 1: _('MUFday'),
                     2: _('Reliability'),
                     3: _('SNR'),
@@ -97,10 +93,8 @@ class VOAAreaPlotGUI:
     def __init__(self, data_source_filename, parent=None, exit_on_close = True, datadir=""):
         self.datadir = datadir
         self.exit_on_close = exit_on_close
-        #self.uifile = os.path.join(os.path.realpath(os.path.dirname(sys.argv[0])), "voaAreaPlotgui.ui")
         self.parent = parent
         self.ui_file = os.path.join(self.datadir, "ui", "voaAreaPlotBox.ui")
-        #self.wTree = Gtk.Builder.new_from_file(self.ui_file)
         self.wTree = Gtk.Builder()
         self.wTree.add_from_file(self.ui_file)
 
@@ -112,6 +106,7 @@ class VOAAreaPlotGUI:
         if not self.parent:
             self.win = Gtk.Window()
             self.win.set_title(_("Plot Control"))
+            self.win.connect("delete-event", self.quit_application)
             self.win.add(self.main_box)
         else:
             self.win = Gtk.Dialog("Plot Control", self.parent)
@@ -158,8 +153,6 @@ class VOAAreaPlotGUI:
             Gtk.main()
 
     def run_plot(self, widget):
-#        _color_map = self.cmap_d[self.cmap_combobox.get_active()]
-#        _data_type = self.type_combobox.get_active()+1
         _color_map = self.cmap_combobox.get_model().get_value(self.cmap_combobox.get_active_iter(), 0)
         _data_type = self.type_combobox.get_model().get_value(self.type_combobox.get_active_iter(), 0)
         if self.group_combobox.get_active() == 0:
@@ -195,7 +188,6 @@ class VOAAreaPlotGUI:
         cell = Gtk.CellRendererText()
         cb.pack_start(cell, True)
         cb.add_attribute(cell, 'text', 1)
-        #cb.set_wrap_width(20)
         cb.set_active(0)
 
 
