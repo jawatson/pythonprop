@@ -119,10 +119,13 @@ class VOAAreaPlot:
                     save_file = '',
                     run_quietly = False,
                     dpi = 150,
-                    parent = None):
+                    parent = None,
+                    datadir=None):
 
         self.run_quietly = run_quietly
         self.dpi=float(dpi)
+
+        self.datadir = datadir
 
         plot_parameters = VOAFile((in_file+'.voa'))
         plot_parameters.parse_file()
@@ -364,7 +367,7 @@ class VOAAreaPlot:
 
         #todo this ought to a command line param
         if not self.run_quietly:
-            dia = VOAPlotWindow('pythonProp - ' + self.image_defs['title'], canvas, parent=parent)
+            dia = VOAPlotWindow('pythonProp - ' + self.image_defs['title'], canvas, parent=parent, datadir=self.datadir)
         return
 
     def on_draw(self, event):
@@ -442,9 +445,8 @@ class VOAAreaPlot:
         return '%d' % x
 
 
-def main(in_file):
-    #todo read the version from a central string...
-    parser = OptionParser(usage="%voaAreaPlot [options] file", version="%voaAreaPlot 0.9.1")
+def main(in_file, datadir=None):
+    parser = OptionParser(usage="%voaAreaPlot [options] file")
     parser.disable_interspersed_args()
     #tested ok
     parser.add_option("-c", "--contours",
@@ -625,7 +627,8 @@ def main(in_file):
                     points_of_interest = points_of_interest,
                     save_file = options.save_file,
                     run_quietly = options.run_quietly,
-                    dpi = options.dpi)
+                    dpi = options.dpi,
+                    datadir=datadir)
 
 
 if __name__ == "__main__":

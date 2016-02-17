@@ -50,7 +50,13 @@ class VOAPlotWindow():
     PLOT_RESPONSE_SAVE = 101
     PLOT_RESPONSE_CLOSE = 102
 
-    def __init__(self, title, canvas, png_source=None, parent=None, dpi=150):
+    def __init__(self,
+            title,
+            canvas,
+            png_source=None,
+            parent=None,
+            dpi=150,
+            datadir=None):
         self.dpi = dpi
         self.parent = parent
         self.png_source = png_source
@@ -59,7 +65,8 @@ class VOAPlotWindow():
         if not self.parent:
             self.win = Gtk.Window()
 
-            self.ui_file = os.path.join('/usr/local/share/pythonprop', "ui", "voaPropWindowBox.ui")
+            self.ui_file = os.path.join(datadir, "ui", "voaPropWindowBox.ui")
+
             self.wTree = Gtk.Builder()
             self.wTree.add_from_file(self.ui_file)
             self.get_objects("main_box", "print_button", "save_button", "close_button")
