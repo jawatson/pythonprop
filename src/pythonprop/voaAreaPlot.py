@@ -40,10 +40,8 @@ import math
 import datetime
 
 import matplotlib
-try:
-    from mpl_toolkits.basemap import Basemap
-except:
-	pass
+from mpl_toolkits.basemap import Basemap
+
 
 import gi
 gi.require_version('Gtk', '3.0')
