@@ -68,7 +68,7 @@ class VOATextFileViewDialog:
                             "text_buffer",
                             "save_button",
                             "print_button",
-                            "ok_button")
+                            "close_button")
         self.save_button.connect("clicked", self.on_save_clicked)
         self.print_button.connect("clicked", self.on_print_clicked)
 
