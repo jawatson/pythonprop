@@ -24,7 +24,6 @@ import sys
 import os
 import datetime
 import subprocess
-import zipfile
 
 from mpl_toolkits.basemap import Basemap
 
@@ -38,8 +37,6 @@ try:
     from gi.repository import Gtk
 except:
     sys.exit(1)
-
-from .vgzArchive import VGZArchive
 
 import gettext, locale, sys
 GETTEXT_DOMAIN = 'voacapgui'
@@ -141,16 +138,15 @@ class VOAAreaPlotGUI:
 
         if data_source_filename.endswith('.vgz'):
             self.in_filename = data_source_filename
-            va = VGZArchive(data_source_filename)
-            print(va.get_num_plots())
+            in_file = VOAFile(self.in_filename, vgzip=True)
         else:
             if data_source_filename.endswith('.voa'):
                 data_source_filename = data_source_filename.split(".voa")[0]
 
             self.in_filename = data_source_filename
             in_file = VOAFile(self.in_filename+'.voa')
-            in_file.parse_file()
-            self.num_plots = in_file.get_num_plots()
+        in_file.parse_file()
+        self.num_plots = in_file.get_num_plots()
         d = { 0 : _('All Plots'),}
         for i in range(1,self.num_plots+1): d[i] = str(i)
         self.populate_combo(self.group_combobox, d, 'key')

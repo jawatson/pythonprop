@@ -3,7 +3,7 @@
 #
 # File: voaAreaPlotgui.py
 #
-# Copyright (c) 2009 J.Watson
+# Copyright (c) 2016 J.Watson
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -20,33 +20,13 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-import sys
+import os
 import zipfile
-from io import BytesIO
 
-from .voaFile import VOAFile
+def get_voa_filename(zname):
+    with zipfile.ZipFile(zname, 'r') as vgzip:
+        file_list = vgzip.namelist()
+        return next(fn for fn in file_list if fn.endswith('.voa'))
 
-class VGZArchive:
-
-    def __init__(self, filename):
-        # TODO if file exists
-        with zipfile.ZipFile(filename, 'r') as vgzip:
-            self.file_list = vgzip.namelist()
-            self.voa_filename = next(fn for fn in self.file_list if fn.endswith('.voa'))
-            voa_content = vgzip.read(self.voa_filename)
-            print(voa_content)
-        self.vf = VOAFile(BytesIO(voa_content))
-        print("done init")
-
-
-    def get_num_plots(self):
-        print("Number of plots: {:d}".format(self.vf.get_num_plots()))
-        return self.vf.get_num_plots()
-
-
-if __name__ == "__main__":
-    if (len(sys.argv) != 2):
-        print('Usage: vgzArchive archive_name')
-        sys.exit(2)
-    app = VGZArchive(sys.argv[-1])
-    print("Number of plots: {:d}".format(app.get_num_plots))
+def get_base_filename(zname):
+    return os.path.splitext(get_voa_filename(zname))[0]

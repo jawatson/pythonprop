@@ -33,6 +33,7 @@
 # Try and delete the frame on ortho plots
 # All defaults should be defined in the same way, in the same place
 # The matplotlib AxesGrid toolkit is a collection of helper classes to ease displaying multiple images in matplotlib. The AxesGrid toolkit is distributed with matplotlib source. DOH!
+import io
 import os
 import re
 import sys
@@ -60,10 +61,15 @@ import numpy.ma as ma
 
 from optparse import OptionParser
 
+import zipfile
+
 from .voaAreaRect import VOAAreaRect
 from .voaFile import VOAFile
 from .hamlocation import HamLocation
 from .voaPlotWindow import *
+
+from .vgzArchive import get_base_filename
+
 
 import gettext
 import locale
@@ -125,7 +131,10 @@ class VOAAreaPlot:
 
         self.datadir = datadir
 
-        plot_parameters = VOAFile((in_file+'.voa'))
+        if in_file.endswith('.vgz'):
+            plot_parameters = VOAFile(in_file, vgzip=True)
+        else:
+            plot_parameters = VOAFile((in_file+'.voa'))
         plot_parameters.parse_file()
 
         if (plot_parameters.get_projection() != 'cyl'):
@@ -229,7 +238,12 @@ class VOAAreaPlot:
 
             ax.label_outer()
             #print "opening: ",(in_file+'.vg'+str(vg_file))
-            vgFile = open(in_file+'.vg'+str(vg_file))
+            if in_file.endswith('.vgz'):
+                base_filename = get_base_filename(in_file)
+                zf = zipfile.ZipFile(in_file)
+                vgFile = io.TextIOWrapper(zf.open("{:s}.vg{:d}".format(base_filename, vg_file)), 'utf-8')
+            else:
+                vgFile = open(in_file+'.vg'+str(vg_file))
             pattern = re.compile(r"[a-z]+")
 
             for line in vgFile:
@@ -241,6 +255,8 @@ class VOAAreaPlot:
                     value = min(self.image_defs['max'], value)
                     points[int(line[3:6])-1][int(line[0:3])-1] = value
             vgFile.close()
+            if 'zf' in locals():
+                zf.close()
 
             m_args={}
             if projection in ('cyl', 'mill', 'gall'):

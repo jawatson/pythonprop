@@ -23,6 +23,7 @@
 #from __future__ import with_statement
 import codecs
 import datetime
+import io
 import sys
 import string
 import math
@@ -30,8 +31,11 @@ import os.path
 from .hamlocation import *
 from .voaAreaRect import *
 import calendar as cal
+import zipfile
 
-DEBUG = True
+from .vgzArchive import get_voa_filename
+
+DEBUG = False
 
 PROJECTION= {0:'aeqd', 1:'cyl'}
 
@@ -64,7 +68,7 @@ class VOAFile:
     Tx Ants  :[default /const17.voa ]  0.000  57.0   500.0000
 
     """
-    def __init__(self, fn):
+    def __init__(self, fn, vgzip=False):
         self.TX_SITE     = 100
         self.P_CENTRE    = 101
         self.RX_SITE     = 102
@@ -104,12 +108,19 @@ class VOAFile:
         self.PSC4 = 1.0
 
         self.filename = fn
+        self.vgzip = vgzip
 
     def parse_file(self):
-        voaFile = codecs.open(self.filename, "r", "utf-8")
+        if not self.vgzip:
+            voaFile = open(self.filename)
+        else:
+            voa_filename = get_voa_filename(self.filename)
+            zf = zipfile.ZipFile(self.filename)
+            voaFile = io.TextIOWrapper(zf.open(voa_filename), 'utf-8')
         try:
             #voaFile = open(self.filename)
             for line in voaFile:
+                if DEBUG: print(line)
                 if line.startswith("Area"):
                     self.llcrnrlon = float(line[11:20])
                     self.llcrnrlat = float(line[31:40])
@@ -185,6 +196,9 @@ class VOAFile:
         finally:
             if DEBUG: print("Closing the file")
             voaFile.close()
+            if 'zf' in locals():
+                if DEBUG: print("Closing the zip file")
+                zf.close()
 
     def get_gridsize(self):    return self.gridsize
     def set_gridsize(self, gridsize):
