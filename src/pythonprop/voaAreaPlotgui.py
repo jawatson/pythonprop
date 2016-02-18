@@ -108,13 +108,6 @@ class VOAAreaPlotGUI:
                         "greyline_checkbutton", "parallels_checkbutton",
                         "meridians_checkbutton", "save_button")
 
-        if not enable_save:
-            print("hiding the save button")
-            self.save_button.hide()
-        else:
-            self.save_button.connect("clicked", self.on_save_clicked)
-
-
         if not self.parent:
             self.win = Gtk.Window()
             self.win.set_title(_("Plot Control"))
@@ -158,10 +151,14 @@ class VOAAreaPlotGUI:
                       "on_cancel_button_clicked" : self.quit_application,
                       "on_ok_button_clicked" : self.run_plot}
         self.wTree.connect_signals(event_dic)
+        self.save_button.connect("clicked", self.on_save_clicked)
+
         if self.parent:
             self.win.run()
         else:
             self.win.show_all()
+            if not enable_save:
+                self.save_button.hide()
             Gtk.main()
 
     def on_save_clicked(self, widget):
