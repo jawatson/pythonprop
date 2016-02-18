@@ -31,7 +31,7 @@ from .hamlocation import *
 from .voaAreaRect import *
 import calendar as cal
 
-DEBUG = False
+DEBUG = True
 
 PROJECTION= {0:'aeqd', 1:'cyl'}
 

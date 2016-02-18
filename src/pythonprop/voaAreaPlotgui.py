@@ -39,6 +39,8 @@ try:
 except:
     sys.exit(1)
 
+from .vgzArchive import VGZArchive
+
 import gettext, locale, sys
 GETTEXT_DOMAIN = 'voacapgui'
 LOCALE_PATH = os.path.join(os.path.realpath(os.path.dirname(sys.argv[0])), 'po')
@@ -64,10 +66,8 @@ lang.install()#app, local_path)
 gettext.bindtextdomain(GETTEXT_DOMAIN, LOCALE_PATH)
 gettext.textdomain(GETTEXT_DOMAIN)
 
-
 from .voaFile import *
 from .voaAreaPlot import *
-
 
 class VOAAreaPlotGUI:
     """Graphical front end to the voaAreaPlot application"""
@@ -91,15 +91,15 @@ class VOAAreaPlotGUI:
               'summer': _('summer'),
               'winter': _('winter')}
 
-    def __init__(self, data_source_filename,
+    def __init__(self,
+            data_source_filename,
             parent=None,
             exit_on_close = True,
             enable_save = False,
             datadir=""):
-        self.datadir = datadir
         self.exit_on_close = exit_on_close
         self.parent = parent
-        self.ui_file = os.path.join(self.datadir, "ui", "voaAreaPlotBox.ui")
+        self.ui_file = os.path.join(datadir, "ui", "voaAreaPlotBox.ui")
         self.wTree = Gtk.Builder()
         self.wTree.add_from_file(self.ui_file)
 
@@ -136,13 +136,21 @@ class VOAAreaPlotGUI:
             iter = model.iter_next(iter)
 
         #todo check the file exists
-        if data_source_filename.endswith('.voa'):
-            data_source_filename = data_source_filename.split(".voa")[0] #TODO: this needs to be more robust...
+        #TODO: this needs to be more robust...
+        # consider capitalisation
 
-        self.in_filename = data_source_filename
-        in_file = VOAFile(self.in_filename+'.voa')
-        in_file.parse_file()
-        self.num_plots = in_file.get_num_plots()
+        if data_source_filename.endswith('.vgz'):
+            self.in_filename = data_source_filename
+            va = VGZArchive(data_source_filename)
+            print(va.get_num_plots())
+        else:
+            if data_source_filename.endswith('.voa'):
+                data_source_filename = data_source_filename.split(".voa")[0]
+
+            self.in_filename = data_source_filename
+            in_file = VOAFile(self.in_filename+'.voa')
+            in_file.parse_file()
+            self.num_plots = in_file.get_num_plots()
         d = { 0 : _('All Plots'),}
         for i in range(1,self.num_plots+1): d[i] = str(i)
         self.populate_combo(self.group_combobox, d, 'key')
