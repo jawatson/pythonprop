@@ -68,7 +68,7 @@ class VOAFile:
     Tx Ants  :[default /const17.voa ]  0.000  57.0   500.0000
 
     """
-    def __init__(self, fn, vgzip=False):
+    def __init__(self, fn):
         self.TX_SITE     = 100
         self.P_CENTRE    = 101
         self.RX_SITE     = 102
@@ -108,15 +108,16 @@ class VOAFile:
         self.PSC4 = 1.0
 
         self.filename = fn
-        self.vgzip = vgzip
 
     def parse_file(self):
-        if not self.vgzip:
-            voaFile = open(self.filename)
-        else:
+
+        if self.filename.endswith('.vgz'):
             voa_filename = get_voa_filename(self.filename)
             zf = zipfile.ZipFile(self.filename)
             voaFile = io.TextIOWrapper(zf.open(voa_filename), 'utf-8')
+        else:
+            voaFile = open(self.filename)
+
         try:
             #voaFile = open(self.filename)
             for line in voaFile:

@@ -94,6 +94,7 @@ class VOAAreaPlotGUI:
             exit_on_close = True,
             enable_save = False,
             datadir=""):
+        self.voa_filename = data_source_filename
         self.exit_on_close = exit_on_close
         self.parent = parent
         self.ui_file = os.path.join(datadir, "ui", "voaAreaPlotBox.ui")
@@ -135,16 +136,18 @@ class VOAAreaPlotGUI:
         #todo check the file exists
         #TODO: this needs to be more robust...
         # consider capitalisation
-
+        """
         if data_source_filename.endswith('.vgz'):
             self.in_filename = data_source_filename
-            in_file = VOAFile(self.in_filename, vgzip=True)
+            in_file = VOAFile(self.in_filename)
         else:
             if data_source_filename.endswith('.voa'):
                 data_source_filename = data_source_filename.split(".voa")[0]
 
             self.in_filename = data_source_filename
             in_file = VOAFile(self.in_filename+'.voa')
+        """
+        in_file = VOAFile(self.voa_filename)
         in_file.parse_file()
         self.num_plots = in_file.get_num_plots()
         d = { 0 : _('All Plots'),}
@@ -211,7 +214,7 @@ class VOAAreaPlotGUI:
         	_vg_files = [self.group_combobox.get_active()]
         _time_zone = self.tz_spinbutton.get_value_as_int()
         plot_parent = self.parent if self.parent else self.win
-        plot = VOAAreaPlot(self.in_filename,
+        plot = VOAAreaPlot(self.voa_filename,
                         data_type = _data_type,
                         vg_files = _vg_files,
                         time_zone = _time_zone,

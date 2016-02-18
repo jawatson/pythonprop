@@ -131,10 +131,7 @@ class VOAAreaPlot:
 
         self.datadir = datadir
 
-        if in_file.endswith('.vgz'):
-            plot_parameters = VOAFile(in_file, vgzip=True)
-        else:
-            plot_parameters = VOAFile((in_file+'.voa'))
+        plot_parameters = VOAFile((in_file))
         plot_parameters.parse_file()
 
         if (plot_parameters.get_projection() != 'cyl'):
@@ -237,13 +234,12 @@ class VOAAreaPlot:
             self.subplots.append(ax)
 
             ax.label_outer()
-            #print "opening: ",(in_file+'.vg'+str(vg_file))
             if in_file.endswith('.vgz'):
                 base_filename = get_base_filename(in_file)
                 zf = zipfile.ZipFile(in_file)
                 vgFile = io.TextIOWrapper(zf.open("{:s}.vg{:d}".format(base_filename, vg_file)), 'utf-8')
             else:
-                vgFile = open(in_file+'.vg'+str(vg_file))
+                vgFile = open("{:s}.vg{:d}".format(os.path.splitext(in_file)[0], vg_file))
             pattern = re.compile(r"[a-z]+")
 
             for line in vgFile:
@@ -558,9 +554,6 @@ def main(in_file, datadir=None):
         dest="timezone",
         default=0,
         help=_("Time zone (integer, default = 0)"))
-
-    if in_file.endswith('.voa'):
-        in_file = in_file.split(".voa")[0] #TODO: this needs to be more robust...
 
     (options, args) = parser.parse_args()
 
