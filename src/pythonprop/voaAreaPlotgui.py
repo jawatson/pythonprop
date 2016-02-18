@@ -165,32 +165,41 @@ class VOAAreaPlotGUI:
             Gtk.main()
 
     def on_save_clicked(self, widget):
-        print("Base filename: {:s}".format(self.in_filename))
-        print("Num plots {:d}".format(self.num_plots))
         dialog = Gtk.FileChooserDialog("Save prediction data", self.win,
             Gtk.FileChooserAction.SAVE,
             (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
              "Select", Gtk.ResponseType.OK))
         dialog.set_default_size(800, 400)
+        filter_vgz = Gtk.FileFilter()
+        filter_vgz.set_name("VGZ files")
+        filter_vgz.add_pattern("*.vgz")
+        dialog.add_filter(filter_vgz)
 
         response = dialog.run()
 
         if response == Gtk.ResponseType.OK:
-            print("Select clicked")
-            print("Folder selected: " + dialog.get_filename())
             save_fn = dialog.get_filename()
-        elif response == Gtk.ResponseType.CANCEL:
-            print("Cancel clicked")
         dialog.destroy()
         if response == Gtk.ResponseType.OK:
             self.save_prediction_files(save_fn)
 
 
-    def save_prediction_files(self, filename):
-        vgz_file = zipfile.ZipFile(filename, "w")
-        fn = self.in_filename+'.voa'
-        vgz_file.write(fn, fn, zipfile.ZIP_DEFLATED)
-        vgz_file.close()
+    def save_prediction_files(self, vgz_filename):
+        vgz_filename = vgz_filename if vgz_filename.endswith('.vgz') else vgz_filename+'.vgz'
+        with zipfile.ZipFile(vgz_filename, 'w') as vgzip:
+            fn = self.in_filename+'.voa'
+            vgzip.write(fn, os.path.basename(fn), zipfile.ZIP_DEFLATED)
+            for vg_file_num in range(1, self.num_plots+1):
+                fn = "{:s}.vg{:d}".format(self.in_filename, vg_file_num)
+                vgzip.write(fn, os.path.basename(fn), zipfile.ZIP_DEFLATED)
+        dialog = Gtk.MessageDialog(self.win, 0, Gtk.MessageType.INFO,
+            Gtk.ButtonsType.OK, "VGZ File Saved")
+        dialog.format_secondary_text(
+            "Saved as {:s}".format(vgz_filename))
+        dialog.run()
+
+        dialog.destroy()
+
 
     def run_plot(self, widget):
         _color_map = self.cmap_combobox.get_model().get_value(self.cmap_combobox.get_active_iter(), 0)
