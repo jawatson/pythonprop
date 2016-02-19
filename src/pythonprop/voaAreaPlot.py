@@ -131,8 +131,13 @@ class VOAAreaPlot:
 
         self.datadir = datadir
 
-        plot_parameters = VOAFile((in_file))
-        plot_parameters.parse_file()
+        try:
+            plot_parameters = VOAFile((in_file))
+            plot_parameters.parse_file()
+        except zipfile.BadZipFile as e:
+            if parent is None:
+                print("Invalid .vgz file")
+                sys.exit(1)
 
         if (plot_parameters.get_projection() != 'cyl'):
             print(_("Error: Only lat/lon (type 1) input files are supported"))

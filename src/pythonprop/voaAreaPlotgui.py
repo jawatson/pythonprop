@@ -159,6 +159,8 @@ class VOAAreaPlotGUI:
         self.save_button.connect("clicked", self.on_save_clicked)
 
         if self.parent:
+            if not enable_save:
+                self.save_button.hide()
             self.win.run()
         else:
             self.win.show_all()

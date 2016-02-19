@@ -86,7 +86,7 @@ from .voaDefaults import *
 from .voaSiteChooser import *
 from .voaP2PPlot import *
 from .voaP2PPlotgui import *
-from .voaAreaPlotgui import voaAreaPlotgui
+from .voaAreaPlotgui import VOAAreaPlotGUI
 from .ssnFetch import *
 from .voaSSNThumb import *
 from .voaFile import *
@@ -1677,12 +1677,13 @@ all other entries will be ignored.'))
 
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            print("Select clicked")
-            print("File selected: " + dialog.get_filename())
-        elif response == Gtk.ResponseType.CANCEL:
-            print("Cancel clicked")
-
+            vgzip_file = dialog.get_filename()
         dialog.destroy()
+        graph = VOAAreaPlotGUI(vgzip_file,
+                parent=self.main_window,
+                enable_save=False,
+                datadir=self.datadir)
+        graph.quit_application()
 
 
     def quit_application(self, widget):

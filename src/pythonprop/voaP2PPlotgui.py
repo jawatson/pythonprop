@@ -54,7 +54,6 @@ lang.install()#app, local_path)
 gettext.bindtextdomain(GETTEXT_DOMAIN, LOCALE_PATH)
 gettext.textdomain(GETTEXT_DOMAIN)
 
-
 from .voaOutFile import VOAOutFile
 from .voaP2PPlot import VOAP2PPlot
 from .voa3DPlot import VOA3DPlot
@@ -162,6 +161,7 @@ class VOAP2PPlotGUI:
             self.win.show_all()
             Gtk.main()
 
+
     def run_plot(self, widget):
 #        _color_map = self.cmap_list[self.cmap_combobox.get_active()]
 #        _data_type = self.type_combobox.get_active()
@@ -206,6 +206,7 @@ class VOAP2PPlotGUI:
         cb.add_attribute(cell, 'text', 1)
         #cb.set_wrap_width(20)
         cb.set_active(0)
+
 
     def on_type_combo_changed(self, widget):
         selected_plot_type = int(self.type_combobox.get_model().get_value(self.type_combobox.get_active_iter(), 0))
