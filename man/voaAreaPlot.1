@@ -5,10 +5,13 @@
 .SH NAME
 voaAreaPlot \- Plot VOACAP Area Data Files
 .SH SYNOPSIS
-.B voaAreaPlot [options] fileName.voa
+.B voaAreaPlot [options] file_name
 .SH DESCRIPTION
 .B voaAreaPlot
-A python script used to graphically display the contents of output files produced by VOACAP 'area' calculations. 'fileName.voa' is the path to the .voa input file.  The corresponding output file (with the .vg1 extension) must be located in the same directory as the .voa file.
+A python script used to graphically display the contents of output files
+produced by VOACAP 'area' calculations. the 'file_name parameter defines the
+path to a .voa or .vgz file.  If a .voa file is specified, the corresponding
+output files (e.g. '.vg1') must be located in the same directory.
 .SH OPTIONS
 .IP "--version"
 Display the version number and exit.
@@ -58,6 +61,9 @@ Specify a timezone.  This option adjusts the (UTC) time specified in the datafil
 .SH EXAMPLES
 .IP "voaAreaPlot aDataFile.voa"
 Plots the contents of the file aDataFile.voa using default settings.
+.IP "voaAreaPlot aZipArchive.vgz"
+Plots the contents of the .voa file found in the .vgz archive using the default
+settings.
 .IP "voaAreaPlot -r i -p mill aDataFile.voa"
 Plots an intermediate resolution miller projection.
 .IP "voaAreaPlot -m autumn -p ortho aDataFile.voa"
