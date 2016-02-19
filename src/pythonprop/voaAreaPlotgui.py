@@ -91,11 +91,9 @@ class VOAAreaPlotGUI:
     def __init__(self,
             data_source_filename,
             parent=None,
-            exit_on_close = True,
             enable_save = False,
             datadir=""):
         self.voa_filename = data_source_filename
-        self.exit_on_close = exit_on_close
         self.parent = parent
         self.ui_file = os.path.join(datadir, "ui", "voaAreaPlotBox.ui")
         self.wTree = Gtk.Builder()
@@ -257,7 +255,7 @@ class VOAAreaPlotGUI:
         #only emit main_quit if we're running as a standalone app
         #todo do we need to do anyother clean-up here if we're _not_
         #running as a standalone app
-        if self.exit_on_close:
+        if not self.parent:
             Gtk.main_quit
             sys.exit(0)
 

@@ -87,13 +87,12 @@ class VOAP2PPlotGUI:
               'winter': _('winter')}
 
 
-    def __init__(self, data_source_filename, parent = None, exit_on_close = True,  datadir=""):
+    def __init__(self, data_source_filename, parent = None, datadir=""):
         self.datadir = datadir
         self.in_filename = data_source_filename
         #todo check the file exists
         in_file = VOAOutFile(self.in_filename)
 
-        self.exit_on_close = exit_on_close
         #self.uifile = os.path.join(os.path.realpath(os.path.dirname(sys.argv[0])), "voaP2PPlotgui.ui")
         self.parent = parent
         """
@@ -228,7 +227,7 @@ class VOAP2PPlotGUI:
         #only emit main_quit if we're running as a standalone app
         #todo do we need to do anyother clean-up here if we're _not_
         #running as a standalone app
-        if self.exit_on_close:
+        if not self.parent:
             Gtk.main_quit
             sys.exit(0)
 

@@ -86,7 +86,7 @@ from .voaDefaults import *
 from .voaSiteChooser import *
 from .voaP2PPlot import *
 from .voaP2PPlotgui import *
-from .voaAreaPlotgui import *
+from .voaAreaPlotgui import voaAreaPlotgui
 from .ssnFetch import *
 from .voaSSNThumb import *
 from .voaFile import *
@@ -275,6 +275,7 @@ class VOACAP_GUI():
             "on_mi_run_activate": self.run_prediction,
             "on_mi_show_yelp_activate": self.show_yelp,
             "on_mi_about_activate" : self.show_about_dialog,
+            "on_mi_open_vgz_activate" : self.open_vgz_file,
             "on_mi_quit_activate" : self.quit_application,
             "on_main_window_destroy" : self.quit_application,
             "on_ssn_web_update_button_clicked" : self.update_ssn_table,
@@ -1493,7 +1494,7 @@ all other entries will be ignored.'))
             self.statusbar.pop(self.area_context_id)
 
             s = os.path.join(os.path.expanduser("~"), 'itshfbc','areadata','pyArea.voa')
-            graph = VOAAreaPlotGUI(s, parent=self.main_window, exit_on_close=False, enable_save=True, datadir=self.datadir)
+            graph = VOAAreaPlotGUI(s, parent=self.main_window, enable_save=True, datadir=self.datadir)
             graph.quit_application()
 
         #P2P Predictions follow
@@ -1592,7 +1593,6 @@ all other entries will be ignored.'))
                 if run_type == 'g':
                     graph = VOAP2PPlotGUI(self.itshfbc_path+os.sep+'run'+os.sep+output_filename,
                         parent=self.main_window,
-                        exit_on_close=False,
                         datadir=self.datadir)
                     graph.quit_application()
             except OSError as e:
@@ -1662,6 +1662,27 @@ all other entries will be ignored.'))
         with open(fn, 'w') as templates_def_fd:
             templates_def_fd.write(s)
         self.area_templates_file = fn
+
+
+    def open_vgz_file(self,widget):
+        dialog = Gtk.FileChooserDialog("Please select a vgz file", self.main_window,
+            Gtk.FileChooserAction.OPEN,
+            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+             "Select", Gtk.ResponseType.OK))
+        filter_vgz = Gtk.FileFilter()
+        filter_vgz.set_name(".vgz files")
+        filter_vgz.add_pattern("*.vgz")
+        dialog.add_filter(filter_vgz)
+        dialog.set_default_size(800, 400)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            print("Select clicked")
+            print("File selected: " + dialog.get_filename())
+        elif response == Gtk.ResponseType.CANCEL:
+            print("Cancel clicked")
+
+        dialog.destroy()
 
 
     def quit_application(self, widget):
