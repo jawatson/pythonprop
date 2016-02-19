@@ -21,6 +21,7 @@
 # 02110-1301, USA.
 
 #from __future__ import with_statement
+import calendar
 import codecs
 import datetime
 import io
@@ -497,6 +498,12 @@ class VOAFile:
                                 mode=_mode)
             return site_description
 
+
+    def get_group_titles(self):
+        titles = []
+        for ctr in range(0, self.get_num_plots()):
+            titles.append("{:d}: {:.2f}MHz {:02d}:00UTC {:s}".format(ctr+1, self.frequencies[ctr], self.utcs[ctr], calendar.month_name[int(self.monthDays[ctr])]))
+        return titles
 
     def get_detailed_plot_description_string(self, field):
         """Returns a string of comprehensive information about the plot.

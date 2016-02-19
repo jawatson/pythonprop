@@ -982,6 +982,7 @@ class VOACAP_GUI():
         else:
             self.add_templ_btn.set_sensitive(True)
 
+
     def p2p_useday_tog(self, *args):
         change_to = None
         e = ee = ''
@@ -1679,11 +1680,24 @@ all other entries will be ignored.'))
         if response == Gtk.ResponseType.OK:
             vgzip_file = dialog.get_filename()
         dialog.destroy()
-        graph = VOAAreaPlotGUI(vgzip_file,
-                parent=self.main_window,
-                enable_save=False,
-                datadir=self.datadir)
-        graph.quit_application()
+        try:
+            graph = VOAAreaPlotGUI(vgzip_file,
+                    parent=self.main_window,
+                    enable_save=False,
+                    datadir=self.datadir)
+            graph.quit_application()
+        except zipfile.BadZipFile as e:
+            self.show_msg_dialog("VGZ Error", "Error opening {:s}".format(vgzip_file), msg_type="ERROR")
+
+    # INFO, WARNING & ERROR messages
+    def show_msg_dialog(self, msg_title, msg_body, msg_type='INFO'):
+        dialog = Gtk.MessageDialog(self.main_window,
+            0,
+            getattr(Gtk.MessageType, msg_type),
+            Gtk.ButtonsType.CANCEL, msg_title)
+        dialog.format_secondary_text(msg_body)
+        dialog.run()
+        dialog.destroy()
 
 
     def quit_application(self, widget):

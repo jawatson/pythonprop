@@ -149,8 +149,14 @@ class VOAAreaPlotGUI:
         in_file.parse_file()
         self.num_plots = in_file.get_num_plots()
         d = { 0 : _('All Plots'),}
-        for i in range(1,self.num_plots+1): d[i] = str(i)
+
+        l = in_file.get_group_titles()
+        d.update(list(zip(list(range(1, len(l)+1)), l)))
         self.populate_combo(self.group_combobox, d, 'key')
+
+
+        #for i in range(1,self.num_plots+1): d[i] = str(i)
+        #self.populate_combo(self.group_combobox, d, 'key')
 
         event_dic = { "on_dialog_destroy" : self.quit_application,
                       "on_cancel_button_clicked" : self.quit_application,
