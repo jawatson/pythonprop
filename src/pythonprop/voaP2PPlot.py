@@ -51,14 +51,15 @@ import os
 import math
 from optparse import OptionParser
 
+import numpy as np
 from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg
 import matplotlib.transforms as mtransforms
 from matplotlib.figure import Figure
 from matplotlib.font_manager import FontProperties
 from matplotlib.ticker import FuncFormatter
 
-from .voaOutFile import *
-from .voaPlotWindow import *
+from .voaOutFile import VOAOutFile
+from .voaPlotWindow import VOAPlotWindow
 
 import gettext
 import locale
@@ -118,7 +119,8 @@ class VOAP2PPlot:
                 save_file = '',
                 dpi=150,
                 parent = None,
-                user_bands=None):
+                user_bands=None,
+                datadir=None):
 
         """
         user_bands - a list of bands to be displayed.
@@ -270,12 +272,22 @@ class VOAP2PPlot:
         canvas.show()
 
         if save_file :
-            self.save_plot(canvas, save_file)
+            self.save_plot(save_file)
 
         if not self.run_quietly:
             # TODO consider using a scrolled pane here...
-            dia = VOAPlotWindow('pythonProp - ' + self.image_defs['title'], canvas, parent, dpi=self.dpi)
+            dia = VOAPlotWindow('pythonProp - ' + self.image_defs['title'],
+                        canvas,
+                        parent=parent,
+                        png_source = self,
+                        dpi=self.dpi,
+                        datadir=datadir)
         return
+
+
+    def get_png(self, id):
+        print("creating a png")
+        self.save_plot("test.png")
 
 
     def on_draw(self, event):
@@ -322,7 +334,7 @@ class VOAP2PPlot:
         leg.get_frame().set_alpha(0.75)
         return leg
 
-    def save_plot(self, canvas, filename=None):
+    def save_plot(self, filename=None):
         #canvas.print_figure(filename, dpi=150, facecolor='white', edgecolor='white')
         self.fig.savefig(filename, dpi=self.dpi, facecolor=self.fig.get_facecolor(), edgecolor='none')
 
@@ -369,7 +381,7 @@ class VOAP2PPlot:
         return tmp_str
 
 
-def main(data_file):
+def main(data_file, datadir=None):
     parser = OptionParser(usage=_("%voaP2PPlot [options] file"), version="%voaP2PPlot 0.9")
 
     #tested ok
@@ -516,7 +528,7 @@ def main(data_file):
                     plot_groups = plot_groups,
                     plot_contours = options.plot_contours,
                     face_colour = options.face_colour,
-                    plot_filled_contours = options.plot_filled_contours,
+                    filled_contours = options.plot_filled_contours,
                     plot_label = options.plot_label,
                     color_map=options.color_map,
                     time_zone = time_zone,
@@ -524,7 +536,8 @@ def main(data_file):
                     plot_bands = bands,
                     run_quietly = options.run_quietly,
                     save_file = options.save_file,
-                    dpi = options.dpi)
+                    dpi = options.dpi,
+                    datadir=datadir)
 
 
 if __name__ == "__main__":

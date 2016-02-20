@@ -40,22 +40,23 @@ import math
 import datetime
 
 import matplotlib
-try:
-    from mpl_toolkits.basemap import Basemap
-except:
-	pass
+from mpl_toolkits.basemap import Basemap
 
+
+import gi
+gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-#matplotlib.use('GTK3Agg')
 
 import matplotlib.colors as colors
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg
+from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
+
 from matplotlib.figure import Figure
 from matplotlib.font_manager import FontProperties
 
 from matplotlib.ticker import FuncFormatter
 import numpy as np
+import numpy.ma as ma
 
 from optparse import OptionParser
 
@@ -116,10 +117,13 @@ class VOAAreaPlot:
                     save_file = '',
                     run_quietly = False,
                     dpi = 150,
-                    parent = None):
+                    parent = None,
+                    datadir=None):
 
         self.run_quietly = run_quietly
         self.dpi=float(dpi)
+
+        self.datadir = datadir
 
         plot_parameters = VOAFile((in_file+'.voa'))
         plot_parameters.parse_file()
@@ -235,22 +239,21 @@ class VOAAreaPlot:
                     # TODO Does this need to be normalised here if it's also being done in the plot?
                     value = max(self.image_defs['min'], value)
                     value = min(self.image_defs['max'], value)
-                    #if value < self.image_defs[2] : value = self.image_defs[2]
-                    #if value > self.image_defs[3] : value = self.image_defs[3]
                     points[int(line[3:6])-1][int(line[0:3])-1] = value
             vgFile.close()
 
+            m_args={}
             if projection in ('cyl', 'mill', 'gall'):
-                m_args = {"llcrnrlon":area_rect.get_sw_lon(),
+                m_args.update({"llcrnrlon":area_rect.get_sw_lon(),
                     "llcrnrlat":area_rect.get_sw_lat(),
                     "urcrnrlon":area_rect.get_ne_lon(),
-                    "urcrnrlat":area_rect.get_ne_lat()}
+                    "urcrnrlat":area_rect.get_ne_lat()})
 
             if projection in ('robin', 'vandg', 'sinu', 'mbtfpq', 'eck4',
                             'kav7', 'moll', 'hammer', 'gnom',
                             'laea', 'aeqd', 'cea', 'merc'):
-                m_args = {"lat_0":plot_centre_location.get_latitude(),
-                    "lon_0":plot_centre_location.get_longitude()}
+                m_args.update({"lat_0":plot_centre_location.get_latitude(),
+                    "lon_0":plot_centre_location.get_longitude()})
                 if projection in ('cea', 'merc'):
                     m_args['lat_ts']=0
 
@@ -262,34 +265,18 @@ class VOAAreaPlot:
 
             #points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
             #colMap.set_under(color ='k', alpha=0.0)
-
+            lons, lats  = np.meshgrid(lons, lats)
+            points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
             if (filled_contours):
-                # make 2-d grid of lons, lats
-                lons, lats  = np.meshgrid(lons, lats)
-                points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
                 im = m.contourf(lons, lats, points, self.image_defs['y_labels'],
                     latlon=True,
                     cmap = colMap)
                 plot_contours = True
-
             else:
-                # transform to nx x ny regularly spaced 5km native projection grid
-                nx = 360#int((m.xmax-m.xmin)/360.)+1
-                print("m.xmax={:.2f}".format(m.xmax))
-                print("m.xmin={:.2f}".format(m.xmin))
-                print(nx)
-                ny = 180#int((m.ymax-m.ymin)/360.)+1
-                print("m.ymax={:.2f}".format(m.ymax))
-                print("m.ymin={:.2f}".format(m.ymin))
-                print(ny)
-                dat = m.transform_scalar(points,lons,lats,nx,ny,masked=True)
-                im = m.imshow(dat,
+                im = m.pcolormesh(lons, lats, points,
+                    latlon=True,
                     cmap = colMap,
-                    origin = 'lower',
-                    alpha = 0.8,
-                    norm = colors.Normalize(clip = False,
-                    vmin = self.image_defs['min'],
-                    vmax = self.image_defs['max']))
+                    shading='gouraud')
 
             if plot_contours:
                 ct = m.contour(lons, lats, points, self.image_defs['y_labels'][1:],
@@ -369,7 +356,7 @@ class VOAAreaPlot:
             t.set_fontsize(colorbar_fontsize)
 
         #self.fig.tight_layout()
-        canvas = FigureCanvasGTK3Agg(self.fig)
+        canvas = FigureCanvas(self.fig)
         self.fig.canvas.mpl_connect('draw_event', self.on_draw)
         canvas.show()
 
@@ -378,7 +365,7 @@ class VOAAreaPlot:
 
         #todo this ought to a command line param
         if not self.run_quietly:
-            dia = VOAPlotWindow('pythonProp - ' + self.image_defs['title'], canvas, parent=parent)
+            dia = VOAPlotWindow('pythonProp - ' + self.image_defs['title'], canvas, parent=parent, datadir=self.datadir)
         return
 
     def on_draw(self, event):
@@ -456,9 +443,8 @@ class VOAAreaPlot:
         return '%d' % x
 
 
-def main(in_file):
-    #todo read the version from a central string...
-    parser = OptionParser(usage="%voaAreaPlot [options] file", version="%voaAreaPlot 0.9.1")
+def main(in_file, datadir=None):
+    parser = OptionParser(usage="%voaAreaPlot [options] file")
     parser.disable_interspersed_args()
     #tested ok
     parser.add_option("-c", "--contours",
@@ -535,7 +521,6 @@ def main(in_file):
         default = 'c',
         choices = ['c', 'l', 'i', 'h', 'f'],
         help=_("RESOLUTION - may be one of 'c' (crude), 'l' (low), 'i' (intermediate), 'h' (high), 'f' (full)"))
-
 
     parser.add_option("-s", "--size",
         dest="dpi",
@@ -615,7 +600,7 @@ def main(in_file):
             except:
                 print(_("Error reading vg files, resetting to '1'"))
                 vg_files = [1]
-        print(_("The following %d files have been selected: ") % (len(vg_files)), vg_files)
+        #print(_("The following %d files have been selected: ") % (len(vg_files)), vg_files)
 
     if options.timezone:
         time_zone = int(options.timezone)
@@ -640,7 +625,8 @@ def main(in_file):
                     points_of_interest = points_of_interest,
                     save_file = options.save_file,
                     run_quietly = options.run_quietly,
-                    dpi = options.dpi)
+                    dpi = options.dpi,
+                    datadir=datadir)
 
 
 if __name__ == "__main__":

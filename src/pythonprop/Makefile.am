@@ -2,7 +2,7 @@
 
 ## http://www.micahcarrick.com/tutorials/autotools-tutorial-python-gtk/getting-started.html#section_4
 
-SUBDIRS=ui templates 
+SUBDIRS=ui templates
 
 pythonprop_PYTHON=	\
 	voa3DPlot.py \
@@ -25,14 +25,13 @@ pythonprop_PYTHON=	\
 	voaMeth26Out.py \
 	voaMultiPlot.py \
 	voaOutFile.py \
+	voaOutFilePrinter.py \
+	voaPlotFilePrinter.py \
 	voaPlotWindow.py \
 	voaSiteChooser.py \
 	voaSSNThumb.py \
 	voaTextFileViewDialog.py \
-	__init__.py 
+	__init__.py
 
 
 pythonpropdir = $(pythondir)/pythonprop
-
-
-

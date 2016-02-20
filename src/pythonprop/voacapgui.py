@@ -171,8 +171,10 @@ class VOACAP_GUI():
                 "p2pcircuitckb",
                 "p2pcalbt", "p2pusedayck", "p2pmacrocb", "p2pmacroaddbt",
                 )
-        #self.p2pcalbt.set_label(_('_Cal'))
-        #self.p2pcalbt.set_image(Gtk.Image.new_from_stock(Gtk.STOCK_INDEX, Gtk.IconSize.BUTTON))
+        self.ssn_context_id = self.statusbar.get_context_id("SSN Messages")
+        self.p2p_context_id = self.statusbar.get_context_id("P2P Messages")
+        self.area_context_id = self.statusbar.get_context_id("Area Messages")
+
         # TODO clear up "p2psavebt", "p2pcircuitcb",
         self.p2p_useday = False
         self.p2pdayspinbutton.set_sensitive(self.p2p_useday)
@@ -233,7 +235,10 @@ class VOACAP_GUI():
         self.set_circuit_panel_state(False)
 
         try:
-            self.ssn_repo = SSNFetch(parent = self.main_window, save_location = self.ssn_path, s_bar=self.statusbar)
+            self.ssn_repo = SSNFetch(parent = self.main_window,
+                save_location = self.ssn_path,
+                s_bar=self.statusbar,
+                s_bar_context=self.ssn_context_id)
         except NoSSNData as e:
             print((e.value))
             self.quit_application(None)
@@ -597,8 +602,7 @@ class VOACAP_GUI():
             _valid = False
 
         if _valid != True:
-            context_id = self.statusbar.get_context_id("nossns")
-            self.statusbar.push(context_id, _("No SSNs are defined"))
+            self.statusbar.push(self.ssn_context_id, _("No SSNs are defined"))
         return _valid
 
 
@@ -1474,9 +1478,10 @@ all other entries will be ignored.'))
                 dialog.run()
                 dialog.destroy()
 
-            print("executing vocapl...")
-#            os.system('voacapl ~/itshfbc area calc pyArea.voa')
-#            print  os.path.join(os.path.expanduser("~"), 'itshfbc')
+            self.statusbar.pop(self.area_context_id)
+            self.statusbar.push(self.area_context_id, "Running prediction...")
+            while Gtk.events_pending():
+                Gtk.main_iteration()
             ret = os.spawnlp(os.P_WAIT, 'voacapl', 'voacapl', os.path.join(os.path.expanduser("~"), 'itshfbc'), "area", "calc",  "pyArea.voa")
 
             if ret:
@@ -1485,7 +1490,7 @@ all other entries will be ignored.'))
                 dialog.run()
                 dialog.destroy()
                 return -1
-            print("done voacapl")
+            self.statusbar.pop(self.area_context_id)
 
             s = os.path.join(os.path.expanduser("~"), 'itshfbc','areadata','pyArea.voa')
             graph = VOAAreaPlotGUI(s, parent=self.main_window, exit_on_close=False, datadir=self.datadir)

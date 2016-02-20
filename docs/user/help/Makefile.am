@@ -17,12 +17,12 @@ DOC_FIGURES = figures/antenna_chooser.png \
 
 pdfdir = $(pkgdatadir)/docs
 
-pdf_DATA = voacapgui.pdf 
+pdf_DATA = voacapgui.pdf voacapgui-C.omf
 
 EXTRA_DIST = $(pdf_DATA) 
 
-voacapgui.pdf: C/voacapgui.xml C/legal.xml
-	dblatex C/voacapgui.xml -o voacapgui.pdf
+#voacapgui.pdf: C/voacapgui.xml C/legal.xml
+#	dblatex C/voacapgui.xml -o voacapgui.pdf
 
 CLEANFILES = $(pdf_DATA)
 

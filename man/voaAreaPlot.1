@@ -16,6 +16,8 @@ Display the version number and exit.
 Plot contours on the map.
 .IP "-d DATATYPE, --datatype=DATATYPE"
 An integer number representing the data type (MUF, REL or SNR) to plot. Valid values of DATATYPE are 1 (MUF), 2 (REL), 3 (SNR) 4 (SNRxx), 5 (SDBW) and 6 (SDBW - formatted as S-Meter values).  Default value is 1 (MUF)
+.IP "--filled-contour"
+Creates a filled contour plot.
 .IP "-h, --help"
 Print a help message and exit.
 .IP "-i, --meridian"
@@ -38,18 +40,18 @@ POI_FILE is a text file with points of interest to plot on the map.  The file is
 40.549999, 21.483334, Taif
 .br
 50.150002, 26.266666, Dahran
-.IP "-r RESOLUTION, --resolution=RESOLUTION"
-A single character that specifies the resolution to plot with.  May be one of 'c' (crude), 'l' (low), 'i' (intermediate), 'h' (high), 'f' (full).  Default is 'c' (crude).
-.IP "-v VG_FILES, --vg_files=VG_FILES"
-VG_FILES specifies which .vg files to plot, e.g. '-v 1,3,5,6' or use '-v a' to print all plots associated with the input file.  Default is 1.
 .IP "-p PROJECTION, --projection=PROJECTION"
-PROJECTION specifies the map projection.  Valid values are 'cyl' = Cylindrical Equidistant (default), 'mill' = Miller Cylindrical, 'sinu' = Sinusoidal, 'ortho' = Orthographic, 'eqdc' = Equidistant Conic, 'robin' = Robinson, 'moll' = Mollweide & 'tmerc' = Transverse Mercator.
+PROJECTION specifies the map projection.  Valid values are 'cyl' (Equidistant
+Cylindrical), 'mill' (Miller Cylindrical), gall' (Gall Stereographic),
+'robin' (Robinson), 'vandg' (van der Grinten), 'sinu' (Sinusoidal), 'mbtfpq'
+(McBryde-Thomas Flat Polar Quartic), 'eck4' (Eckert IV), 'kav7' (Kavrayskiy
+VII), 'moll' (Mollweide), 'hammer' (Hammer).
 .IP "-r RESOLUTION, --resolution=RESOLUTION"
 A single character representing resolution of the final plot.  RESOLUTION may be one of 'c' (crude), 'l' (low), 'i' (intermediate), 'h' (high), 'f' (full)
 .IP "-t, --terminator"
 Displays the night/day regions on the map.
 .IP "-v VG_FILES, --vg_files=VG_FILES"
-Specify which vg_files to plot.
+VG_FILES specifies which .vg files to plot, e.g. '-v 1,3,5,6' or use '-v a' to print all plots associated with the input file.  Default is 1.
 .IP "-z TIMEZONE, --timezone=TIMEZONE"
 Specify a timezone.  This option adjusts the (UTC) time specified in the datafile to the users local time.
 
@@ -64,9 +66,9 @@ Plots an orthographic projection using the colour map 'autumn'.
 .SH ENVIRONMENT
 voaAreaPlot does not require or make use of any environmental variables.   The program requires the matlibplot library and basemap toolkit to run.
 .SH BUGS
-Strange things happen when trying to plot a greyline over anything but the default projection.  Please submit .voa and .vg* files when submitting bug reports.
+No major bugs are known. Please submit .voa and .vg* files when submitting bug reports.
 .SH AUTHOR
-This program was written by James Watson (M0DNS / HZ1JW) <jimwatson at mac dot com>
+The application and and man page was written by James Watson (M0DNS / HZ1JW) <jimwatson at mac dot com>
 
 .SH ACKNOLEDGMENTS
-I'm indebted to the authors of matplotlib and the basemap toolkit whaich make plotting complex data sets straight forward and fun :-) Also to Lowell and Alex for beta testing and support.
+I'm indebted to the authors of matplotlib and the basemap toolkit which make plotting complex data sets straight forward and fun :-) Also to Lowell and Alex for beta testing and support.

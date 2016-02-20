@@ -86,7 +86,7 @@ class SSNFetch(Gtk.ListStore):
 
 
 
-    def __init__(self, parent = None, save_location=None, s_bar=None):
+    def __init__(self, parent = None, save_location=None, s_bar=None, s_bar_context=None):
         """Progress notes will be sent to the status bar
         defined by s_bar.  This may be replaced with a
         statusbar manager in later versions.'
@@ -99,6 +99,7 @@ class SSNFetch(Gtk.ListStore):
         Gtk.ListStore.__init__( self, *columns )
         self.save_location = save_location
         self.s_bar = s_bar
+        self.s_bar_context = s_bar_context
         # if no file exists, grab it
         if not os.path.isfile(self.save_location):
             e = _("No SSN Data Found")
@@ -126,16 +127,16 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
         msg_str = _("Transferring Data: ")+str(fraction)+"%"
         print(msg_str)
         if self.s_bar:
-            context_id = self.s_bar.get_context_id("ssn_data_transfer")
-            self.s_bar.push(context_id, msg_str)
+            self.s_bar.pop(self.s_bar_context)
+            self.s_bar.push(self.s_bar_context, msg_str)
             while Gtk.events_pending():
                 Gtk.main_iteration()
 
     def update_ssn_file(self):
         print("*** Connecting to " + self.ssn_url)
         if self.s_bar:
-            context_id = self.s_bar.get_context_id("ssn_data_connecting")
-            self.s_bar.push(context_id, _("Connecting to ") + self.ssn_url)
+            self.s_bar.pop(self.s_bar_context)
+            self.s_bar.push(self.s_bar_context , "Connecting to {:s}".format(self.ssn_url))
             while Gtk.events_pending():
                 Gtk.main_iteration()
         try:
@@ -144,16 +145,16 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
             # todo delete the temp
             print("*** Disconnected from internet ***")
             if self.s_bar:
-                context_id = self.s_bar.get_context_id("ssn_data_done")
-                self.s_bar.push(context_id, _("Done"))
+                self.s_bar.pop(self.s_bar_context)
+                self.s_bar.push(self.s_bar_context, _("Done"))
                 while Gtk.events_pending():
                     Gtk.main_iteration()
             self.read_ssn_file()
         except:
             print("*** Failed to retrieve data ***")
             if self.s_bar:
-                context_id = self.s_bar.get_context_id("ssn_data_done")
-                self.s_bar.push(context_id, _("Error: Unable to retrieve data"))
+                self.s_bar.pop(self.s_bar_context)
+                self.s_bar.push(self.s_bar_context, _("Error: Unable to retrieve data"))
                 while Gtk.events_pending():
                     Gtk.main_iteration()
 
@@ -192,8 +193,8 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
             #todo check that we clear the dictionary as well
             print(sys.exc_info()[0])
             if self.s_bar:
-                context_id = self.s_bar.get_context_id("ssn_data_read_err")
-                self.s_bar.push(context_id, _("Error: Unable to read SSN data"))
+                self.s_bar.pop(self.s_bar_context)
+                self.s_bar.push(self.s_bar_context, _("Error: Unable to read SSN data"))
                 while Gtk.events_pending():
                     Gtk.main_iteration()
 

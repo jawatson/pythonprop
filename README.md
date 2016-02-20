@@ -8,8 +8,9 @@ propagation prediction engine.
 From v0.16, the application uses the GTK3 compatible PyGobject library.
 
 #Installation (Python 3)
-From version v.20, the application uses Python 3.  New users are encouraged to
-use Python 3.
+From version v.20, the application uses Python 3, supported on the current
+version of most major distros.  New users are encouraged to use the Python 3
+version of the application .
 
 The application requires the following dependancies;
 * python3-matplotlib
@@ -59,7 +60,7 @@ The application itself requires a few python dependancies;
 
 These can be installed on Fedora 23 with the following command;
 
-    $ sudo yum install rarian-compat gnome-doc-utils pkgconfig python-basemap python-matplotlib-gtk3
+    $ sudo dnf install rarian-compat gnome-doc-utils pkgconfig python-basemap python-matplotlib-gtk3
 
 Debian / Ubuntu users can install these dependencies with the following command;
 
@@ -83,7 +84,34 @@ The following command will create the build structure from a fresh svn checkout;
 
     $ ./autogen.sh
 
-##Running the Applictation
+##Running the Application
 The application may be started by typing 'voacapgui' at the command line. v0.16
 includes a .desktop file allowing the application to be started from the system
 application launcher.
+
+#Roadmap
+##Release 0.21
+* disable the contour checkbox if 3d plots or 'none' is chosen - Done
+* Sort out the no parent warnings.  Use a main window and dialog window
+  as appropriate. - Done:uses a single box widget and creates a dialog
+  or window as required.
+* Add a save button to the circuit viewer - OK
+* Expose filled contour on p2p -OK
+* Make the colorbar same height as plot on area plots - Fixed on single plots
+* Put a frame around the ssn box - Fixed
+* Remove the 'next 12 months' option, it's the same as the next N months - done (11Feb16)
+* Update man page to reflect filled contour - OK
+
+##Release 0.22
+* Add print buttons to the result views.
+* Add the ability to save area plots in a zip ('.vgz') file containing, the
+  input/output files and a meta.txt of notes / annotations and a file list.
+* Add a load / save menu to load up a file and jump straight to the
+  plotting function.  This same function could also restore the settings
+  to permit the plot to be modified and recalculated.
+
+##Release 0.23
+* Migrate mapping to cartopy
+
+##Release 0.24
+* Investigate running voacapl in a separate thread to provide some form of visual progress indicator.
