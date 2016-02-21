@@ -47,6 +47,12 @@
     <property name="can_focus">False</property>
     <property name="stock">gtk-open</property>
   </object>
+  <object class="GtkImage" id="image2">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-open</property>
+    <property name="icon_size">6</property>
+  </object>
   <object class="GtkListStore" id="liststore1"/>
   <object class="GtkListStore" id="liststore2"/>
   <object class="GtkAdjustment" id="min_toa_adjustment">
@@ -184,12 +190,22 @@
                     <property name="can_focus">False</property>
                     <child>
                       <object class="GtkImageMenuItem" id="mi_open_vgz">
-                        <property name="label">Open vgz file</property>
+                        <property name="label">Open VGZ...</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="image">image1</property>
                         <property name="use_stock">False</property>
                         <signal name="activate" handler="on_mi_open_vgz_activate" swapped="no"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkImageMenuItem" id="mi_restore_vgz">
+                        <property name="label">Restore From VGZ...</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="image">image2</property>
+                        <property name="use_stock">False</property>
+                        <signal name="activate" handler="on_mi_restore_vgz_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>

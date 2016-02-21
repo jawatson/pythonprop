@@ -275,7 +275,8 @@ class VOACAP_GUI():
             "on_mi_run_activate": self.run_prediction,
             "on_mi_show_yelp_activate": self.show_yelp,
             "on_mi_about_activate" : self.show_about_dialog,
-            "on_mi_open_vgz_activate" : self.open_vgz_file,
+            "on_mi_open_vgz_activate": self.open_vgz_file,
+            "on_mi_restore_vgz_activate": self.restore_from_voa_file,
             "on_mi_quit_activate" : self.quit_application,
             "on_main_window_destroy" : self.quit_application,
             "on_ssn_web_update_button_clicked" : self.update_ssn_table,
@@ -613,6 +614,7 @@ class VOACAP_GUI():
         if self.tx_antenna_entry.get_text_length() == 0: _is_valid = False
         return _is_valid
 
+
     def is_rx_site_data_valid(self):
         _is_valid = True
         if self.rx_antenna_entry.get_text_length() == 0: _is_valid = False
@@ -659,8 +661,10 @@ class VOACAP_GUI():
         self.p2pfreq_tv.set_sensitive(state)
         self.build_graphcb()
 
+
     def p2p_method_changed(self, widget):
         self.update_p2p_run_button_status()
+
 
     def build_p2p_tvs(self):
        # grey out delete and save buttons, since there are no entries in the model
@@ -1664,8 +1668,7 @@ all other entries will be ignored.'))
             templates_def_fd.write(s)
         self.area_templates_file = fn
 
-
-    def open_vgz_file(self,widget):
+    def get_vgz_filename(self):
         dialog = Gtk.FileChooserDialog("Please select a vgz file", self.main_window,
             Gtk.FileChooserAction.OPEN,
             (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
@@ -1677,17 +1680,67 @@ all other entries will be ignored.'))
         dialog.set_default_size(800, 400)
 
         response = dialog.run()
+        vgzip_file = ""
         if response == Gtk.ResponseType.OK:
             vgzip_file = dialog.get_filename()
         dialog.destroy()
-        try:
-            graph = VOAAreaPlotGUI(vgzip_file,
-                    parent=self.main_window,
-                    enable_save=False,
-                    datadir=self.datadir)
-            graph.quit_application()
-        except zipfile.BadZipFile as e:
-            self.show_msg_dialog("VGZ Error", "Error opening {:s}".format(vgzip_file), msg_type="ERROR")
+        return vgzip_file
+
+
+    def open_vgz_file(self,widget):
+        vgzip_file = self.get_vgz_filename()
+        if vgzip_file != "":
+            try:
+                graph = VOAAreaPlotGUI(vgzip_file,
+                        parent=self.main_window,
+                        enable_save=False,
+                        datadir=self.datadir)
+                graph.quit_application()
+            except zipfile.BadZipFile as e:
+                self.show_msg_dialog("VGZ Error", "Error opening {:s}".format(vgzip_file), msg_type="ERROR")
+
+    def restore_from_voa_file(self, widget):
+        vgzip_file = self.get_vgz_filename()
+        voa_file = VOAFile(vgzip_file)
+        voa_file.parse_file()
+        self.tx_site_entry.set_text(voa_file.get_tx_label())
+        self.tx_lat_spinbutton.set_value(voa_file.get_tx_lat())
+        self.tx_lon_spinbutton.set_value(voa_file.get_tx_lon())
+        self.gridsizespinbutton.set_value(voa_file.get_gridsize())
+        self.tx_antenna_entry.set_text(voa_file.get_txAntenna())
+        self.tx_antenna_path = voa_file.get_txAntenna()
+
+        self.tx_bearing_spinbutton.set_value(voa_file.get_txBearing())
+        self.tx_power_spinbutton.set_value(voa_file.get_txPower() * 1000)
+
+        self.mm_noise_spinbutton.set_value(voa_file.get_xnoise())
+        self.min_toa_spinbutton.set_value(voa_file.get_amind())
+        self.reliability_spinbutton.set_value(voa_file.get_xlufp())
+        self.snr_spinbutton.set_value(voa_file.get_rsn())
+        self.mpath_spinbutton.set_value(voa_file.get_pmp())
+        self.delay_spinbutton.set_value(voa_file.get_dmpx())
+
+        self.foe_spinbutton.set_value(voa_file.get_psc1())
+        self.fof1_spinbutton.set_value(voa_file.get_psc2())
+        self.fof2_spinbutton.set_value(voa_file.get_psc3())
+        self.foes_spinbutton.set_value(voa_file.get_psc4())
+
+        """
+        self.model_combo.set_active(int(config.get('DEFAULT', 'model')))
+        self.path_combo.set_active(int(config.get('DEFAULT', 'path')))
+
+        self.areayearspinbutton.set_value(config.getint('area','year'))
+        self.monthspinbutton.set_value(config.getint('area','month'))
+        self.utcspinbutton.set_value(config.getint('area','utc'))
+        self.freqspinbutton.set_value(config.getfloat('area', 'frequency'))
+        self.area_templates_file = config.get('area', 'templates_file')
+        self.area_rect=VOAAreaRect(config.getfloat('area','sw_lat'),
+                                    config.getfloat('area','sw_lon'),
+                                    config.getfloat('area','ne_lat'),
+                                    config.getfloat('area','ne_lon'))
+        self.area_label.set_text(self.area_rect.get_formatted_string())
+        """
+        #self.open_vgz_file(vgzip=vgzip_file)
 
     # INFO, WARNING & ERROR messages
     def show_msg_dialog(self, msg_title, msg_body, msg_type='INFO'):

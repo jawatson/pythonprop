@@ -20,7 +20,6 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-#from __future__ import with_statement
 import calendar
 import codecs
 import datetime
@@ -158,16 +157,17 @@ class VOAFile:
                     self.txlabel = line[30:50].strip()
                     if DEBUG: print("Tx. = ", self.txlabel)
                     self.txlat = self.parse_lat_lon(line[10:20])
-                    if DEBUG: print(self.txlat)
+                    if DEBUG: print(x_anself.txlat)
                     self.txlon = self.parse_lat_lon(line[20:30])
                     if DEBUG: print(self.txlon)
                 elif line.startswith("Tx Ants"):
                     self.txPower = float(line[49:60].strip())
                     self.txBearing = float(line[40:46].strip())
                     self.txGain = float(line[33:39].strip())
-                    self.txAntenna = self.strcompress(line[10:33].strip())
+                    self.txAntenna = self.strcompress(line[11:32].strip())
+
                 elif line.startswith("Rec Ants"):
-                    self.rxAntenna = self.strcompress(line[10:33].strip())
+                    self.rxAntenna = self.strcompress(line[11:32].strip())
                 elif line.startswith("Hours    :"):
                     self.utcs = []
                     file_times = str.split(line[10:len(line)])
@@ -209,6 +209,7 @@ class VOAFile:
     def get_centre_label(self): return self.pcentrelabel
     def get_centre_lat(self):    return self.pcentrelat
     def get_centre_lon(self):    return self.pcentrelon
+
     def get_tx_label(self): return self.txlabel
     def get_tx_lat(self): return self.txlat
     def get_tx_lon(self): return self.txlon
@@ -324,38 +325,76 @@ class VOAFile:
 
 
     def set_tx_antenna(self, data_file, design_freq=0.0, bearing=0.0, power=0.125):
-        self.tx_ant_data_file = data_file
+        self.txAntenna = data_file
         self.tx_ant_design_freq = design_freq
-        self.tx_ant_bearing = bearing
-        self.tx_ant_power = power
+        self.txBearing = bearing
+        self.txPower = power
 
+    def get_txBearing(self):
+        return self.txBearing
+
+    def get_txPower(self):
+        return self.txPower
+
+    def get_txAntenna(self):
+        return self.txAntenna
+
+    def get_xnoise(self):
+        return self.XNOISE
 
     def set_xnoise(self, xnoise):
         self.XNOISE = int(xnoise)
 
+    def get_amind(self):
+        return self.AMIND
+
     def set_amind(self, amind):
         self.AMIND = float(amind)
+
+    def get_xlufp(self):
+        return self.XLUFP
 
     def set_xlufp(self, xlufp):
         self.XLUFP = int(xlufp)
 
+    def get_rsn(self):
+        return self.RSN
+
     def set_rsn(self, rsn):
         self.RSN = int(rsn)
+
+    def get_pmp(self):
+        return self.PMP
 
     def set_pmp(self, pmp):
         self.PMP = float(pmp)
 
+    def get_dmpx(self):
+        return self.DMPX
+
     def set_dmpx(self, dmpx):
         self.DMPX = float(dmpx)
+
+    def get_psc1(self):
+        return self.PSC1
 
     def set_psc1(self, psc1):
         self.PSC1 = float(psc1)
 
+    def get_psc2(self):
+        return self.PSC2
+
     def set_psc2(self, psc2):
         self.PSC2 = float(psc2)
 
+    def get_psc3(self):
+        return self.PSC3
+
     def set_psc3(self, psc3):
         self.PSC3 = float(psc3)
+
+    def get_psc4(self):
+        return self.PSC4
 
     def set_psc4(self, psc4):
         self.PSC4 = float(psc4)
@@ -580,7 +619,7 @@ class VOAFile:
             (self.rx_ant_data_file, self.rx_ant_gain, self.rx_ant_bearing)
         f.write(tmpStr)
         tmpStr = "Tx Ants  :[%21s]%7.3f%6.1f%10.4f\n" % \
-            (self.tx_ant_data_file, self.tx_ant_design_freq, self.tx_ant_bearing, self.tx_ant_power)
+            (self.txAntenna, self.tx_ant_design_freq, self.txBearing, self.txPower)
         f.write(tmpStr)
         f.close()
 
