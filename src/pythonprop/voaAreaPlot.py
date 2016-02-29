@@ -255,6 +255,8 @@ class VOAAreaPlot:
                     value = max(self.image_defs['min'], value)
                     value = min(self.image_defs['max'], value)
                     points[int(line[3:6])-1][int(line[0:3])-1] = value
+                    if value > 0.9:
+                        print(value)
             vgFile.close()
             if 'zf' in locals():
                 zf.close()
@@ -292,6 +294,8 @@ class VOAAreaPlot:
             else:
                 im = m.pcolormesh(lons, lats, points,
                     latlon=True,
+                    vmin = self.image_defs['min'],
+                    vmax = self.image_defs['max'],
                     cmap = colMap,
                     shading='gouraud')
 
