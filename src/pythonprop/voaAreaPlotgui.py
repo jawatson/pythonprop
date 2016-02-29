@@ -134,17 +134,7 @@ class VOAAreaPlotGUI:
         #todo check the file exists
         #TODO: this needs to be more robust...
         # consider capitalisation
-        """
-        if data_source_filename.endswith('.vgz'):
-            self.in_filename = data_source_filename
-            in_file = VOAFile(self.in_filename)
-        else:
-            if data_source_filename.endswith('.voa'):
-                data_source_filename = data_source_filename.split(".voa")[0]
-
-            self.in_filename = data_source_filename
-            in_file = VOAFile(self.in_filename+'.voa')
-        """
+        
         in_file = VOAFile(self.voa_filename)
         in_file.parse_file()
         self.num_plots = in_file.get_num_plots()
