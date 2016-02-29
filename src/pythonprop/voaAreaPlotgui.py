@@ -196,11 +196,13 @@ class VOAAreaPlotGUI:
 
     def save_prediction_files(self, vgz_filename):
         vgz_filename = vgz_filename if vgz_filename.endswith('.vgz') else vgz_filename+'.vgz'
+        print("Voa fn = {:s}".format(self.voa_filename))
+        base_filename, file_extension = os.path.splitext(self.voa_filename)
         with zipfile.ZipFile(vgz_filename, 'w') as vgzip:
-            fn = self.in_filename+'.voa'
+            fn = base_filename + '.voa'
             vgzip.write(fn, os.path.basename(fn), zipfile.ZIP_DEFLATED)
             for vg_file_num in range(1, self.num_plots+1):
-                fn = "{:s}.vg{:d}".format(self.in_filename, vg_file_num)
+                fn = "{:s}.vg{:d}".format(base_filename, vg_file_num)
                 vgzip.write(fn, os.path.basename(fn), zipfile.ZIP_DEFLATED)
         dialog = Gtk.MessageDialog(self.win, 0, Gtk.MessageType.INFO,
             Gtk.ButtonsType.OK, "VGZ File Saved")

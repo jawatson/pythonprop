@@ -1491,6 +1491,7 @@ all other entries will be ignored.'))
             ret = os.spawnlp(os.P_WAIT, 'voacapl', 'voacapl', os.path.join(os.path.expanduser("~"), 'itshfbc'), "area", "calc",  "pyArea.voa")
 
             if ret:
+                self.statusbar.pop(self.area_context_id)
                 e = "voacapl returned %s. Can't continue." % ret
                 dialog = Gtk.MessageDialog(self.main_window, Gtk.DialogFlags.MODAL|Gtk.DialogFlags.DESTROY_WITH_PARENT, Gtk.MessageType.ERROR, Gtk.ButtonsType.CLOSE, e )
                 dialog.run()
@@ -1699,6 +1700,7 @@ all other entries will be ignored.'))
             except zipfile.BadZipFile as e:
                 self.show_msg_dialog("VGZ Error", "Error opening {:s}".format(vgzip_file), msg_type="ERROR")
 
+
     def restore_from_voa_file(self, widget):
         vgzip_file = self.get_vgz_filename()
         voa_file = VOAFile(vgzip_file)
@@ -1712,6 +1714,9 @@ all other entries will be ignored.'))
 
         self.tx_bearing_spinbutton.set_value(voa_file.get_txBearing())
         self.tx_power_spinbutton.set_value(voa_file.get_txPower() * 1000)
+
+        self.area_rect=voa_file.get_area_rect()
+        self.area_label.set_text(self.area_rect.get_formatted_string())
 
         self.mm_noise_spinbutton.set_value(voa_file.get_xnoise())
         self.min_toa_spinbutton.set_value(voa_file.get_amind())
@@ -1734,11 +1739,7 @@ all other entries will be ignored.'))
         self.utcspinbutton.set_value(config.getint('area','utc'))
         self.freqspinbutton.set_value(config.getfloat('area', 'frequency'))
         self.area_templates_file = config.get('area', 'templates_file')
-        self.area_rect=VOAAreaRect(config.getfloat('area','sw_lat'),
-                                    config.getfloat('area','sw_lon'),
-                                    config.getfloat('area','ne_lat'),
-                                    config.getfloat('area','ne_lon'))
-        self.area_label.set_text(self.area_rect.get_formatted_string())
+
         """
         #self.open_vgz_file(vgzip=vgzip_file)
 
