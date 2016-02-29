@@ -1429,7 +1429,7 @@ be processed, all other entries will be ignored.  Please delete some entries.'))
                             self.tx_lat_spinbutton.get_value())
             vf.P_CENTRE = vf.TX_SITE
 
-            vf.set_xnoise(abs(self.mm_noise_spinbutton.get_value()))
+            vf.set_xnoise(self.mm_noise_spinbutton.get_value())
             vf.set_amind(self.min_toa_spinbutton.get_value())
             vf.set_xlufp(self.reliability_spinbutton.get_value())
             vf.set_rsn(self.snr_spinbutton.get_value())

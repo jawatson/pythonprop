@@ -338,12 +338,18 @@ class VOAFile:
 
     def get_txAntenna(self):
         return self.txAntenna
+    """
+    XNOISE represents the level of man-made.  In the file it s stored as a
+    postive integer.  This must be converted to a negative value for use in
+    calculations (e.g. '145' replresents a man-made noise level of 145dBW/Hz)
 
+    When get/set are used, 'real' (e.g. '-145' values are expected, returned)
+    """
     def get_xnoise(self):
-        return self.XNOISE
+        return -self.XNOISE
 
     def set_xnoise(self, xnoise):
-        self.XNOISE = int(xnoise)
+        self.XNOISE = abs(int(xnoise))
 
     def get_amind(self):
         return self.AMIND
