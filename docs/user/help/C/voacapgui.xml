@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
-<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
 "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
 <!ENTITY appname          "voacapgui">
 <!ENTITY app "<application>voacapgui</application>">
-<!ENTITY appversion   "0.14">
-<!ENTITY manrevision  "0.1">
-<!ENTITY date "October 2014">
+<!ENTITY appversion   "0.22">
+<!ENTITY manrevision  "0.2">
+<!ENTITY date "February 2016">
 <!-- Information about the entities
-Use the app and appname entities to specify the name of the application.  
+Use the app and appname entities to specify the name of the application.
 Use the appversion entity to specify the version of the application.
 Use the manrevision entity to specify the revision number of this manual.
 Use the date entity to specify the release date of this manual.
@@ -21,37 +21,37 @@ Template last modified 2006-11-21
 -->
 <!-- =============Document Header ============================= -->
 <article id="index" lang="en">
-  <articleinfo> 
+  <articleinfo>
     <title>&app; Manual</title>
     <abstract role="description">
       <para>&app; provides a Graphical User Interface to the VOACAP
         HF propagation prediction application.</para>
-    </abstract>         
+    </abstract>
 
-    <copyright> 
-      <year>2014</year> 
-      <holder>J.Watson</holder> 
-    </copyright> 
+    <copyright>
+      <year>2014</year>
+      <holder>J.Watson</holder>
+    </copyright>
 
     <!-- An address can be added to the publisher information. -->
-    <publisher role="maintainer"> 
-      <publishername>J.Watson</publishername> 
-    </publisher> 
+    <publisher role="maintainer">
+      <publishername>J.Watson</publishername>
+    </publisher>
 
     <xi:include href="legal.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
-    <!-- The file legal.xml contains link to license for the documentation, 
-    and other legal stuff such as "NO WARRANTY" statement. 
+    <!-- The file legal.xml contains link to license for the documentation,
+    and other legal stuff such as "NO WARRANTY" statement.
     Please do not change any of this. -->
 
-    <authorgroup> 
-      <author> 
-        <firstname>James</firstname> 
-        <surname>Watson</surname> 
+    <authorgroup>
+      <author>
+        <firstname>James</firstname>
+        <surname>Watson</surname>
         <!--
-        <affiliation> 
-          <orgname>GNOME Documentation Project</orgname> 
+        <affiliation>
+          <orgname>GNOME Documentation Project</orgname>
         </affiliation> -->
-      </author> 
+      </author>
     </authorgroup>
 
     <!-- According to GNU FDL, revision history is mandatory if you are -->
@@ -66,53 +66,53 @@ Template last modified 2006-11-21
     <!-- For example, if the GNOME desktop release is V2.x, the first version of the manual that -->
     <!-- is written in that desktop timeframe is V2.0, the second version of the manual is V2.1, etc. -->
     <!-- When the desktop release version changes to V3.x, the revision number of the manual changes -->
-    <!-- to V3.0, and so on. -->  
+    <!-- to V3.0, and so on. -->
     <revhistory>
-      <revision> 
-        <revnumber>&app; Manual v&manrevision;</revnumber> 
-        <date>&date;</date> 
-        <revdescription> 
+      <revision>
+        <revnumber>&app; Manual v&manrevision;</revnumber>
+        <date>&date;</date>
+        <revdescription>
           <para role="author">J.Watson
             <email>jwatson@neomailbox.ch</email> -->
           </para>
           <!--<para role="publisher">GNOME Documentation Project</para>-->
-        </revdescription> 
-      </revision> 
-    </revhistory> 
+        </revdescription>
+      </revision>
+    </revhistory>
 
     <releaseinfo>This manual describes version &appversion; of &app;.
-    </releaseinfo> 
-    <legalnotice> 
-      <title>Feedback</title> 
+    </releaseinfo>
+    <legalnotice>
+      <title>Feedback</title>
       <para>To report a bug or make a suggestion regarding &app; application or
-        this manual, please contact the author. 
+        this manual, please contact the author.
       </para>
       <!-- Translators may also add here feedback address for translations -->
-    </legalnotice> 
-  </articleinfo> 
+    </legalnotice>
+  </articleinfo>
 
-  <indexterm zone="index"> 
-    <primary>voacapgui</primary> 
-  </indexterm> 
+  <indexterm zone="index">
+    <primary>voacapgui</primary>
+  </indexterm>
 
   <!-- ============= Document Body ============================= -->
   <!-- ============= Introduction ============================== -->
   <!-- Use the Introduction section to give a brief overview of what
   the application is and what it does. -->
-  <sect1 id="introduction"> 
-    <title>Introduction</title> 
-    <para>&app; is a front end to the VOACAP engine and may be used to;</para> 
-    <itemizedlist> 
-      <listitem> 
-        <para>Produce HF propagation predictions between two fixed locations (Point-to-Point / P2P mode).</para> 
-      </listitem> 
-      <listitem> 
-        <para>Produce HF propagation plots over a user defined area from a fixed transmit site (Area Mode).</para> 
-      </listitem> 
-    </itemizedlist> 
+  <sect1 id="introduction">
+    <title>Introduction</title>
+    <para>&app; is a front end to the VOACAP engine and may be used to;</para>
+    <itemizedlist>
+      <listitem>
+        <para>Produce HF propagation predictions between two fixed locations (Point-to-Point / P2P mode).</para>
+      </listitem>
+      <listitem>
+        <para>Produce HF propagation plots over a user defined area from a fixed transmit site (Area Mode).</para>
+      </listitem>
+    </itemizedlist>
     <note>
-      <para>voacapgui requires a working copy of the VOACAP engine installed 
-        on the host machine.  Installation of VOACAP is beyond the scope of 
+      <para>voacapgui requires a working copy of the VOACAP engine installed
+        on the host machine.  Installation of VOACAP is beyond the scope of
         this manual.</para>
     </note>
   </sect1>
@@ -122,22 +122,22 @@ Template last modified 2006-11-21
   to start the application and to describe the user interface components
   of the application. If there is other information that it is important
   for readers to know before they start using the application, you should
-  also include this information here. 
-  If the information about how to get started is very short, you can 
+  also include this information here.
+  If the information about how to get started is very short, you can
   include it in the Introduction and omit this section. -->
 
-  <sect1 id="voacapgui-getting-started"> 
-    <title>Getting Started</title> 
+  <sect1 id="voacapgui-getting-started">
+    <title>Getting Started</title>
 
     <sect2 id="voacapgui-start">
       <title>Starting &app;</title>
       <para>You can start &app; in the following ways:
-      </para> 
+      </para>
       <variablelist>
         <varlistentry>
           <term><guimenu>Applications</guimenu> menu</term>
           <listitem>
-            <para>Choose 
+            <para>Choose
               <menuchoice>
                 <guisubmenu>Submenu Name </guisubmenu>
                 <guimenuitem>&app;</guimenuitem>
@@ -147,11 +147,11 @@ Template last modified 2006-11-21
         <varlistentry>
           <term>Command line</term>
           <listitem>
-            <para>To start &app; from a command line, type the following 
+            <para>To start &app; from a command line, type the following
               command, then press <keycap>Return</keycap>:</para>
-            <para> 
-              <command>&app;</command> 
-            </para> 
+            <para>
+              <command>&app;</command>
+            </para>
           </listitem>
         </varlistentry>
       </variablelist>
@@ -162,20 +162,20 @@ Template last modified 2006-11-21
       <para>When you start &app;, the following window is displayed.</para>
 
       <!-- ==== Figure ==== -->
-      <figure id="mainwindow-fig"> 
-        <title>&app; Start Up Window</title> 
-        <screenshot> 
-          <mediaobject> 
+      <figure id="mainwindow-fig">
+        <title>&app; Start Up Window</title>
+        <screenshot>
+          <mediaobject>
             <imageobject><imagedata
-                fileref="figures/main_window.png" format="PNG"/> 
+                fileref="figures/main_window.png" format="PNG"/>
             </imageobject>
-            <textobject> 
-              <phrase>Shows &app; main window. Contains titlebar, 
-                menubar, tabbed area, Settings, and 
-                Help menus. </phrase> 
-            </textobject> 
-          </mediaobject> 
-        </screenshot> 
+            <textobject>
+              <phrase>Shows &app; main window. Contains titlebar,
+                menubar, tabbed area, Settings, and
+                Help menus. </phrase>
+            </textobject>
+          </mediaobject>
+        </screenshot>
       </figure>
       <!-- ==== End of Figure ==== -->
 
@@ -188,7 +188,7 @@ Template last modified 2006-11-21
         <varlistentry>
           <term>Menubar</term>
           <listitem>
-            <para>The menu contains submenus alowing users to quit the 
+            <para>The menu contains submenus alowing users to quit the
               application and access the help documentation.</para>
           </listitem>
         </varlistentry>
@@ -202,16 +202,16 @@ Template last modified 2006-11-21
                 <varlistentry>
                   <term><guimenu>Applications</guimenu> Tab</term>
                   <listitem>
-                    <para>Used to define the geographic location of sites and 
-                      associated properties (transmitter power, antennas etc.). 
+                    <para>Used to define the geographic location of sites and
+                      associated properties (transmitter power, antennas etc.).
                     </para>
                   </listitem>
                 </varlistentry>
                 <varlistentry>
                   <term><guimenu>Applications</guimenu> Tab</term>
                   <listitem>
-                    <para>Used to define the geographic location of sites and 
-                      associated properties (transmitter power, antennas etc.). 
+                    <para>Used to define the geographic location of sites and
+                      associated properties (transmitter power, antennas etc.).
                     </para>
                   </listitem>
                 </varlistentry>
@@ -256,143 +256,143 @@ Template last modified 2006-11-21
   <!-- Use this section to describe how to use the application to perform the tasks for which the application is designed.
   If this section runs to more than a few screens in Yelp, consider splitting it into several top-level sections.
   -->
-  <sect1 id="voacapgui-usage"> 
-    <title>Usage</title> 
+  <sect1 id="voacapgui-usage">
+    <title>Usage</title>
     <para>You can use the &app; application to
-      perform the following tasks: 
-      <itemizedlist> 
-        <listitem> 
-          <para> 
-            Produce Point-to-Point Predictions <xref linkend="voacapgui-p2p"/></para> 
-        </listitem> 
-        <listitem> 
-          <para> 
-            Produce Area Plots <xref linkend="voacapgui-area"/></para> 
-        </listitem> 
+      perform the following tasks:
+      <itemizedlist>
+        <listitem>
+          <para>
+            Produce Point-to-Point Predictions <xref linkend="voacapgui-p2p"/></para>
+        </listitem>
+        <listitem>
+          <para>
+            Produce Area Plots <xref linkend="voacapgui-area"/></para>
+        </listitem>
     </itemizedlist> </para>
     <!-- ================ Usage Subsection ================================ -->
-    <sect2 id="voacapgui-p2p"> 
-      <title>VOACAP Point-to-Point Predictions</title> 
-      <para>To perform a P2P prediction, select the 
-        <guimenu>Site</guimenu> tab in the notebook and click the 
-        <guibutton>Site</guibutton> button in the 
-        <guilabel>Tx. Site</guilabel> 
+    <sect2 id="voacapgui-p2p">
+      <title>VOACAP Point-to-Point Predictions</title>
+      <para>To perform a P2P prediction, select the
+        <guimenu>Site</guimenu> tab in the notebook and click the
+        <guibutton>Site</guibutton> button in the
+        <guilabel>Tx. Site</guilabel>
         panel to open the Site Chooser dialog window.</para>
 
       <!-- ==== Figure ==== -->
-      <figure id="fig-site-chooser"> 
-        <title>&app; Site Chooser</title> 
-        <screenshot> 
-          <mediaobject> 
+      <figure id="fig-site-chooser">
+        <title>&app; Site Chooser</title>
+        <screenshot>
+          <mediaobject>
             <imageobject><imagedata
-                fileref="figures/site_chooser.png" format="PNG"/> 
+                fileref="figures/site_chooser.png" format="PNG"/>
             </imageobject>
-            <textobject> 
-              <phrase>Shows &app; main window. Contains titlebar, 
-                menubar, tabbed area, Settings, and 
-                Help menus. </phrase> 
-            </textobject> 
-          </mediaobject> 
-        </screenshot> 
+            <textobject>
+              <phrase>Shows &app; main window. Contains titlebar,
+                menubar, tabbed area, Settings, and
+                Help menus. </phrase>
+            </textobject>
+          </mediaobject>
+        </screenshot>
       </figure>
       <!-- ==== End of Figure ==== -->
 
-      <para>Sites may be defined 
+      <para>Sites may be defined
         by either;
         <itemizedlist>
           <listitem><para>Clicking on the map.</para></listitem>
           <listitem><para>Using the Locator combo boxes.</para></listitem>
-          <listitem><para>Entering latitude and longitude directly into the 
+          <listitem><para>Entering latitude and longitude directly into the
               <guilabel>Lat:</guilabel> and <guilabel>Lon:</guilabel> text entry
               fields.</para></listitem>
           <listitem><para>Selecting from a list of predefined sites acessed by
               clicking the <guilabel>Select From File</guilabel> expander.</para></listitem>
         </itemizedlist>
-        Once the required site information has been entered, click the 
+        Once the required site information has been entered, click the
         <guibutton>OK</guibutton> to close the Site Chooser dialog and
         return to the main window.
-      </para> 
-      <para>Antenna Selection is made by clicking the 
-        <guibutton>Antenna</guibutton> button to open the Antenna Chooser 
+      </para>
+      <para>Antenna Selection is made by clicking the
+        <guibutton>Antenna</guibutton> button to open the Antenna Chooser
         dialog window.</para>
 
       <!-- ==== Figure ==== -->
-      <figure id="fig-antenna-chooser"> 
-        <title>&app; Antenna Chooser</title> 
-        <screenshot> 
-          <mediaobject> 
+      <figure id="fig-antenna-chooser">
+        <title>&app; Antenna Chooser</title>
+        <screenshot>
+          <mediaobject>
             <imageobject><imagedata
-                fileref="figures/antenna_chooser.png" format="PNG"/> 
+                fileref="figures/antenna_chooser.png" format="PNG"/>
             </imageobject>
-            <textobject> 
-              <phrase>Shows &app; main window. Contains titlebar, 
-                menubar, tabbed area, Settings, and 
-                Help menus. </phrase> 
-            </textobject> 
-          </mediaobject> 
-        </screenshot> 
+            <textobject>
+              <phrase>Shows &app; main window. Contains titlebar,
+                menubar, tabbed area, Settings, and
+                Help menus. </phrase>
+            </textobject>
+          </mediaobject>
+        </screenshot>
       </figure>
       <!-- ==== End of Figure ==== -->
 
-      <para>Specific antenna models may be selected by browsing 
-        through the available models by clicking on the expander buttons in 
-        the left panel.  Click the <guibutton>OK</guibutton> button to accept 
+      <para>Specific antenna models may be selected by browsing
+        through the available models by clicking on the expander buttons in
+        the left panel.  Click the <guibutton>OK</guibutton> button to accept
         the selected antenna and return to the main window.
-      </para>  
+      </para>
       <para>The bearing of the antenna is defined in the bearing text entry
         and may be either entered directly or directed to the Rx. Site by
         clicking the <guibutton>Bearing</guibutton> button.
       </para>
-      <para>The transmitter power (in Watts) is then entered using the 
+      <para>The transmitter power (in Watts) is then entered using the
         <guilabel>Power (W)</guilabel> entry field.
       </para>
       <para>Site data for the receive site may then be entered in the
         <guilabel>Rx. Site</guilabel> panel.
       </para>
-      <tip><para>After entering the receive site coordinate, it may be 
+      <tip><para>After entering the receive site coordinate, it may be
           necessary to click the <guibutton>Bearing</guibutton> button
-          in the <guilabel>Tx. Site</guilabel> panel to redirect the 
+          in the <guilabel>Tx. Site</guilabel> panel to redirect the
           transmit antenna to the newly defined receive site.</para>
       </tip>
-      <para>Click the <guimenu>P2P</guimenu> tab to move to the 
-        Point-to-Point panel to define the predictions to be 
+      <para>Click the <guimenu>P2P</guimenu> tab to move to the
+        Point-to-Point panel to define the predictions to be
         performed.</para>
 
       <!-- ==== Figure ==== -->
-      <figure id="fig-p2p-tab"> 
-        <title>&app; P2P Notebook Tab</title> 
-        <screenshot> 
-          <mediaobject> 
+      <figure id="fig-p2p-tab">
+        <title>&app; P2P Notebook Tab</title>
+        <screenshot>
+          <mediaobject>
             <imageobject><imagedata
-                fileref="figures/p2p_tab.png" format="PNG"/> 
+                fileref="figures/p2p_tab.png" format="PNG"/>
             </imageobject>
-            <textobject> 
-              <phrase>Shows &app; main window. Contains titlebar, 
-                menubar, tabbed area, Settings, and 
-                Help menus. </phrase> 
-            </textobject> 
-          </mediaobject> 
-        </screenshot> 
+            <textobject>
+              <phrase>Shows &app; main window. Contains titlebar,
+                menubar, tabbed area, Settings, and
+                Help menus. </phrase>
+            </textobject>
+          </mediaobject>
+        </screenshot>
       </figure>
       <!-- ==== End of Figure ==== -->
-      <para>Define the time for the prediction by specifying a year and 
-        month in the <guilabel>Year</guilabel> and <guilabel>Month</guilabel> 
-        entry fields respectively.  If required, a day may also be specified 
-        by selecting the <guilabel>Use Day</guilabel> checkbox and entering a 
+      <para>Define the time for the prediction by specifying a year and
+        month in the <guilabel>Year</guilabel> and <guilabel>Month</guilabel>
+        entry fields respectively.  If required, a day may also be specified
+        by selecting the <guilabel>Use Day</guilabel> checkbox and entering a
         day value in the <guilabel>Day</guilabel> entry field.</para>
-      <caution><para>Enabling the Days value will force the VOACAP engine 
-          to use the URSI88 coefficients instead of the preferred CCIR 
+      <caution><para>Enabling the Days value will force the VOACAP engine
+          to use the URSI88 coefficients instead of the preferred CCIR
           values.</para></caution>
       <sect3>
         <title>Cicuit Calculations</title>
         <para>The default behavior of voacapgui is to produce graphical
-          output showing the performance of frequencies in the range 
-          2-30MHz over a 24 hour period.  While this may be useful for 
+          output showing the performance of frequencies in the range
+          2-30MHz over a 24 hour period.  While this may be useful for
           most applications, text based 'cicuit' predictions may be
-          used when an analysis of performance at spot frequencies 
+          used when an analysis of performance at spot frequencies
           is required</para>
-        <para>To enable circuit predictions, click the 
-          <guilabel>Circuit</guilabel> checkbox and use the 
+        <para>To enable circuit predictions, click the
+          <guilabel>Circuit</guilabel> checkbox and use the
           <guilabel>Frequency</guilabel> entry panel and associated
           <guibutton>Add</guibutton> button to populate the frequency
           table</para>
@@ -405,33 +405,33 @@ Template last modified 2006-11-21
     <sect2>
       <title>Displaying the results</title>
       <para>Results of circuit mode calculations are displayed directly in
-        a text dialog.</para> 
-      <para>In the case of graphical reults, the 
-        <guilabel>Plot Control</guilabel> opens and offers the following 
+        a text dialog.</para>
+      <para>In the case of graphical reults, the
+        <guilabel>Plot Control</guilabel> opens and offers the following
         selections;
 
         <!-- ==== Figure ==== -->
-        <figure id="p2p-plotconfig"> 
-          <title>&app; P2P Plot Configuration</title> 
-          <screenshot> 
-            <mediaobject> 
+        <figure id="p2p-plotconfig">
+          <title>&app; P2P Plot Configuration</title>
+          <screenshot>
+            <mediaobject>
               <imageobject><imagedata
-                  fileref="figures/p2p_plot_configure.png" format="PNG"/> 
+                  fileref="figures/p2p_plot_configure.png" format="PNG"/>
               </imageobject>
-              <textobject> 
-                <phrase>Shows &app; main window. Contains titlebar, 
-                  menubar, tabbed area, Settings, and 
-                  Help menus. </phrase> 
-              </textobject> 
-            </mediaobject> 
-          </screenshot> 
+              <textobject>
+                <phrase>Shows &app; main window. Contains titlebar,
+                  menubar, tabbed area, Settings, and
+                  Help menus. </phrase>
+              </textobject>
+            </mediaobject>
+          </screenshot>
         </figure>
         <!-- ==== End of Figure ==== -->
 
         <variablelist>
           <varlistentry>
             <term><guilabel>Plot Type</guilabel></term>
-            <listitem><para>Specify the 
+            <listitem><para>Specify the
                 data to be displayed behind the MUF / FOT curves.  Available
                 data sets are Reliability, MUFday, DBW, SNR and none.</para>
             </listitem>
@@ -450,116 +450,115 @@ Template last modified 2006-11-21
           <varlistentry>
             <term><guilabel>colour Map</guilabel></term>
             <listitem><para>Specify the colour map to use for plotting the
-                background data set.</para> 
+                background data set.</para>
             </listitem>
           </varlistentry>
         </variablelist>
       </para>
       <para>Click the <guibutton>OK</guibutton> button to open the image
         file.</para>
-    </sect2> 
+    </sect2>
     <!-- ================ Usage Subsection ================================ -->
-    <sect2 id="voacapgui-area"> 
-      <title>VOACAP Area Predictions</title> 
-      <para>To perform an area prediction, select the 
-        <guimenu>Site</guimenu> tab in the notebook and click the 
-        <guibutton>Site</guibutton> in the <guilabel>Tx. Site</guilabel> 
-        panel to open the Site Chooser dialog window.</para> 
+    <sect2 id="voacapgui-area">
+      <title>VOACAP Area Predictions</title>
+      <para>To perform an area prediction, select the
+        <guimenu>Site</guimenu> tab in the notebook and click the
+        <guibutton>Site</guibutton> in the <guilabel>Tx. Site</guilabel>
+        panel to open the Site Chooser dialog window.</para>
 
-      <para> Sites may be defined 
-        by either;
+      <para> Sites may be defined by either;
         <itemizedlist>
           <listitem><para>Clicking on the map.</para></listitem>
           <listitem><para>Using the Locator combo boxes.</para></listitem>
-          <listitem><para>Entering latitude and longitude directly into the 
+          <listitem><para>Entering latitude and longitude directly into the
               <guilabel>Lat:</guilabel> and <guilabel>Lon:</guilabel> text entry
               fields.</para></listitem>
           <listitem><para>Selecting from a list of predefined sites acessed by
               clicking the <guilabel>Select From File</guilabel> expander.</para></listitem>
         </itemizedlist>
-        Once the required site information has been entered, click the 
+        Once the required site information has been entered, click the
         <guibutton>OK</guibutton> to close the Site Chooser dialog and
         return to the main window.
-      </para> 
+      </para>
 
-      <para>Antenna Selection is made by clicking the 
-        <guibutton>Antenna</guibutton> button to open the Antenna Chooser 
-        dialog window.  Specific antenna models may be selected by browsing 
-        through the available models by clicking on the expander buttons in 
-        the left panel.  Click the <guibutton>OK</guibutton> button to accept 
+      <para>Antenna Selection is made by clicking the
+        <guibutton>Antenna</guibutton> button to open the Antenna Chooser
+        dialog window.  Specific antenna models may be selected by browsing
+        through the available models by clicking on the expander buttons in
+        the left panel.  Click the <guibutton>OK</guibutton> button to accept
         the selected antenna and return to the main window.
-      </para>  
+      </para>
       <para>The bearing of the antenna is defined in the bearing text entry
         and may be either entered directly or directed to the Rx. Site by
         clicking the <guibutton>Bearing</guibutton> button.
       </para>
-      <para>The transmitter power (in Watts) is then entered using the 
+      <para>The transmitter power (in Watts) is then entered using the
         <guilabel>Power (W)</guilabel> entry field.
       </para>
       <para>Details of the receive antenna then be entered in the
         <guilabel>Rx. Site</guilabel> panel.
       </para>
       <note>When performing area calculations only the receive site
-        antenna definition is used.  All other information in the 
+        antenna definition is used.  All other information in the
         <guilabel>Rx Site</guilabel> is ignored.
       </note>
-      <para>Click the <guimenu>Area</guimenu> tab to move to the 
-        <guilabel>Area</guilabel> panel to define the predictions to be 
+      <para>Click the <guimenu>Area</guimenu> tab to move to the
+        <guilabel>Area</guilabel> panel to define the predictions to be
         performed.</para>
       <!-- ==== Figure ==== -->
-      <figure id="fig-area-tab"> 
-        <title>&app; Area Tab</title> 
-        <screenshot> 
-          <mediaobject> 
+      <figure id="fig-area-tab">
+        <title>&app; Area Tab</title>
+        <screenshot>
+          <mediaobject>
             <imageobject><imagedata
-                fileref="figures/area_tab.png" format="PNG"/> 
+                fileref="figures/area_tab.png" format="PNG"/>
             </imageobject>
-            <textobject> 
-              <phrase>Shows &app; main window. Contains titlebar, 
-                menubar, tabbed area, Settings, and 
-                Help menus. </phrase> 
-            </textobject> 
-          </mediaobject> 
-        </screenshot> 
+            <textobject>
+              <phrase>Shows &app; main window. Contains titlebar,
+                menubar, tabbed area, Settings, and
+                Help menus. </phrase>
+            </textobject>
+          </mediaobject>
+        </screenshot>
       </figure>
       <!-- ==== End of Figure ==== -->
-      <para>Define the time for the prediction by specifying a year and 
-        month in the <guilabel>Year</guilabel> and <guilabel>Month</guilabel> 
+      <para>Define the time for the prediction by specifying a year and
+        month in the <guilabel>Year</guilabel> and <guilabel>Month</guilabel>
         entry fields respectively.</para>
-      <para>Define the frequency of operation for the prediction in the 
-        <guilabel>Freq</guilabel> text entry then click the 
+      <para>Define the frequency of operation for the prediction in the
+        <guilabel>Freq</guilabel> text entry then click the
         <guibutton>Add</guibutton> button to add the selected values to the
         main panel. Additional plots may be defined by selecting required
-        <guilabel>Year</guilabel>, <guilabel>Month</guilabel>  
-        <guilabel>UTC</guilabel> and <guilabel>Freq</guilabel> values and 
+        <guilabel>Year</guilabel>, <guilabel>Month</guilabel>
+        <guilabel>UTC</guilabel> and <guilabel>Freq</guilabel> values and
         adding them to the main panel with the <guibutton>Add</guibutton>.
       </para>
-      <para>Click the <guibutton>Area</guibutton> button to open the 
-        <guilabel>Area Chooser</guilabel> dialog panel which supports 
+      <para>Click the <guibutton>Area</guibutton> button to open the
+        <guilabel>Area Chooser</guilabel> dialog panel which supports
         defining the receive area in two ways;
-        <itemizedlist> 
-          <listitem> 
+        <itemizedlist>
+          <listitem>
             <para>Dragging the cursor across the map.</para>
-          </listitem> 
-          <listitem> 
+          </listitem>
+          <listitem>
             <para>Entering values for the North East corner and South
               West corners directly into the entry fields.</para>
-          </listitem> 
+          </listitem>
         </itemizedlist>
         Click the <guibutton>OK</guibutton> to accept the displayed values
         and return to the main window.
-      </para> 
-      <para>Select the required grid size from the 
-        <guilabel>Gridsize</guilabel> entry and start the prediction by 
+      </para>
+      <para>Select the required grid size from the
+        <guilabel>Gridsize</guilabel> entry and start the prediction by
         clicking the <guibutton>Execute</guibutton> button.
       </para>
       <tip>
         <para>The VOACAP <code>GRID</code> parameter specifies a grid overlayed
           onto the specifed coverage area.  Predictions are performed
           at each intersection within the grid.  Large <code>GRID</code> values
-          are used to produce print quality plots but at teh expennse of 
+          are used to produce print quality plots but at teh expennse of
           computing time.  Users amy find it better to specify a small grid
-          size for initial runs to check that the inputs are correct prior 
+          size for initial runs to check that the inputs are correct prior
           to setting higher values for final printing.
         </para>
       </tip>
@@ -567,32 +566,32 @@ Template last modified 2006-11-21
     <sect2>
       <title>Displaying the Area Results</title>
       <para>The <guilabel>Plot Control</guilabel> dialog is opened
-        as soon as the prediction calculations are complete and 
+        as soon as the prediction calculations are complete and
         offers the following
         selections;
 
         <!-- ==== Figure ==== -->
-        <figure id="area-plotconfig"> 
-          <title>&app; Area Plot Configuration</title> 
-          <screenshot> 
-            <mediaobject> 
+        <figure id="area-plotconfig">
+          <title>&app; Area Plot Configuration</title>
+          <screenshot>
+            <mediaobject>
               <imageobject><imagedata
-                  fileref="figures/area_plot_configure.png" format="PNG"/> 
+                  fileref="figures/area_plot_configure.png" format="PNG"/>
               </imageobject>
-              <textobject> 
-                <phrase>Shows &app; main window. Contains titlebar, 
-                  menubar, tabbed area, Settings, and 
-                  Help menus. </phrase> 
-              </textobject> 
-            </mediaobject> 
-          </screenshot> 
+              <textobject>
+                <phrase>Shows &app; main window. Contains titlebar,
+                  menubar, tabbed area, Settings, and
+                  Help menus. </phrase>
+              </textobject>
+            </mediaobject>
+          </screenshot>
         </figure>
         <!-- ==== End of Figure ==== -->
 
         <variablelist>
           <varlistentry>
             <term><guilabel>Plot Type</guilabel></term>
-            <listitem><para>Specify the 
+            <listitem><para>Specify the
                 data to be displayed behind the MUF / FOT curves.  Available
                 data sets are Reliability, MUFday, DBW, SNR and none.</para>
             </listitem>
@@ -611,82 +610,85 @@ Template last modified 2006-11-21
           <varlistentry>
             <term><guilabel>Colour Map</guilabel></term>
             <listitem><para>Specify the colour map to use for plotting the
-                background data set.</para> 
+                background data set.</para>
             </listitem>
           </varlistentry>
           <varlistentry>
             <term><guilabel>Contours</guilabel></term>
-            <listitem><para>Controls the plotting of contours on the area 
-                map.</para> 
+            <listitem><para>Produces a filled contour plot.</para>
             </listitem>
           </varlistentry>
           <varlistentry>
             <term><guilabel>Greyline</guilabel></term>
-            <listitem><para>Controls the plotting of a greyline on the area 
-                map.</para> 
+            <listitem><para>Controls the plotting of a greyline on the area
+                map.</para>
             </listitem>
           </varlistentry>
           <varlistentry>
             <term><guilabel>Parallels</guilabel></term>
             <listitem><para>Controls the plotting of paralells on the area
-                map.</para> 
+                map.</para>
             </listitem>
           </varlistentry>
           <varlistentry>
             <term><guilabel>Meridians</guilabel></term>
             <listitem><para>Controls the plotting of meridians on the area
-                map.</para> 
+                map.</para>
             </listitem>
           </varlistentry>
         </variablelist>
       </para>
+      <para>Prediction data may be stored in a '.vgz' file; a zip file
+        containing the source .voa file along with the output .vg_ files.
+        These files may be saved and retreived using the File Open VGA File
+        menu item.</para>
       <para>Click the <guibutton>OK</guibutton> button to open the area plot
         image.</para>
-    </sect2> 
+    </sect2>
   </sect1>
   <!-- ============= Customization ============================= -->
   <!-- Use this section to describe how to customize the application. -->
-  <sect1 id="voacapgui-prefs"> 
-    <title>System Settings</title> 
-    <itemizedlist> 
-      <listitem> 
-        <para> 
-          <xref linkend="voacapgui-system"/>System</para> 
-      </listitem> 
-      <listitem> 
-        <para> 
-          <xref linkend="voacapgui-ssn"/>SSN</para> 
-      </listitem> 
+  <sect1 id="voacapgui-prefs">
+    <title>System Settings</title>
+    <itemizedlist>
+      <listitem>
+        <para>
+          <xref linkend="voacapgui-system"/>System</para>
+      </listitem>
+      <listitem>
+        <para>
+          <xref linkend="voacapgui-ssn"/>SSN</para>
+      </listitem>
     </itemizedlist>
     <!-- =============== Customization Subsection ================ -->
     <!-- Use a new section to describe different tabbed sections on the Preferences
     dialog. -->
-    <sect2 id="voacapgui-system"> 
+    <sect2 id="voacapgui-system">
       <title>System Settings</title>
       The <guilabel>System</guilabel> Notebook Tab is used to define
-      a number of system side VOACAP parameters. 
+      a number of system side VOACAP parameters.
       <!-- ==== Figure ==== -->
-      <figure id="system-tab"> 
-        <title>&app; System Tab</title> 
-        <screenshot> 
-          <mediaobject> 
+      <figure id="system-tab">
+        <title>&app; System Tab</title>
+        <screenshot>
+          <mediaobject>
             <imageobject><imagedata
-                fileref="figures/system_tab.png" format="PNG"/> 
+                fileref="figures/system_tab.png" format="PNG"/>
             </imageobject>
-            <textobject> 
-              <phrase>Shows &app; main window. Contains titlebar, 
-                menubar, tabbed area, Settings, and 
-                Help menus. </phrase> 
-            </textobject> 
-          </mediaobject> 
-        </screenshot> 
+            <textobject>
+              <phrase>Shows &app; main window. Contains titlebar,
+                menubar, tabbed area, Settings, and
+                Help menus. </phrase>
+            </textobject>
+          </mediaobject>
+        </screenshot>
       </figure>
       <!-- ==== End of Figure ==== -->
-      <variablelist> 
-        <varlistentry> 
-          <term><guilabel>Man-Made Noise</guilabel></term> 
-          <listitem> 
-            <para>This is an important parameter, used to characterise 
+      <variablelist>
+        <varlistentry>
+          <term><guilabel>Man-Made Noise</guilabel></term>
+          <listitem>
+            <para>This is an important parameter, used to characterise
               the level of man-made noise at the receive location.</para>
             <para>Valid values are in the range 100-200 -dBw/Hz</para>
             <informaltable frame='none' rowsep='0' colsep='0'>
@@ -709,30 +711,30 @@ Template last modified 2006-11-21
               </tgroup>
             </informaltable>
           </listitem>
-        </varlistentry> 
-        <varlistentry> 
-          <term><guilabel>Min. Take-Off Angle</guilabel></term> 
-          <listitem> 
+        </varlistentry>
+        <varlistentry>
+          <term><guilabel>Min. Take-Off Angle</guilabel></term>
+          <listitem>
             <para>This value is normally very small unless antenna performance
               is anticipated to be so poor at low angles that these angles
               should not be used in the estimation of upper useful frequencies,
-              or if the horizon is so obstructed that low take off angles and 
+              or if the horizon is so obstructed that low take off angles and
               reception angles appear unlikely.</para>
             <para>Valid values are in the rangle 0.1 - 90.0 degrees</para>
           </listitem>
-        </varlistentry> 
-        <varlistentry> 
-          <term><guilabel>Reliability</guilabel></term> 
-          <listitem> 
+        </varlistentry>
+        <varlistentry>
+          <term><guilabel>Reliability</guilabel></term>
+          <listitem>
             <para>An estimate of the percent of days within a month that the
               signal quality will meet the level defined by the
               <guilabel>Required SNR</guilabel> parameter.</para>
           </listitem>
-        </varlistentry> 
-        <varlistentry> 
-          <term><guilabel>Required SNR (dB/Hz)</guilabel></term> 
-          <listitem> 
-            <para>An important parameter used to specify the required 
+        </varlistentry>
+        <varlistentry>
+          <term><guilabel>Required SNR (dB/Hz)</guilabel></term>
+          <listitem>
+            <para>An important parameter used to specify the required
               Signal-to-Noise ratio of the hourly median power relative
               to the hourly median noise in a 1Hz bandwidth.</para>
             <para>Typical values of Required SNR are;</para>
@@ -755,85 +757,85 @@ Template last modified 2006-11-21
               </tgroup>
             </informaltable>
           </listitem>
-        </varlistentry> 
-        <varlistentry> 
-          <term><guilabel>Multipath Tolerance</guilabel></term> 
-          <listitem> 
-            <para>Specifies the maximum difference in power between the 
+        </varlistentry>
+        <varlistentry>
+          <term><guilabel>Multipath Tolerance</guilabel></term>
+          <listitem>
+            <para>Specifies the maximum difference in power between the
               sky-wave modes to permit satisfactory system peformance
-              in the presence of multiple signals.  Modes weaker than the 
+              in the presence of multiple signals.  Modes weaker than the
               specified level are not considered multipath problems.</para>
             <para>The valid range is 0-40dB (Default = 3.dB)</para>
           </listitem>
-        </varlistentry> 
-        <varlistentry> 
-          <term><guilabel>Max Delay (mS)</guilabel></term> 
-          <listitem> 
+        </varlistentry>
+        <varlistentry>
+          <term><guilabel>Max Delay (mS)</guilabel></term>
+          <listitem>
             <para>Specifies the maximum tolerable delay in between sky-wave
-              modes to permit satisfactory system performance in the 
+              modes to permit satisfactory system performance in the
               presence of multiple signals.  Modes within the specified linit
               are not considered multipath problems.</para>
             <para>The valid range is 0-99.99 mSec (Default = 10.00 mSec)</para>
           </listitem>
-        </varlistentry> 
-        <varlistentry> 
-          <term><guilabel>Ionospheric Variables foE, foF1, foF2, foEs</guilabel></term> 
-          <listitem> 
-            <para>Multipliers that adjust the predicted critical frequency 
+        </varlistentry>
+        <varlistentry>
+          <term><guilabel>Ionospheric Variables foE, foF1, foF2, foEs</guilabel></term>
+          <listitem>
+            <para>Multipliers that adjust the predicted critical frequency
               for the associated layer.</para>
-            <para>Default values for foE, foF1 &amp; foF2 are 1.0, 
+            <para>Default values for foE, foF1 &amp; foF2 are 1.0,
               foEs = 0.0</para>
           </listitem>
-        </varlistentry> 
-        <varlistentry> 
-          <term><guilabel>Model</guilabel></term> 
-          <listitem> 
+        </varlistentry>
+        <varlistentry>
+          <term><guilabel>Model</guilabel></term>
+          <listitem>
             <para>Define the coefficients used for the calculations</para>
             <para>Default is CCIR</para>
           </listitem>
-        </varlistentry> 
-        <varlistentry> 
-          <term><guilabel>Path</guilabel></term> 
-          <listitem> 
+        </varlistentry>
+        <varlistentry>
+          <term><guilabel>Path</guilabel></term>
+          <listitem>
             <para>Specifies if a long or short path calaculation should
               be performed.</para>
             <para>Default: Short</para>
           </listitem>
-        </varlistentry> 
-      </variablelist> 
+        </varlistentry>
+      </variablelist>
     </sect2>
     <!-- ============= Customization Subsection ===================== -->
     <!-- Another tabbed section on the Preferences dialog. -->
-    <sect2 id="voacapgui-ssn"> 
-      <title>Sun Spot Numbers (SSN)</title> 
-      <para>This tab is used to display the Sun Spot Numers (SSN) read by 
+    <sect2 id="voacapgui-ssn">
+      <title>Sun Spot Numbers (SSN)</title>
+      <para>This tab is used to display the Sun Spot Numers (SSN) read by
         voacapgui and passed to VOACAP.</para>
       <!-- ==== Figure ==== -->
-      <figure id="fig-ssn-tab"> 
-        <title>&app; SSN Tab</title> 
-        <screenshot> 
-          <mediaobject> 
+      <figure id="fig-ssn-tab">
+        <title>&app; SSN Tab</title>
+        <screenshot>
+          <mediaobject>
             <imageobject><imagedata
-                fileref="figures/ssn_tab.png" format="PNG"/> 
+                fileref="figures/ssn_tab.png" format="PNG"/>
             </imageobject>
-            <textobject> 
-              <phrase>Shows &app; main window. Contains titlebar, 
-                menubar, tabbed area, Settings, and 
-                Help menus. </phrase> 
-            </textobject> 
-          </mediaobject> 
-        </screenshot> 
+            <textobject>
+              <phrase>Shows &app; main window. Contains titlebar,
+                menubar, tabbed area, Settings, and
+                Help menus. </phrase>
+            </textobject>
+          </mediaobject>
+        </screenshot>
       </figure>
       <!-- ==== End of Figure ==== -->
       <para>The information is derived from data
         published by NOAA and made available at  <ulink url="ftp://ftp.ngdc.noaa.gov/STP/space-weather/solar-data/solar-indices/sunspot-numbers/predicted/table_international-sunspot-numbers_monthly-predicted.txt" type="ftp">
-          ftp://ftp.ngdc.noaa.gov/STP/space-weather/solar-data/solar-indices/sunspot-numbers/predicted/table_international-sunspot-numbers_monthly-predicted.txt  </ulink>. </para> 
+          ftp://ftp.ngdc.noaa.gov/STP/space-weather/solar-data/solar-indices/sunspot-numbers/predicted/table_international-sunspot-numbers_monthly-predicted.txt  </ulink>. </para>
       <para>The <guibutton>Web Update</guibutton> may be used to updated the
-        table (requires an Internet connection).  Alternatively, a copy of the 
+        table (requires an Internet connection).  Alternatively, a copy of the
 <filename>table_international-sunspot-numbers_monthly-predicted.txt</filename>
 file can be placed in the user's <filename>~/.voacapgui</filename> directory.
 </para>
-    </sect2> 
+    </sect2>
   </sect1>
 
   <sect1 id="templates">
@@ -843,11 +845,11 @@ file can be placed in the user's <filename>~/.voacapgui</filename> directory.
     <para>Each file must implement only one class named "templates" which
       can implement one or more templates.</para>
     <para> The "templates" class has to define the following methods:</para>
-    <variablelist> 
-      <varlistentry> 
-        <term>__init__(self, parent)</term> 
-        <listitem> 
-          <para>parent is the parent window in case a dialog has to be 
+    <variablelist>
+      <varlistentry>
+        <term>__init__(self, parent)</term>
+        <listitem>
+          <para>parent is the parent window in case a dialog has to be
             used.</para>
         </listitem>
       </varlistentry>
@@ -857,51 +859,51 @@ file can be placed in the user's <filename>~/.voacapgui</filename> directory.
       </varlistentry>
       <varlistentry>
         <term>get_params(self)</term>
-        <listitem>Return a list of strings with properties the caller 
-          should set on the object. For example, for getting the parent 
-          property "prop" set in the templates object scope, this 
+        <listitem>Return a list of strings with properties the caller
+          should set on the object. For example, for getting the parent
+          property "prop" set in the templates object scope, this
           function must return ['prop'].
         </listitem>
       </varlistentry>
       <varlistentry>
         <term>load(self)</term>
-        <listitem>This is the last step performed by the caller prior 
-          to read the names of the templates implemented. This method 
-          should do the minimum amount of work because is always called 
+        <listitem>This is the last step performed by the caller prior
+          to read the names of the templates implemented. This method
+          should do the minimum amount of work because is always called
           in program start, not upon template usage.
         </listitem>
       </varlistentry>
       <varlistentry>
         <term>set_ini(self, model)</term>
-        <listitem>The argument this method gets is the TreeModel object 
-          of the area plot tab as is at the moment the method is invoked. 
-          This method is called once before calling run(), so the model 
+        <listitem>The argument this method gets is the TreeModel object
+          of the area plot tab as is at the moment the method is invoked.
+          This method is called once before calling run(), so the model
           is actualized.
         </listitem>
       </varlistentry>
       <varlistentry>
         <term>run(self)</term>
-        <listitem>This method is called upon the object to let it build 
-          the template values. It should put the result in the 
-          self.ret_templates dict, where the caller will retrieve the 
-          values. If a non zero value is returned to the caller, the 
-          procedure will be canceled, i.e. the template values will not 
+        <listitem>This method is called upon the object to let it build
+          the template values. It should put the result in the
+          self.ret_templates dict, where the caller will retrieve the
+          values. If a non zero value is returned to the caller, the
+          procedure will be canceled, i.e. the template values will not
           be added to the model.
         </listitem>
       </varlistentry>
     </variablelist>
   </sect1>
   <!-- ============= Bugs ================================== -->
-  <!-- This section is optional and is commented out by default. 
-  You can use it to describe known bugs and limitations of the 
+  <!-- This section is optional and is commented out by default.
+  You can use it to describe known bugs and limitations of the
   program if there are any - please be frank and list all
-  problems you know of.--> 
+  problems you know of.-->
 
   <sect1 id="voacap-bugs">
     <title>Known Bugs and Limitations</title>
     <para>Apart from when starting the application for the very first time,
       &app; does not check for updated SSN values.  The user is responsible
-      for periodically checking / updating the SSN values using the 
+      for periodically checking / updating the SSN values using the
       <guibutton>Web Update</guibutton> button on the SSN tab. </para>
   </sect1>
   <!-- ============= About ================================== -->
@@ -910,12 +912,12 @@ file can be placed in the user's <filename>~/.voacapgui</filename> directory.
   section is optional: primary place for this info is "About.." box of
   the program. However, if you do wish to include this info in the
   manual, this is the place to put it. Alternatively, you can put this information in the title page.-->
-  <sect1 id="voacapgui-about"> 
-    <title>About &app;</title> 
-    <para> &app; was written by J.Watson(M0DNS / HZ1JW) and 
+  <sect1 id="voacapgui-about">
+    <title>About &app;</title>
+    <para> &app; was written by J.Watson(M0DNS / HZ1JW) and
       Fernado Maresca (LU2DFM)
       (<email>jwatson@neomailbox.ch</email>). To find more information about
-      &app;, please visit the 
+      &app;, please visit the
       <ulink url="http://www.qsl.net/hz1jw/pythonprop/index.html" type="http">
         pythonprop homepage</ulink>. </para>
     <para>
@@ -927,10 +929,10 @@ file can be placed in the user's <filename>~/.voacapgui</filename> directory.
     <para> This program is distributed under the terms of the GNU
       General Public license as published by the Free Software
       Foundation; either version 2 of the License, or (at your option)
-      any later version. A 
+      any later version. A
       <ulink url="ghelp:gpl" type="help">copy of this license</ulink>
       is included with this documentation; another can be found in the file
       COPYING included with the source code of this program. </para>
 
-  </sect1> 
+  </sect1>
 </article>
