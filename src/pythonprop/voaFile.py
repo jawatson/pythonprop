@@ -86,6 +86,7 @@ class VOAFile:
         self.rxAntenna = ''
         self.txGain = 0.0
         self.projection = 0
+        self.path = 'Short'
         self.llcrnrlon = 0.0
         self.llcrnrlat = 0.0
         self.urcrnrlon = 0.0
@@ -160,6 +161,7 @@ class VOAFile:
                     if DEBUG: print(x_anself.txlat)
                     self.txlon = self.parse_lat_lon(line[20:30])
                     if DEBUG: print(self.txlon)
+                    self.path = 'Short' if line[52:56].strip().startswith('S') else 'Long'
                 elif line.startswith("Tx Ants"):
                     self.txPower = float(line[49:60].strip())
                     self.txBearing = float(line[40:46].strip())
@@ -188,10 +190,6 @@ class VOAFile:
                     file_freqs = str.split(line[10:len(line)])
                     for freq in file_freqs:
                         self.frequencies.append(float(freq))
-
-# The following lines were originally commented out to get the script to
-# run correctly on python 2.4.  They have been uncommented now that python
-# 2.5 is more widely used.
         except IOError:
             print("Error opening/reading file ", fn)
             sys.exit(1)
@@ -343,8 +341,17 @@ class VOAFile:
     postive integer.  This must be converted to a negative value for use in
     calculations (e.g. '145' replresents a man-made noise level of 145dBW/Hz)
 
+<<<<<<< HEAD
     When get/set are used, 'real' (e.g. '-145' values are expected, returned)
     """
+=======
+    def get_path(self):
+        return self.path
+
+    def set_path(self, path):
+        self.path = 'Short' if path.startswith('S') else 'Long'
+
+>>>>>>> 70a59377047a4ad20e43a54a4c639b669a66f6f3
     def get_xnoise(self):
         return -self.XNOISE
 
@@ -583,7 +590,7 @@ class VOAFile:
         f.write('Parameter:DBU      0\n')
         f.write('Parameter:SNRxx    0\n')
         f.write('Parameter:REL      0\n')
-        tmpStr= "Transmit :%10s%10s%20s Short\n" % (self.lat_as_string(self.txlat), self.lon_as_string(self.txlon), self.txlabel)
+        tmpStr= "Transmit :%10s%10s%20s %5s\n" % (self.lat_as_string(self.txlat), self.lon_as_string(self.txlon), self.txlabel, self.path)
         f.write(tmpStr)
 
         tmpStr= "Area     :%10.1f%10.1f%10.1f%10.1f\n" % \
