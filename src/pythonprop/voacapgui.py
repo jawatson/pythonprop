@@ -276,7 +276,6 @@ class VOACAP_GUI():
             "on_mi_show_yelp_activate": self.show_yelp,
             "on_mi_about_activate" : self.show_about_dialog,
             "on_mi_open_vgz_activate": self.open_vgz_file,
-            "on_mi_restore_vgz_activate": self.restore_from_voa_file,
             "on_mi_quit_activate" : self.quit_application,
             "on_main_window_destroy" : self.quit_application,
             "on_ssn_web_update_button_clicked" : self.update_ssn_table,
@@ -867,6 +866,7 @@ class VOACAP_GUI():
         if not f: return
         f(args)
 
+
     def build_area_tv(self):
         # grey out delete and save buttons, since there are no entries in the model
         self.area_delbt.set_sensitive(False)
@@ -1231,7 +1231,6 @@ be processed, all other entries will be ignored.  Please delete some entries.'))
             else:
                 self.p2pfreq_tv.set_cursor((last_path,))
                 return
-
 
 
     def area_del_tv_row(self, *args):
@@ -1700,7 +1699,9 @@ all other entries will be ignored.'))
             except zipfile.BadZipFile as e:
                 self.show_msg_dialog("VGZ Error", "Error opening {:s}".format(vgzip_file), msg_type="ERROR")
 
-
+    """
+    # This is on hold until I figure out a way to save the year along with
+    # the voa file (maybe a comment?)
     def restore_from_voa_file(self, widget):
         vgzip_file = self.get_vgz_filename()
         voa_file = VOAFile(vgzip_file)
@@ -1718,6 +1719,10 @@ all other entries will be ignored.'))
         self.area_rect=voa_file.get_area_rect()
         self.area_label.set_text(self.area_rect.get_formatted_string())
 
+        #self.area_add_tv_rows([(year, month_i, utc, freq)])
+        self.area_add_tv_rows([(2018, 5, 2, 15.310)])
+
+
         self.mm_noise_spinbutton.set_value(voa_file.get_xnoise())
         self.min_toa_spinbutton.set_value(voa_file.get_amind())
         self.reliability_spinbutton.set_value(voa_file.get_xlufp())
@@ -1729,19 +1734,9 @@ all other entries will be ignored.'))
         self.fof1_spinbutton.set_value(voa_file.get_psc2())
         self.fof2_spinbutton.set_value(voa_file.get_psc3())
         self.foes_spinbutton.set_value(voa_file.get_psc4())
-
-        """
-        self.model_combo.set_active(int(config.get('DEFAULT', 'model')))
-        self.path_combo.set_active(int(config.get('DEFAULT', 'path')))
-
-        self.areayearspinbutton.set_value(config.getint('area','year'))
-        self.monthspinbutton.set_value(config.getint('area','month'))
-        self.utcspinbutton.set_value(config.getint('area','utc'))
-        self.freqspinbutton.set_value(config.getfloat('area', 'frequency'))
-        self.area_templates_file = config.get('area', 'templates_file')
-
-        """
+        
         #self.open_vgz_file(vgzip=vgzip_file)
+        """
 
     # INFO, WARNING & ERROR messages
     def show_msg_dialog(self, msg_title, msg_body, msg_type='INFO'):
