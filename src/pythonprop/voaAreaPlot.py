@@ -255,8 +255,6 @@ class VOAAreaPlot:
                     value = max(self.image_defs['min'], value)
                     value = min(self.image_defs['max'], value)
                     points[int(line[3:6])-1][int(line[0:3])-1] = value
-                    if value > 0.9:
-                        print(value)
             vgFile.close()
             if 'zf' in locals():
                 zf.close()
@@ -446,7 +444,6 @@ class VOAAreaPlot:
     presented at http://www.voacap.com/s-meter.html
     """
     def SMETER_format(self, x, pos):
-        print(x)
         S_DICT = {-151.18:'S1', -145.15:'S2', -139.13:'S3', -133.11:'S4', -127.09:'S5', \
                     -121.07:'S6', -115.05:'S7', -109.03:'S8', -103.01:'S9', -93.01:'S9+10dB', \
                     -83.01:'S9+20dB', -73.01:'S9+30dB', -63.01:'S9+40dB', -53.01:'S9+50dB', -43.01:'S9+60dB'}
