@@ -47,13 +47,12 @@ Typing 'voacapgui' from the command line or the Gnome desktop will start the mai
 New users are encouraged to use Python 3 (see above).  No further Python 2 updates are planned.
 
 ##User Install
-The inclusion of Gnome documentation from v0.16 onwards requires a few additional
-dependencies;
+The inclusion of Gnome documentation from v0.16 onwards requires a few additional dependencies;
 * rarian-compat
 * gnome-doc-utils
 * pkg-config
 
-The application itself requires a few python dependancies;
+The application itself requires a few python dependencies;
 * matplotlib
 * basemap
 * python-matplotlib-gtk3
@@ -92,14 +91,15 @@ application launcher.
 #Roadmap
 
 ##Release 0.22
-* Add print buttons to the result views. Done 18/2
-* Add the ability to save area plots in a zip ('.vgz') file containing, the
-  input/output files and a meta.txt of notes / annotations and a file list.
+* Add print buttons to the result views. (Done 18/2)
+* Add the ability to save area plots in a zip ('.vgz') file containing, the input/output files and a meta.txt of notes / annotations and a file list.
 * Add a load / save menu to load up a file and jump straight to the
   plotting function.  This same function could also restore the settings
-  to permit the plot to be modified and recalculated.
-* Add a few plot details to the voaAreaPlotgui combo (same as the P2P)
-
+  to permit the plot to be modified and recalculated. Create a 'restore_from_voa_file()' function to achieve this.
+* Add a function to simply open a vgz file. (Done 19/2)
+* Add a few plot details to the voaAreaPlotgui combo (same as the P2P) (Done 19/2)
+* Add some checks when opening a zipfile. Use a common warning dialog to
+  alert users of failed reads. (Done 19/2)
 ##Release 0.23
 * Migrate mapping to cartopy
 

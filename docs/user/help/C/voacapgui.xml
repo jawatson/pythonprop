@@ -3,9 +3,9 @@
 "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
 <!ENTITY appname          "voacapgui">
 <!ENTITY app "<application>voacapgui</application>">
-<!ENTITY appversion   "0.14">
-<!ENTITY manrevision  "0.1">
-<!ENTITY date "October 2014">
+<!ENTITY appversion   "0.22">
+<!ENTITY manrevision  "0.2">
+<!ENTITY date "February 2016">
 <!-- Information about the entities
 Use the app and appname entities to specify the name of the application.
 Use the appversion entity to specify the version of the application.
@@ -482,8 +482,12 @@ Template last modified 2006-11-21
         <guibutton>Site</guibutton> in the <guilabel>Tx. Site</guilabel>
         panel to open the Site Chooser dialog window.</para>
 
+<<<<<<< HEAD
       <para> Sites may be defined
         by either;
+=======
+      <para> Sites may be defined by either;
+>>>>>>> save_files
         <itemizedlist>
           <listitem><para>Clicking on the map.</para></listitem>
           <listitem><para>Using the Locator combo boxes.</para></listitem>
@@ -632,8 +636,12 @@ Template last modified 2006-11-21
           </varlistentry>
           <varlistentry>
             <term><guilabel>Contours</guilabel></term>
+<<<<<<< HEAD
             <listitem><para>Controls the plotting of contours on the area
                 map.</para>
+=======
+            <listitem><para>Produces a filled contour plot.</para>
+>>>>>>> save_files
             </listitem>
           </varlistentry>
           <varlistentry>
@@ -656,6 +664,10 @@ Template last modified 2006-11-21
           </varlistentry>
         </variablelist>
       </para>
+      <para>Prediction data may be stored in a '.vgz' file; a zip file
+        containing the source .voa file along with the output .vg_ files.
+        These files may be saved and retreived using the File Open VGA File
+        menu item.</para>
       <para>Click the <guibutton>OK</guibutton> button to open the area plot
         image.</para>
     </sect2>
