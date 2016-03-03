@@ -481,13 +481,7 @@ Template last modified 2006-11-21
         <guimenu>Site</guimenu> tab in the notebook and click the
         <guibutton>Site</guibutton> in the <guilabel>Tx. Site</guilabel>
         panel to open the Site Chooser dialog window.</para>
-
-<<<<<<< HEAD
-      <para> Sites may be defined
-        by either;
-=======
       <para> Sites may be defined by either;
->>>>>>> save_files
         <itemizedlist>
           <listitem><para>Clicking on the map.</para></listitem>
           <listitem><para>Using the Locator combo boxes.</para></listitem>
@@ -636,13 +630,8 @@ Template last modified 2006-11-21
           </varlistentry>
           <varlistentry>
             <term><guilabel>Contours</guilabel></term>
-<<<<<<< HEAD
-            <listitem><para>Controls the plotting of contours on the area
-                map.</para>
-=======
             <listitem><para>Produces a filled contour plot.</para>
->>>>>>> save_files
-            </listitem>
+          </listitem>
           </varlistentry>
           <varlistentry>
             <term><guilabel>Greyline</guilabel></term>
