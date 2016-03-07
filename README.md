@@ -90,18 +90,8 @@ application launcher.
 
 #Roadmap
 
-##Release 0.22
-* Add print buttons to the result views. (Done 18/2)
-* Add the ability to save area plots in a zip ('.vgz') file containing, the input/output files and a meta.txt of notes / annotations and a file list.
-* Add a load / save menu to load up a file and jump straight to the
-  plotting function.  This same function could also restore the settings
-  to permit the plot to be modified and recalculated. Create a 'restore_from_voa_file()' function to achieve this.
-* Add a function to simply open a vgz file. (Done 19/2)
-* Add a few plot details to the voaAreaPlotgui combo (same as the P2P) (Done 19/2)
-* Add some checks when opening a zipfile. Use a common warning dialog to
-  alert users of failed reads. (Done 19/2)
 ##Release 0.23
-* Migrate mapping to cartopy
+* Migrate mapping to cartopy (Postponed until cartopy is included within most distros by default.)
 
 ##Release 0.24
 * Investigate running voacapl in a separate thread to provide some form of visual progress indicator.
