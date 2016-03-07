@@ -341,17 +341,14 @@ class VOAFile:
     postive integer.  This must be converted to a negative value for use in
     calculations (e.g. '145' replresents a man-made noise level of 145dBW/Hz)
 
-<<<<<<< HEAD
     When get/set are used, 'real' (e.g. '-145' values are expected, returned)
     """
-=======
     def get_path(self):
         return self.path
 
     def set_path(self, path):
         self.path = 'Short' if path.startswith('S') else 'Long'
 
->>>>>>> 70a59377047a4ad20e43a54a4c639b669a66f6f3
     def get_xnoise(self):
         return -self.XNOISE
 
