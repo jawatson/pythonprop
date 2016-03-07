@@ -20,9 +20,10 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-#from __future__ import with_statement
+import calendar
 import codecs
 import datetime
+import io
 import sys
 import string
 import math
@@ -30,6 +31,9 @@ import os.path
 from .hamlocation import *
 from .voaAreaRect import *
 import calendar as cal
+import zipfile
+
+from .vgzArchive import get_voa_filename
 
 DEBUG = False
 
@@ -82,6 +86,7 @@ class VOAFile:
         self.rxAntenna = ''
         self.txGain = 0.0
         self.projection = 0
+        self.path = 'Short'
         self.llcrnrlon = 0.0
         self.llcrnrlat = 0.0
         self.urcrnrlon = 0.0
@@ -106,10 +111,18 @@ class VOAFile:
         self.filename = fn
 
     def parse_file(self):
-        voaFile = codecs.open(self.filename, "r", "utf-8")
+
+        if self.filename.endswith('.vgz'):
+            voa_filename = get_voa_filename(self.filename)
+            zf = zipfile.ZipFile(self.filename)
+            voaFile = io.TextIOWrapper(zf.open(voa_filename), 'utf-8')
+        else:
+            voaFile = open(self.filename)
+
         try:
             #voaFile = open(self.filename)
             for line in voaFile:
+                if DEBUG: print(line)
                 if line.startswith("Area"):
                     self.llcrnrlon = float(line[11:20])
                     self.llcrnrlat = float(line[31:40])
@@ -145,16 +158,18 @@ class VOAFile:
                     self.txlabel = line[30:50].strip()
                     if DEBUG: print("Tx. = ", self.txlabel)
                     self.txlat = self.parse_lat_lon(line[10:20])
-                    if DEBUG: print(self.txlat)
+                    if DEBUG: print(x_anself.txlat)
                     self.txlon = self.parse_lat_lon(line[20:30])
                     if DEBUG: print(self.txlon)
+                    self.path = 'Short' if line[52:56].strip().startswith('S') else 'Long'
                 elif line.startswith("Tx Ants"):
                     self.txPower = float(line[49:60].strip())
                     self.txBearing = float(line[40:46].strip())
                     self.txGain = float(line[33:39].strip())
-                    self.txAntenna = self.strcompress(line[10:33].strip())
+                    self.txAntenna = self.strcompress(line[11:32].strip())
+
                 elif line.startswith("Rec Ants"):
-                    self.rxAntenna = self.strcompress(line[10:33].strip())
+                    self.rxAntenna = self.strcompress(line[11:32].strip())
                 elif line.startswith("Hours    :"):
                     self.utcs = []
                     file_times = str.split(line[10:len(line)])
@@ -175,16 +190,15 @@ class VOAFile:
                     file_freqs = str.split(line[10:len(line)])
                     for freq in file_freqs:
                         self.frequencies.append(float(freq))
-
-# The following lines were originally commented out to get the script to
-# run correctly on python 2.4.  They have been uncommented now that python
-# 2.5 is more widely used.
         except IOError:
             print("Error opening/reading file ", fn)
             sys.exit(1)
         finally:
             if DEBUG: print("Closing the file")
             voaFile.close()
+            if 'zf' in locals():
+                if DEBUG: print("Closing the zip file")
+                zf.close()
 
     def get_gridsize(self):    return self.gridsize
     def set_gridsize(self, gridsize):
@@ -193,6 +207,7 @@ class VOAFile:
     def get_centre_label(self): return self.pcentrelabel
     def get_centre_lat(self):    return self.pcentrelat
     def get_centre_lon(self):    return self.pcentrelon
+
     def get_tx_label(self): return self.txlabel
     def get_tx_lat(self): return self.txlat
     def get_tx_lon(self): return self.txlon
@@ -308,38 +323,88 @@ class VOAFile:
 
 
     def set_tx_antenna(self, data_file, design_freq=0.0, bearing=0.0, power=0.125):
-        self.tx_ant_data_file = data_file
+        self.txAntenna = data_file
         self.tx_ant_design_freq = design_freq
-        self.tx_ant_bearing = bearing
-        self.tx_ant_power = power
+        self.txBearing = bearing
+        self.txPower = power
 
+    def get_txBearing(self):
+        return self.txBearing
+
+    def get_txPower(self):
+        return self.txPower
+
+    def get_txAntenna(self):
+        return self.txAntenna
+    """
+    XNOISE represents the level of man-made.  In the file it s stored as a
+    postive integer.  This must be converted to a negative value for use in
+    calculations (e.g. '145' replresents a man-made noise level of 145dBW/Hz)
+
+    When get/set are used, 'real' (e.g. '-145' values are expected, returned)
+    """
+    def get_path(self):
+        return self.path
+
+    def set_path(self, path):
+        self.path = 'Short' if path.startswith('S') else 'Long'
+
+    def get_xnoise(self):
+        return -self.XNOISE
 
     def set_xnoise(self, xnoise):
-        self.XNOISE = int(xnoise)
+        self.XNOISE = abs(int(xnoise))
+
+    def get_amind(self):
+        return self.AMIND
 
     def set_amind(self, amind):
         self.AMIND = float(amind)
 
+    def get_xlufp(self):
+        return self.XLUFP
+
     def set_xlufp(self, xlufp):
         self.XLUFP = int(xlufp)
+
+    def get_rsn(self):
+        return self.RSN
 
     def set_rsn(self, rsn):
         self.RSN = int(rsn)
 
+    def get_pmp(self):
+        return self.PMP
+
     def set_pmp(self, pmp):
         self.PMP = float(pmp)
+
+    def get_dmpx(self):
+        return self.DMPX
 
     def set_dmpx(self, dmpx):
         self.DMPX = float(dmpx)
 
+    def get_psc1(self):
+        return self.PSC1
+
     def set_psc1(self, psc1):
         self.PSC1 = float(psc1)
+
+    def get_psc2(self):
+        return self.PSC2
 
     def set_psc2(self, psc2):
         self.PSC2 = float(psc2)
 
+    def get_psc3(self):
+        return self.PSC3
+
     def set_psc3(self, psc3):
         self.PSC3 = float(psc3)
+
+    def get_psc4(self):
+        return self.PSC4
 
     def set_psc4(self, psc4):
         self.PSC4 = float(psc4)
@@ -483,6 +548,12 @@ class VOAFile:
             return site_description
 
 
+    def get_group_titles(self):
+        titles = []
+        for ctr in range(0, self.get_num_plots()):
+            titles.append("{:d}: {:.2f}MHz {:02d}:00UTC {:s}".format(ctr+1, self.frequencies[ctr], self.utcs[ctr], calendar.month_name[int(self.monthDays[ctr])]))
+        return titles
+
     def get_detailed_plot_description_string(self, field):
         """Returns a string of comprehensive information about the plot.
 
@@ -516,7 +587,7 @@ class VOAFile:
         f.write('Parameter:DBU      0\n')
         f.write('Parameter:SNRxx    0\n')
         f.write('Parameter:REL      0\n')
-        tmpStr= "Transmit :%10s%10s%20s Short\n" % (self.lat_as_string(self.txlat), self.lon_as_string(self.txlon), self.txlabel)
+        tmpStr= "Transmit :%10s%10s%20s %5s\n" % (self.lat_as_string(self.txlat), self.lon_as_string(self.txlon), self.txlabel, self.path)
         f.write(tmpStr)
 
         tmpStr= "Area     :%10.1f%10.1f%10.1f%10.1f\n" % \
@@ -558,7 +629,7 @@ class VOAFile:
             (self.rx_ant_data_file, self.rx_ant_gain, self.rx_ant_bearing)
         f.write(tmpStr)
         tmpStr = "Tx Ants  :[%21s]%7.3f%6.1f%10.4f\n" % \
-            (self.tx_ant_data_file, self.tx_ant_design_freq, self.tx_ant_bearing, self.tx_ant_power)
+            (self.txAntenna, self.tx_ant_design_freq, self.txBearing, self.txPower)
         f.write(tmpStr)
         f.close()
 

@@ -33,6 +33,7 @@
 # Try and delete the frame on ortho plots
 # All defaults should be defined in the same way, in the same place
 # The matplotlib AxesGrid toolkit is a collection of helper classes to ease displaying multiple images in matplotlib. The AxesGrid toolkit is distributed with matplotlib source. DOH!
+import io
 import os
 import re
 import sys
@@ -60,10 +61,15 @@ import numpy.ma as ma
 
 from optparse import OptionParser
 
+import zipfile
+
 from .voaAreaRect import VOAAreaRect
 from .voaFile import VOAFile
 from .hamlocation import HamLocation
 from .voaPlotWindow import *
+
+from .vgzArchive import get_base_filename
+
 
 import gettext
 import locale
@@ -125,8 +131,13 @@ class VOAAreaPlot:
 
         self.datadir = datadir
 
-        plot_parameters = VOAFile((in_file+'.voa'))
-        plot_parameters.parse_file()
+        try:
+            plot_parameters = VOAFile((in_file))
+            plot_parameters.parse_file()
+        except zipfile.BadZipFile as e:
+            if parent is None:
+                print("Invalid .vgz file")
+                sys.exit(1)
 
         if (plot_parameters.get_projection() != 'cyl'):
             print(_("Error: Only lat/lon (type 1) input files are supported"))
@@ -228,8 +239,12 @@ class VOAAreaPlot:
             self.subplots.append(ax)
 
             ax.label_outer()
-            #print "opening: ",(in_file+'.vg'+str(vg_file))
-            vgFile = open(in_file+'.vg'+str(vg_file))
+            if in_file.endswith('.vgz'):
+                base_filename = get_base_filename(in_file)
+                zf = zipfile.ZipFile(in_file)
+                vgFile = io.TextIOWrapper(zf.open("{:s}.vg{:d}".format(base_filename, vg_file)), 'utf-8')
+            else:
+                vgFile = open("{:s}.vg{:d}".format(os.path.splitext(in_file)[0], vg_file))
             pattern = re.compile(r"[a-z]+")
 
             for line in vgFile:
@@ -241,6 +256,8 @@ class VOAAreaPlot:
                     value = min(self.image_defs['max'], value)
                     points[int(line[3:6])-1][int(line[0:3])-1] = value
             vgFile.close()
+            if 'zf' in locals():
+                zf.close()
 
             m_args={}
             if projection in ('cyl', 'mill', 'gall'):
@@ -275,6 +292,8 @@ class VOAAreaPlot:
             else:
                 im = m.pcolormesh(lons, lats, points,
                     latlon=True,
+                    vmin = self.image_defs['min'],
+                    vmax = self.image_defs['max'],
                     cmap = colMap,
                     shading='gouraud')
 
@@ -425,7 +444,6 @@ class VOAAreaPlot:
     presented at http://www.voacap.com/s-meter.html
     """
     def SMETER_format(self, x, pos):
-        print(x)
         S_DICT = {-151.18:'S1', -145.15:'S2', -139.13:'S3', -133.11:'S4', -127.09:'S5', \
                     -121.07:'S6', -115.05:'S7', -109.03:'S8', -103.01:'S9', -93.01:'S9+10dB', \
                     -83.01:'S9+20dB', -73.01:'S9+30dB', -63.01:'S9+40dB', -53.01:'S9+50dB', -43.01:'S9+60dB'}
@@ -542,9 +560,6 @@ def main(in_file, datadir=None):
         dest="timezone",
         default=0,
         help=_("Time zone (integer, default = 0)"))
-
-    if in_file.endswith('.voa'):
-        in_file = in_file.split(".voa")[0] #TODO: this needs to be more robust...
 
     (options, args) = parser.parse_args()
 

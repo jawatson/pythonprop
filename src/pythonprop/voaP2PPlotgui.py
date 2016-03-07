@@ -54,7 +54,6 @@ lang.install()#app, local_path)
 gettext.bindtextdomain(GETTEXT_DOMAIN, LOCALE_PATH)
 gettext.textdomain(GETTEXT_DOMAIN)
 
-
 from .voaOutFile import VOAOutFile
 from .voaP2PPlot import VOAP2PPlot
 from .voa3DPlot import VOA3DPlot
@@ -87,13 +86,12 @@ class VOAP2PPlotGUI:
               'winter': _('winter')}
 
 
-    def __init__(self, data_source_filename, parent = None, exit_on_close = True,  datadir=""):
+    def __init__(self, data_source_filename, parent = None, datadir=""):
         self.datadir = datadir
         self.in_filename = data_source_filename
         #todo check the file exists
         in_file = VOAOutFile(self.in_filename)
 
-        self.exit_on_close = exit_on_close
         #self.uifile = os.path.join(os.path.realpath(os.path.dirname(sys.argv[0])), "voaP2PPlotgui.ui")
         self.parent = parent
         """
@@ -163,6 +161,7 @@ class VOAP2PPlotGUI:
             self.win.show_all()
             Gtk.main()
 
+
     def run_plot(self, widget):
 #        _color_map = self.cmap_list[self.cmap_combobox.get_active()]
 #        _data_type = self.type_combobox.get_active()
@@ -208,6 +207,7 @@ class VOAP2PPlotGUI:
         #cb.set_wrap_width(20)
         cb.set_active(0)
 
+
     def on_type_combo_changed(self, widget):
         selected_plot_type = int(self.type_combobox.get_model().get_value(self.type_combobox.get_active_iter(), 0))
         is_data_plot = False if selected_plot_type in (0, 5) else True
@@ -228,7 +228,7 @@ class VOAP2PPlotGUI:
         #only emit main_quit if we're running as a standalone app
         #todo do we need to do anyother clean-up here if we're _not_
         #running as a standalone app
-        if self.exit_on_close:
+        if not self.parent:
             Gtk.main_quit
             sys.exit(0)
 

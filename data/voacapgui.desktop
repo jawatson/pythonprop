@@ -1,6 +1,7 @@
 [Desktop Entry]
+Version=1.0
 Type=Application
 Exec=voacapgui
 Name=voacapgui
-Categories=Science;HamRadio
-Icon=pythonprop
+Categories=Science;HamRadio;
+Icon=pythonprop.png

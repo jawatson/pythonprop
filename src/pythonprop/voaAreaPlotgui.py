@@ -63,10 +63,8 @@ lang.install()#app, local_path)
 gettext.bindtextdomain(GETTEXT_DOMAIN, LOCALE_PATH)
 gettext.textdomain(GETTEXT_DOMAIN)
 
-
 from .voaFile import *
 from .voaAreaPlot import *
-
 
 class VOAAreaPlotGUI:
     """Graphical front end to the voaAreaPlot application"""
@@ -90,18 +88,21 @@ class VOAAreaPlotGUI:
               'summer': _('summer'),
               'winter': _('winter')}
 
-    def __init__(self, data_source_filename, parent=None, exit_on_close = True, datadir=""):
-        self.datadir = datadir
-        self.exit_on_close = exit_on_close
+    def __init__(self,
+            data_source_filename,
+            parent=None,
+            enable_save = False,
+            datadir=""):
+        self.voa_filename = data_source_filename
         self.parent = parent
-        self.ui_file = os.path.join(self.datadir, "ui", "voaAreaPlotBox.ui")
+        self.ui_file = os.path.join(datadir, "ui", "voaAreaPlotBox.ui")
         self.wTree = Gtk.Builder()
         self.wTree.add_from_file(self.ui_file)
 
         self.get_objects("main_box", "type_combobox", "group_combobox",
                         "tz_spinbutton", "cmap_combobox", "contour_checkbutton",
                         "greyline_checkbutton", "parallels_checkbutton",
-                        "meridians_checkbutton")
+                        "meridians_checkbutton", "save_button")
 
         if not self.parent:
             self.win = Gtk.Window()
@@ -131,26 +132,76 @@ class VOAAreaPlotGUI:
             iter = model.iter_next(iter)
 
         #todo check the file exists
-        if data_source_filename.endswith('.voa'):
-            data_source_filename = data_source_filename.split(".voa")[0] #TODO: this needs to be more robust...
-
-        self.in_filename = data_source_filename
-        in_file = VOAFile(self.in_filename+'.voa')
+        #TODO: this needs to be more robust...
+        # consider capitalisation
+        
+        in_file = VOAFile(self.voa_filename)
         in_file.parse_file()
         self.num_plots = in_file.get_num_plots()
         d = { 0 : _('All Plots'),}
-        for i in range(1,self.num_plots+1): d[i] = str(i)
+
+        l = in_file.get_group_titles()
+        d.update(list(zip(list(range(1, len(l)+1)), l)))
         self.populate_combo(self.group_combobox, d, 'key')
+
+
+        #for i in range(1,self.num_plots+1): d[i] = str(i)
+        #self.populate_combo(self.group_combobox, d, 'key')
 
         event_dic = { "on_dialog_destroy" : self.quit_application,
                       "on_cancel_button_clicked" : self.quit_application,
                       "on_ok_button_clicked" : self.run_plot}
         self.wTree.connect_signals(event_dic)
+        self.save_button.connect("clicked", self.on_save_clicked)
+
         if self.parent:
+            if not enable_save:
+                self.save_button.hide()
             self.win.run()
         else:
             self.win.show_all()
+            if not enable_save:
+                self.save_button.hide()
             Gtk.main()
+
+    def on_save_clicked(self, widget):
+        dialog = Gtk.FileChooserDialog("Save prediction data", self.win,
+            Gtk.FileChooserAction.SAVE,
+            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+             "Select", Gtk.ResponseType.OK))
+        dialog.set_default_size(800, 400)
+        filter_vgz = Gtk.FileFilter()
+        filter_vgz.set_name("VGZ files")
+        filter_vgz.add_pattern("*.vgz")
+        dialog.add_filter(filter_vgz)
+
+        response = dialog.run()
+
+        if response == Gtk.ResponseType.OK:
+            save_fn = dialog.get_filename()
+        dialog.destroy()
+        if response == Gtk.ResponseType.OK:
+            self.save_prediction_files(save_fn)
+
+
+    def save_prediction_files(self, vgz_filename):
+        vgz_filename = vgz_filename if vgz_filename.endswith('.vgz') else vgz_filename+'.vgz'
+        print("Voa fn = {:s}".format(self.voa_filename))
+        base_filename, file_extension = os.path.splitext(self.voa_filename)
+        with zipfile.ZipFile(vgz_filename, 'w') as vgzip:
+            fn = base_filename + '.voa'
+            vgzip.write(fn, os.path.basename(fn), zipfile.ZIP_DEFLATED)
+            for vg_file_num in range(1, self.num_plots+1):
+                fn = "{:s}.vg{:d}".format(base_filename, vg_file_num)
+                vgzip.write(fn, os.path.basename(fn), zipfile.ZIP_DEFLATED)
+        dialog = Gtk.MessageDialog(self.win, 0, Gtk.MessageType.INFO,
+            Gtk.ButtonsType.OK, "VGZ File Saved")
+        dialog.format_secondary_text(
+            "Saved as {:s}".format(vgz_filename))
+        dialog.run()
+
+        dialog.destroy()
+
 
     def run_plot(self, widget):
         _color_map = self.cmap_combobox.get_model().get_value(self.cmap_combobox.get_active_iter(), 0)
@@ -161,7 +212,7 @@ class VOAAreaPlotGUI:
         	_vg_files = [self.group_combobox.get_active()]
         _time_zone = self.tz_spinbutton.get_value_as_int()
         plot_parent = self.parent if self.parent else self.win
-        plot = VOAAreaPlot(self.in_filename,
+        plot = VOAAreaPlot(self.voa_filename,
                         data_type = _data_type,
                         vg_files = _vg_files,
                         time_zone = _time_zone,
@@ -204,7 +255,7 @@ class VOAAreaPlotGUI:
         #only emit main_quit if we're running as a standalone app
         #todo do we need to do anyother clean-up here if we're _not_
         #running as a standalone app
-        if self.exit_on_close:
+        if not self.parent:
             Gtk.main_quit
             sys.exit(0)
 

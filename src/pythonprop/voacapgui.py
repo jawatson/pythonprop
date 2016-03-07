@@ -86,7 +86,7 @@ from .voaDefaults import *
 from .voaSiteChooser import *
 from .voaP2PPlot import *
 from .voaP2PPlotgui import *
-from .voaAreaPlotgui import *
+from .voaAreaPlotgui import VOAAreaPlotGUI
 from .ssnFetch import *
 from .voaSSNThumb import *
 from .voaFile import *
@@ -275,6 +275,7 @@ class VOACAP_GUI():
             "on_mi_run_activate": self.run_prediction,
             "on_mi_show_yelp_activate": self.show_yelp,
             "on_mi_about_activate" : self.show_about_dialog,
+            "on_mi_open_vgz_activate": self.open_vgz_file,
             "on_mi_quit_activate" : self.quit_application,
             "on_main_window_destroy" : self.quit_application,
             "on_ssn_web_update_button_clicked" : self.update_ssn_table,
@@ -612,6 +613,7 @@ class VOACAP_GUI():
         if self.tx_antenna_entry.get_text_length() == 0: _is_valid = False
         return _is_valid
 
+
     def is_rx_site_data_valid(self):
         _is_valid = True
         if self.rx_antenna_entry.get_text_length() == 0: _is_valid = False
@@ -658,8 +660,10 @@ class VOACAP_GUI():
         self.p2pfreq_tv.set_sensitive(state)
         self.build_graphcb()
 
+
     def p2p_method_changed(self, widget):
         self.update_p2p_run_button_status()
+
 
     def build_p2p_tvs(self):
        # grey out delete and save buttons, since there are no entries in the model
@@ -862,6 +866,7 @@ class VOACAP_GUI():
         if not f: return
         f(args)
 
+
     def build_area_tv(self):
         # grey out delete and save buttons, since there are no entries in the model
         self.area_delbt.set_sensitive(False)
@@ -980,6 +985,7 @@ class VOACAP_GUI():
             self.add_templ_btn.set_sensitive(False)
         else:
             self.add_templ_btn.set_sensitive(True)
+
 
     def p2p_useday_tog(self, *args):
         change_to = None
@@ -1227,7 +1233,6 @@ be processed, all other entries will be ignored.  Please delete some entries.'))
                 return
 
 
-
     def area_del_tv_row(self, *args):
         selection = self.area_tv.get_selection()
         if not selection.count_selected_rows(): return
@@ -1423,7 +1428,7 @@ be processed, all other entries will be ignored.  Please delete some entries.'))
                             self.tx_lat_spinbutton.get_value())
             vf.P_CENTRE = vf.TX_SITE
 
-            vf.set_xnoise(abs(self.mm_noise_spinbutton.get_value()))
+            vf.set_xnoise(self.mm_noise_spinbutton.get_value())
             vf.set_amind(self.min_toa_spinbutton.get_value())
             vf.set_xlufp(self.reliability_spinbutton.get_value())
             vf.set_rsn(self.snr_spinbutton.get_value())
@@ -1485,6 +1490,7 @@ all other entries will be ignored.'))
             ret = os.spawnlp(os.P_WAIT, 'voacapl', 'voacapl', os.path.join(os.path.expanduser("~"), 'itshfbc'), "area", "calc",  "pyArea.voa")
 
             if ret:
+                self.statusbar.pop(self.area_context_id)
                 e = "voacapl returned %s. Can't continue." % ret
                 dialog = Gtk.MessageDialog(self.main_window, Gtk.DialogFlags.MODAL|Gtk.DialogFlags.DESTROY_WITH_PARENT, Gtk.MessageType.ERROR, Gtk.ButtonsType.CLOSE, e )
                 dialog.run()
@@ -1493,7 +1499,7 @@ all other entries will be ignored.'))
             self.statusbar.pop(self.area_context_id)
 
             s = os.path.join(os.path.expanduser("~"), 'itshfbc','areadata','pyArea.voa')
-            graph = VOAAreaPlotGUI(s, parent=self.main_window, exit_on_close=False, datadir=self.datadir)
+            graph = VOAAreaPlotGUI(s, parent=self.main_window, enable_save=True, datadir=self.datadir)
             graph.quit_application()
 
         #P2P Predictions follow
@@ -1592,7 +1598,6 @@ all other entries will be ignored.'))
                 if run_type == 'g':
                     graph = VOAP2PPlotGUI(self.itshfbc_path+os.sep+'run'+os.sep+output_filename,
                         parent=self.main_window,
-                        exit_on_close=False,
                         datadir=self.datadir)
                     graph.quit_application()
             except OSError as e:
@@ -1662,6 +1667,86 @@ all other entries will be ignored.'))
         with open(fn, 'w') as templates_def_fd:
             templates_def_fd.write(s)
         self.area_templates_file = fn
+
+    def get_vgz_filename(self):
+        dialog = Gtk.FileChooserDialog("Please select a vgz file", self.main_window,
+            Gtk.FileChooserAction.OPEN,
+            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+             "Select", Gtk.ResponseType.OK))
+        filter_vgz = Gtk.FileFilter()
+        filter_vgz.set_name(".vgz files")
+        filter_vgz.add_pattern("*.vgz")
+        dialog.add_filter(filter_vgz)
+        dialog.set_default_size(800, 400)
+
+        response = dialog.run()
+        vgzip_file = ""
+        if response == Gtk.ResponseType.OK:
+            vgzip_file = dialog.get_filename()
+        dialog.destroy()
+        return vgzip_file
+
+
+    def open_vgz_file(self,widget):
+        vgzip_file = self.get_vgz_filename()
+        if vgzip_file != "":
+            try:
+                graph = VOAAreaPlotGUI(vgzip_file,
+                        parent=self.main_window,
+                        enable_save=False,
+                        datadir=self.datadir)
+                graph.quit_application()
+            except zipfile.BadZipFile as e:
+                self.show_msg_dialog("VGZ Error", "Error opening {:s}".format(vgzip_file), msg_type="ERROR")
+
+    """
+    # This is on hold until I figure out a way to save the year along with
+    # the voa file (maybe a comment?)
+    def restore_from_voa_file(self, widget):
+        vgzip_file = self.get_vgz_filename()
+        voa_file = VOAFile(vgzip_file)
+        voa_file.parse_file()
+        self.tx_site_entry.set_text(voa_file.get_tx_label())
+        self.tx_lat_spinbutton.set_value(voa_file.get_tx_lat())
+        self.tx_lon_spinbutton.set_value(voa_file.get_tx_lon())
+        self.gridsizespinbutton.set_value(voa_file.get_gridsize())
+        self.tx_antenna_entry.set_text(voa_file.get_txAntenna())
+        self.tx_antenna_path = voa_file.get_txAntenna()
+
+        self.tx_bearing_spinbutton.set_value(voa_file.get_txBearing())
+        self.tx_power_spinbutton.set_value(voa_file.get_txPower() * 1000)
+
+        self.area_rect=voa_file.get_area_rect()
+        self.area_label.set_text(self.area_rect.get_formatted_string())
+
+        #self.area_add_tv_rows([(year, month_i, utc, freq)])
+        self.area_add_tv_rows([(2018, 5, 2, 15.310)])
+
+
+        self.mm_noise_spinbutton.set_value(voa_file.get_xnoise())
+        self.min_toa_spinbutton.set_value(voa_file.get_amind())
+        self.reliability_spinbutton.set_value(voa_file.get_xlufp())
+        self.snr_spinbutton.set_value(voa_file.get_rsn())
+        self.mpath_spinbutton.set_value(voa_file.get_pmp())
+        self.delay_spinbutton.set_value(voa_file.get_dmpx())
+
+        self.foe_spinbutton.set_value(voa_file.get_psc1())
+        self.fof1_spinbutton.set_value(voa_file.get_psc2())
+        self.fof2_spinbutton.set_value(voa_file.get_psc3())
+        self.foes_spinbutton.set_value(voa_file.get_psc4())
+        
+        #self.open_vgz_file(vgzip=vgzip_file)
+        """
+
+    # INFO, WARNING & ERROR messages
+    def show_msg_dialog(self, msg_title, msg_body, msg_type='INFO'):
+        dialog = Gtk.MessageDialog(self.main_window,
+            0,
+            getattr(Gtk.MessageType, msg_type),
+            Gtk.ButtonsType.CANCEL, msg_title)
+        dialog.format_secondary_text(msg_body)
+        dialog.run()
+        dialog.destroy()
 
 
     def quit_application(self, widget):

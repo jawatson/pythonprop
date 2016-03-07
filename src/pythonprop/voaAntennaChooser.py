@@ -47,6 +47,7 @@ class VOAAntennaChooser:
 
     def __init__(self, itshfbc_path=(), size=(), parent=None, datadir=""):
         self.datadir = datadir
+        self.parent = parent
         #self.uifile = os.path.join(os.path.realpath(os.path.dirname(sys.argv[0])), "voaAntennaChooser.ui")
         self.ui_file = os.path.join(self.datadir, "ui", "voaAntennaChooser.ui")
         #self.wTree = Gtk.Builder.new_from_file(self.ui_file)
@@ -64,7 +65,7 @@ class VOAAntennaChooser:
             size = (700,400)
         #print size[0], size[1]
         self.antenna_chooser_dialog.set_size_request(size[0], size[1])
-        self.antenna_chooser_dialog.set_transient_for(parent)
+        self.antenna_chooser_dialog.set_transient_for(self.parent)
         self.antenna_path = itshfbc_path+os.sep+'antennas'
 
         # The tfb and tv aren't really OO at the moment and need tidying up.
@@ -74,21 +75,27 @@ class VOAAntennaChooser:
 
     def run(self):
         """This function runs the antenna selection dialog"""
-
         return_code = self.antenna_chooser_dialog.run()
-
         try:
             antenna_file = self.tfb.get_selected()
+            print(antenna_file)
             f = open(antenna_file)
             antenna_description = f.readline()
             testLine = f.readline()
             f.close()
             if (testLine.find("parameters") == 9):
-                antenna_file =  self.relpath(antenna_file, self.antenna_path)
                 antenna_description = re.sub('\s+', ' ', antenna_description)
-                # The line below should be reinstated once python >=2.6
-                # becomes common on all distros.
-            	#antenna_file = os.path.relpath(antenna_file, self.antenna_path)
+                antenna_file = os.path.relpath(antenna_file, self.antenna_path)
+                if len(antenna_file) > 21:
+                    err_msg_body = "The file path ('{:s}')\nis too long and should be less than 21 characters.\n\nPlease rename the antenna file.".format(antenna_file)
+                    err_dialog = Gtk.MessageDialog(self.parent,
+                        0,
+                        getattr(Gtk.MessageType, "INFO"),
+                        Gtk.ButtonsType.CANCEL, "Filename Too Long")
+                    err_dialog.format_secondary_text(err_msg_body)
+                    err_dialog.run()
+                    err_dialog.destroy()
+                    raise ValueError
             else:
             	antenna_file = None
             	antenna_description = None
@@ -125,9 +132,3 @@ class VOAAntennaChooser:
             if widget is None:
                 raise ValueError(_("Widget '%s' not found") % name)
             setattr(self, name, widget)
-
-    # A crude home grown version of the python 2.6 os.path.relpath method
-    # that will probably be replaced with the real thing once python
-    # >=2.6 becomes wiidespread.
-    def relpath(self, path, root):
-        return path[len(root)+1:]

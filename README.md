@@ -47,13 +47,12 @@ Typing 'voacapgui' from the command line or the Gnome desktop will start the mai
 New users are encouraged to use Python 3 (see above).  No further Python 2 updates are planned.
 
 ##User Install
-The inclusion of Gnome documentation from v0.16 onwards requires a few additional
-dependencies;
+The inclusion of Gnome documentation from v0.16 onwards requires a few additional dependencies;
 * rarian-compat
 * gnome-doc-utils
 * pkg-config
 
-The application itself requires a few python dependancies;
+The application itself requires a few python dependencies;
 * matplotlib
 * basemap
 * python-matplotlib-gtk3
@@ -90,28 +89,9 @@ includes a .desktop file allowing the application to be started from the system
 application launcher.
 
 #Roadmap
-##Release 0.21
-* disable the contour checkbox if 3d plots or 'none' is chosen - Done
-* Sort out the no parent warnings.  Use a main window and dialog window
-  as appropriate. - Done:uses a single box widget and creates a dialog
-  or window as required.
-* Add a save button to the circuit viewer - OK
-* Expose filled contour on p2p -OK
-* Make the colorbar same height as plot on area plots - Fixed on single plots
-* Put a frame around the ssn box - Fixed
-* Remove the 'next 12 months' option, it's the same as the next N months - done (11Feb16)
-* Update man page to reflect filled contour - OK
-
-##Release 0.22
-* Add print buttons to the result views.
-* Add the ability to save area plots in a zip ('.vgz') file containing, the
-  input/output files and a meta.txt of notes / annotations and a file list.
-* Add a load / save menu to load up a file and jump straight to the
-  plotting function.  This same function could also restore the settings
-  to permit the plot to be modified and recalculated.
 
 ##Release 0.23
-* Migrate mapping to cartopy
+* Migrate mapping to cartopy (Postponed until cartopy is included within most distros by default.)
 
 ##Release 0.24
 * Investigate running voacapl in a separate thread to provide some form of visual progress indicator.

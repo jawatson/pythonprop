@@ -279,7 +279,6 @@ class VOAP2PPlot:
             dia = VOAPlotWindow('pythonProp - ' + self.image_defs['title'],
                         canvas,
                         parent=parent,
-                        png_source = self,
                         dpi=self.dpi,
                         datadir=datadir)
         return

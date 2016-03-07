@@ -5,6 +5,7 @@
 SUBDIRS=ui templates
 
 pythonprop_PYTHON=	\
+  vgzArchive.py \
 	voa3DPlot.py \
 	voaAreaPlot.py \
 	voaAreaPlotgui.py \
