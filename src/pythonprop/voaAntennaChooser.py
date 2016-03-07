@@ -84,11 +84,8 @@ class VOAAntennaChooser:
             testLine = f.readline()
             f.close()
             if (testLine.find("parameters") == 9):
-                antenna_file =  self.relpath(antenna_file, self.antenna_path)
                 antenna_description = re.sub('\s+', ' ', antenna_description)
-                # The line below should be reinstated once python >=2.6
-                # becomes common on all distros.
-            	#antenna_file = os.path.relpath(antenna_file, self.antenna_path)
+                antenna_file = os.path.relpath(antenna_file, self.antenna_path)
             else:
             	antenna_file = None
             	antenna_description = None
@@ -125,9 +122,3 @@ class VOAAntennaChooser:
             if widget is None:
                 raise ValueError(_("Widget '%s' not found") % name)
             setattr(self, name, widget)
-
-    # A crude home grown version of the python 2.6 os.path.relpath method
-    # that will probably be replaced with the real thing once python
-    # >=2.6 becomes wiidespread.
-    def relpath(self, path, root):
-        return path[len(root)+1:]
