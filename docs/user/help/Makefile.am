@@ -21,8 +21,8 @@ pdf_DATA = voacapgui.pdf voacapgui-C.omf
 
 EXTRA_DIST = $(pdf_DATA) 
 
-#voacapgui.pdf: C/voacapgui.xml C/legal.xml
-#	dblatex C/voacapgui.xml -o voacapgui.pdf
+voacapgui.pdf: C/voacapgui.xml C/legal.xml
+	dblatex C/voacapgui.xml -o voacapgui.pdf
 
-CLEANFILES = $(pdf_DATA)
+DISTCLEANFILES = $(pdf_DATA)
 
