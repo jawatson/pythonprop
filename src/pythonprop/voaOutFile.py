@@ -123,6 +123,22 @@ class VOAOutFile:
                         _fot[-1] = _fot[0]
                         _hpf[-1] = _hpf[0]
 
+
+                if image_pattern.search(line):
+                    freqEntries = lastFreqLine.split()
+                    for x in range(0, 12):
+                        """Values start at char 11 and are 5 chars wide (we
+                        ignore the first value which is the MUF.
+                        """
+                        try:
+                            val = float(line[11+(5*x):16+(5*x)])
+                        except ValueError:
+                            break
+                        if float(freqEntries[x+2])>=2.0:
+                            _hour = self.get_adjusted_hour(int(float(freqEntries[0])))
+                            _image_buffer[int(float(freqEntries[x+2]))-2][_hour] = val
+                            #print("N {:d} {:d} = {:.2f}".format(int(float(freqEntries[x+2])), _hour, val))
+                """
                 if image_pattern.search(line):
                     #print line
                     imgEntries = line.split()
@@ -131,6 +147,8 @@ class VOAOutFile:
                         if (float_pattern.search(imgEntries[x]) and (float(freqEntries[x+1])>=2.0)):
                             _hour = self.get_adjusted_hour(int(float(freqEntries[0])))
                             _image_buffer[int(float(freqEntries[x+1]))-2][_hour] = float(imgEntries[x])
+                            print("O {:d} {:d} = {:.2f}".format(int(float(freqEntries[x+1])), _hour, float(imgEntries[x])))
+                """
 
             if self.time_zone >= 0:
                 _image_buffer[0:,0]=_image_buffer[0:,24]
