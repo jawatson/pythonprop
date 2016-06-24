@@ -58,7 +58,7 @@ class VOAOutFile:
         self.group_pattern = re.compile(r'COMMENT\s+GROUP\s+(\d+)[:\s]+(.*)')
         image_pattern = re.compile(r'%s\s*$' % self.image_re_patterns[self.data_type])
         #print self.image_re_patterns[self.data_type]
-        float_pattern = re.compile(r"\d+")
+        #float_pattern = re.compile(r"\d+")
 
         _current_group = -1
         try:
