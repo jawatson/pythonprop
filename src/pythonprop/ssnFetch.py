@@ -32,6 +32,12 @@ import time
 from datetime import datetime
 from datetime import date
 from datetime import timedelta
+import csv
+import datetime
+import json
+import io
+import urllib.request
+import pprint
 
 import gettext, locale, sys
 
@@ -69,22 +75,35 @@ class NoSSNData(Exception):
         return repr(self.value)
 
 class SSNFetch(Gtk.ListStore):
-    """ This is a small class to handle retrieving ssn data from a remote location.
-    The ssn data is saved as the file 'table_international-sunspot-numbers_monthly-predicted.txt' in the users configuration
-    folder.  If this file is found, it will be read.  If this file does not exist,
-    the file will be retrieved from the internet.
+    """ This is a small class to handle retrieving ssn data from a remote
+    location.
 
-    WARNING: In the current version the connection to the internet is automatic and
-    is perfomred with the users explicit consent.
+    Data is retreived from the following locations;
+
+    http://sidc.oma.be/silso/INFO/snmstotcsv.php
+
+    http://sidc.oma.be/silso/FORECASTS/prediSC.txt
+
+    The ssn data is parsed and saved into a single file named ssn.json
+    in the users configuration folder.  If this file is found, it is
+    opened and read.  If this file does not exist, the file will be
+    retrieved from the Internet.
+
+    WARNING: In the current version the connection to the internet
+    is automatic and is performed without the users explicit consent.
     """
     ssn_dic = {}
-    ssn_pattern = re.compile('\s+(\d\d\d\d)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+')
-    #ssn_url = "ftp://ftp.ngdc.noaa.gov/STP/SOLAR_DATA/SUNSPOT_NUMBERS/sunspot.predict"
-    ssn_url = "ftp://ftp.ngdc.noaa.gov/STP/space-weather/solar-data/solar-indices/sunspot-numbers/predicted/table_international-sunspot-numbers_monthly-predicted.txt"
+    final_url = 'http://sidc.oma.be/silso/INFO/snmstotcsv.php'
+    pred_url = 'http://sidc.oma.be/silso/FORECASTS/prediSC.txt'
+    out_fn = 'ssn.json'
+    min_year = 2005
     save_location = ""
     s_bar = None
 
+    pp = pprint.PrettyPrinter(indent=4)
 
+    now = datetime.datetime.utcnow()
+    ssn_dict = {'retrieved': now.timestamp(), 'sources':[final_url, pred_url], 'ssn':{}}
 
     def __init__(self, parent = None, save_location=None, s_bar=None, s_bar_context=None):
         """Progress notes will be sent to the status bar
@@ -113,7 +132,7 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
             response = dialog.run()
             dialog.destroy()
             if (response == Gtk.ResponseType.OK):
-                self.update_ssn_file()
+                self.build_ssn_file()
             else:
                 raise NoSSNData("User Cancelled SSN Fetch")
         age = time.time() - self.get_ssn_mtime()
@@ -132,7 +151,48 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
             while Gtk.events_pending():
                 Gtk.main_iteration()
 
-    def update_ssn_file(self):
+    def build_ssn_file(self):
+        print ("Requesting file from {:s}".format(final_url))
+        final_ssn_data = urllib.request.urlopen(final_url)
+        datareader = csv.reader(io.TextIOWrapper(final_ssn_data), delimiter=';')
+        ssn_list = list(datareader)
+        for ssn_record in ssn_list:
+            year = ssn_record[0].strip()
+            if (int(year) >= min_year) and (float(ssn_record[3]) > 0):
+                print(ssn_record)
+                month = str(int(ssn_record[1]))
+                ssn = float(ssn_record[3])
+                if ssn_record[0] not in ssn_dict['ssn']:
+                    ssn_dict['ssn'].update({year:{month:ssn}})
+                else:
+                    ssn_dict['ssn'][year][month] = ssn
+
+        print ("Requesting file from {:s}".format(url))
+        response = urllib.request.urlopen(pred_url)
+        data = response.read()
+        text = data.decode('utf-8')
+        print(text)
+        #print ("Writing data to ssn.json")
+        for line in text.splitlines():
+            year = line[0:4]
+            month = str(int(line[5:7]))
+            ssn = float(line[20:25])
+
+            if year not in ssn_dict['ssn']:
+                ssn_dict['ssn'].update({year:{month:ssn}})
+            else:
+                ssn_dict['ssn'][year][month] = ssn
+
+        with open(out_fn, 'w') as outfile:
+            json.dump(ssn_dict, outfile)
+
+        pp.pprint(ssn_dict)
+
+        print ("Saved to {:s}".format(out_fn))
+
+
+
+    def orig_update_ssn_file(self):
         print("*** Connecting to " + self.ssn_url)
         if self.s_bar:
             self.s_bar.pop(self.s_bar_context)
