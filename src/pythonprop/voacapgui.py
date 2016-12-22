@@ -109,7 +109,7 @@ class VOACAP_GUI():
 
 
     prefs_path = prefs_dir + 'voacapgui.prefs'
-    ssn_path = prefs_dir + 'table_international-sunspot-numbers_monthly-predicted.txt'
+    ssn_path = prefs_dir + 'ssn.json'
     # Check if the prefs directory exists, create one if if it doesn't
     # (This is probably not required as the installer will probably end up
     # creating and populating this directory.)
@@ -1734,7 +1734,7 @@ all other entries will be ignored.'))
         self.fof1_spinbutton.set_value(voa_file.get_psc2())
         self.fof2_spinbutton.set_value(voa_file.get_psc3())
         self.foes_spinbutton.set_value(voa_file.get_psc4())
-        
+
         #self.open_vgz_file(vgzip=vgzip_file)
         """
 

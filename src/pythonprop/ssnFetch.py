@@ -91,7 +91,7 @@ class SSNFetch(Gtk.ListStore):
     WARNING: In the current version the connection to the internet
     is automatic and is performed without the users explicit consent.
     """
-    ssn_dic = {}
+    #ssn_dic = {}
     final_url = 'http://sidc.oma.be/silso/INFO/snmstotcsv.php'
     pred_url = 'http://sidc.oma.be/silso/FORECASTS/prediSC.txt'
     out_fn = 'ssn.json'
@@ -109,7 +109,6 @@ class SSNFetch(Gtk.ListStore):
         defined by s_bar.  This may be replaced with a
         statusbar manager in later versions.'
         """
-        print('doing the init')
         #The model is structured as follows
         # 0 - year as text
         # 1-12: monthly ssn as text
@@ -137,7 +136,7 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
                 raise NoSSNData("User Cancelled SSN Fetch")
         age = time.time() - self.get_ssn_mtime()
         #print "File was saved " + str(age) + "seconds ago."
-        self.read_ssn_file()
+        self.load_ssn_file()
 
 
     def progress_reporthook(self, count, block_size, total_size):
@@ -152,23 +151,23 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
                 Gtk.main_iteration()
 
     def build_ssn_file(self):
-        print ("Requesting file from {:s}".format(final_url))
-        final_ssn_data = urllib.request.urlopen(final_url)
+        print ("Requesting file from {:s}".format(self.final_url))
+        final_ssn_data = urllib.request.urlopen(self.final_url)
         datareader = csv.reader(io.TextIOWrapper(final_ssn_data), delimiter=';')
         ssn_list = list(datareader)
         for ssn_record in ssn_list:
             year = ssn_record[0].strip()
-            if (int(year) >= min_year) and (float(ssn_record[3]) > 0):
+            if (int(year) >= self.min_year) and (float(ssn_record[3]) > 0):
                 print(ssn_record)
                 month = str(int(ssn_record[1]))
                 ssn = float(ssn_record[3])
-                if ssn_record[0] not in ssn_dict['ssn']:
-                    ssn_dict['ssn'].update({year:{month:ssn}})
+                if ssn_record[0] not in self.ssn_dict['ssn']:
+                    self.ssn_dict['ssn'].update({year:{month:ssn}})
                 else:
-                    ssn_dict['ssn'][year][month] = ssn
+                    self.ssn_dict['ssn'][year][month] = ssn
 
-        print ("Requesting file from {:s}".format(url))
-        response = urllib.request.urlopen(pred_url)
+        print ("Requesting file from {:s}".format(self.pred_url))
+        response = urllib.request.urlopen(self.pred_url)
         data = response.read()
         text = data.decode('utf-8')
         print(text)
@@ -178,17 +177,17 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
             month = str(int(line[5:7]))
             ssn = float(line[20:25])
 
-            if year not in ssn_dict['ssn']:
-                ssn_dict['ssn'].update({year:{month:ssn}})
+            if year not in self.ssn_dict['ssn']:
+                self.ssn_dict['ssn'].update({year:{month:ssn}})
             else:
-                ssn_dict['ssn'][year][month] = ssn
+                self.ssn_dict['ssn'][year][month] = ssn
 
-        with open(out_fn, 'w') as outfile:
-            json.dump(ssn_dict, outfile)
+        with open(self.save_location, 'w') as outfile:
+            json.dump(self.ssn_dict, outfile)
 
-        pp.pprint(ssn_dict)
+        self.pp.pprint(self.ssn_dict)
 
-        print ("Saved to {:s}".format(out_fn))
+        print ("Saved to {:s}".format(self.save_location))
 
 
 
@@ -209,7 +208,7 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
                 self.s_bar.push(self.s_bar_context, _("Done"))
                 while Gtk.events_pending():
                     Gtk.main_iteration()
-            self.read_ssn_file()
+            self.load_ssn_file()
         except:
             print("*** Failed to retrieve data ***")
             if self.s_bar:
@@ -219,52 +218,28 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
                     Gtk.main_iteration()
 
 
-    def read_ssn_file(self):
-        self.clear()
-        gmt_time = time.gmtime()
-        try:
-            f = open(self.save_location)
-            for line in f:
-                m = self.ssn_pattern.match(line)
-                if m:
-                    self.ssn_dic[int(m.group(1))] = m.group(2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)
-                    _fg_colour = ["regular"]*13
-                    _ssn_values = [m.group(1),
-                                m.group(2),
-                                m.group(3),
-                                m.group(4),
-                                m.group(5),
-                                m.group(6),
-                                m.group(7),
-                                m.group(8),
-                                m.group(9),
-                                m.group(10),
-                                m.group(11),
-                                m.group(12),
-                                m.group(13)]
-
-                    if _ssn_values[0] == str(gmt_time.tm_year):
-                        _fg_colour[gmt_time.tm_mon] = 'bold'
-                    self.append(_ssn_values + _fg_colour)
-            f.close()
-        except:
-            print("*** Error reading data file ***")
-            self.clear()
-            #todo check that we clear the dictionary as well
-            print(sys.exc_info()[0])
-            if self.s_bar:
-                self.s_bar.pop(self.s_bar_context)
-                self.s_bar.push(self.s_bar_context, _("Error: Unable to read SSN data"))
-                while Gtk.events_pending():
-                    Gtk.main_iteration()
+    def load_ssn_file(self):
+        with open(self.save_location) as data_file:
+            self.ssn_data = json.load(data_file)['ssn']
+        print(self.ssn_data)
 
 
     def get_data_range(self):
         """Returns a tuple (first, last) of the years covered by the data.
         """
-        keys = list(self.ssn_dic.keys())
-        keys.sort()
-        return (keys[0], keys[-1])
+        #keys = list(self.ssn_dic.keys())
+        #keys.sort()
+        #return (keys[0], keys[-1])
+        print(self.ssn_data)
+        min_year = str(min(int(y) for y in self.ssn_data['ssn'].keys()))
+        min_month = str(min(int(m) for m in self.ssn_data['ssn'][min_year].keys()))
+        #SSN_START_DATE = datetime.date(int(min_year), int(min_month), 15)
+        max_year = str(max(int(y) for y in self.ssn_data['ssn'].keys()))
+        max_month = str(max(int(m) for m in self.ssn_data['ssn'][max_year].keys()))
+        #SSN_END_DATE = datetime.date(int(max_year), int(max_month), 15)
+
+        return(min_year, max_year)
+
 
 
     def get_ssn(self, month, year):
