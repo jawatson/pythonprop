@@ -25,7 +25,7 @@
 # returns a list of sunspot numbers for the given year
 #
 import urllib.request, urllib.parse, urllib.error, re
-from gi.repository import Gtk
+#from gi.repository import Gtk
 import os.path
 import shutil
 import time
@@ -33,7 +33,6 @@ from datetime import datetime
 from datetime import date
 from datetime import timedelta
 import csv
-import datetime
 import json
 import io
 import urllib.request
@@ -102,7 +101,7 @@ class SSNFetch(Gtk.ListStore):
 
     pp = pprint.PrettyPrinter(indent=4)
 
-    now = datetime.datetime.utcnow()
+    now = datetime.utcnow()
     ssn_dict = {'retrieved': now.timestamp(), 'sources':[final_url, pred_url], 'ssn':{}}
 
     def __init__(self, parent = None, save_location=None, s_bar=None, s_bar_context=None):
@@ -110,6 +109,7 @@ class SSNFetch(Gtk.ListStore):
         defined by s_bar.  This may be replaced with a
         statusbar manager in later versions.'
         """
+        print('doing the init')
         #The model is structured as follows
         # 0 - year as text
         # 1-12: monthly ssn as text
@@ -311,12 +311,3 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
     def get_file_data(self):
         _mod_time = time.ctime(self.get_ssn_mtime())
         return _("SSN Data Modified: \n") + _mod_time
-
-
-#short test routine
-def main():
-    s = SSNFetch(save_location="fetch_test.txt")
-    years = (2006, 2007, 2008, 2009)
-    for year in years:
-        print('Year = ', year, '.  SSN = ', s.get_ssn_list(year))
-    print('Ths years list is ', s.get_ssn_list())
