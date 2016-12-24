@@ -99,22 +99,23 @@ class SSNFetch(Gtk.ListStore):
     save_location = ""
     s_bar = None
 
-    pp = pprint.PrettyPrinter(indent=4)
+    #pp = pprint.PrettyPrinter(indent=4)
 
     now = datetime.utcnow()
-    ssn_dict = {'retrieved': now.timestamp(), 'sources':[final_url, pred_url], 'ssn':{}}
+    ssn_data = {'retrieved': now.timestamp(), 'sources':[final_url, pred_url], 'ssn':{}}
 
-    def __init__(self, parent = None, save_location=None, s_bar=None, s_bar_context=None):
-        """Progress notes will be sent to the status bar
-        defined by s_bar.  This may be replaced with a
-        statusbar manager in later versions.'
+    def __init__(self, parent=None, save_location=None, s_bar=None, s_bar_context=None):
+        """
+        Progress notes will be sent to the status bar  defined by s_bar.
+        This may be replaced with a statusbar manager in later versions.
         """
         #The model is structured as follows
         # 0 - year as text
         # 1-12: monthly ssn as text
-        # 13-25: forground colour (used to highlight current month
+        # 13-25: foreground colour (used to highlight current month
         columns = [GObject.TYPE_STRING]*26
         Gtk.ListStore.__init__( self, *columns )
+
         self.save_location = save_location
         self.s_bar = s_bar
         self.s_bar_context = s_bar_context
@@ -134,9 +135,10 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
                 self.build_ssn_file()
             else:
                 raise NoSSNData("User Cancelled SSN Fetch")
-        age = time.time() - self.get_ssn_mtime()
+        #age = time.time() - self.get_ssn_mtime()
         #print "File was saved " + str(age) + "seconds ago."
-        self.load_ssn_file()
+        else:
+            self.load_ssn_file()
 
 
     def progress_reporthook(self, count, block_size, total_size):
@@ -161,10 +163,10 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
                 print(ssn_record)
                 month = str(int(ssn_record[1]))
                 ssn = float(ssn_record[3])
-                if ssn_record[0] not in self.ssn_dict['ssn']:
-                    self.ssn_dict['ssn'].update({year:{month:ssn}})
+                if ssn_record[0] not in self.ssn_data['ssn']:
+                    self.ssn_data['ssn'].update({year:{month:ssn}})
                 else:
-                    self.ssn_dict['ssn'][year][month] = ssn
+                    self.ssn_data['ssn'][year][month] = ssn
 
         print ("Requesting file from {:s}".format(self.pred_url))
         response = urllib.request.urlopen(self.pred_url)
@@ -177,51 +179,20 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
             month = str(int(line[5:7]))
             ssn = float(line[20:25])
 
-            if year not in self.ssn_dict['ssn']:
-                self.ssn_dict['ssn'].update({year:{month:ssn}})
+            if year not in self.ssn_data['ssn']:
+                self.ssn_data['ssn'].update({year:{month:ssn}})
             else:
-                self.ssn_dict['ssn'][year][month] = ssn
+                self.ssn_data['ssn'][year][month] = ssn
 
         with open(self.save_location, 'w') as outfile:
-            json.dump(self.ssn_dict, outfile)
-
-        self.pp.pprint(self.ssn_dict)
+            json.dump(self.ssn_data, outfile)
 
         print ("Saved to {:s}".format(self.save_location))
 
 
-
-    def orig_update_ssn_file(self):
-        print("*** Connecting to " + self.ssn_url)
-        if self.s_bar:
-            self.s_bar.pop(self.s_bar_context)
-            self.s_bar.push(self.s_bar_context , "Connecting to {:s}".format(self.ssn_url))
-            while Gtk.events_pending():
-                Gtk.main_iteration()
-        try:
-            f_name, header = urllib.request.urlretrieve(self.ssn_url, reporthook=self.progress_reporthook)
-            shutil.copyfile(f_name, self.save_location)
-            # todo delete the temp
-            print("*** Disconnected from internet ***")
-            if self.s_bar:
-                self.s_bar.pop(self.s_bar_context)
-                self.s_bar.push(self.s_bar_context, _("Done"))
-                while Gtk.events_pending():
-                    Gtk.main_iteration()
-            self.load_ssn_file()
-        except:
-            print("*** Failed to retrieve data ***")
-            if self.s_bar:
-                self.s_bar.pop(self.s_bar_context)
-                self.s_bar.push(self.s_bar_context, _("Error: Unable to retrieve data"))
-                while Gtk.events_pending():
-                    Gtk.main_iteration()
-
-
     def load_ssn_file(self):
         with open(self.save_location) as data_file:
-            self.ssn_data = json.load(data_file)['ssn']
-        print(self.ssn_data)
+            self.ssn_data = json.load(data_file)
 
 
     def get_data_range(self):
@@ -230,23 +201,20 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
         #keys = list(self.ssn_dic.keys())
         #keys.sort()
         #return (keys[0], keys[-1])
-        print(self.ssn_data)
-        min_year = str(min(int(y) for y in self.ssn_data['ssn'].keys()))
-        min_month = str(min(int(m) for m in self.ssn_data['ssn'][min_year].keys()))
+        min_year = int(min(int(y) for y in self.ssn_data['ssn'].keys()))
+        #min_month = int(min(int(m) for m in self.ssn_data[min_year].keys()))
         #SSN_START_DATE = datetime.date(int(min_year), int(min_month), 15)
-        max_year = str(max(int(y) for y in self.ssn_data['ssn'].keys()))
-        max_month = str(max(int(m) for m in self.ssn_data['ssn'][max_year].keys()))
+        max_year = int(max(int(y) for y in self.ssn_data['ssn'].keys()))
+        #max_month = int(max(int(m) for m in self.ssn_data[max_year].keys()))
         #SSN_END_DATE = datetime.date(int(max_year), int(max_month), 15)
-
         return(min_year, max_year)
 
 
 
     def get_ssn(self, month, year):
-        if self.ssn_dic:
-            month_list = self.get_ssn_list(year)
+        if self.ssn_data:
             try:
-                return month_list[int(month)-1]
+                return self.ssn_data['ssn'][str(year)][str(month)]
             except:
                 pass
         return None
@@ -256,23 +224,28 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
         """Returns a pair of lists (date & ssn values) suitable for plotting with
         matplotlib.
         """
+        # Can't this be done with an interpreted list?
         d_list = []
         ssn_list = []
         first, last = self.get_data_range()
         for year in range(first, last+1):
-            ssns = self.get_ssn_list(year)
-            month = 1
-            for ssn in ssns:
+            for month in range(1,13):
                 d = date(year, month, 15)
-                d_list.append(d)
-                ssn_list.append(ssn)
-                month = month + 1
+                if str(month) in self.ssn_data['ssn'][str(year)]:
+                    d_list.append(d)
+                    ssn_list.append(self.ssn_data['ssn'][str(year)][str(month)])
+                else:
+                    break
         return d_list, ssn_list
 
 
     def get_ssn_list(self, year=datetime.utcnow().year):
-        if year in self.ssn_dic:
-            return self.ssn_dic[year]
+        print('in get_ssn_list')
+        print(self.ssn_data['ssn'])
+        print(year)
+        if str(year) in self.ssn_data['ssn']:
+            print('rereivig')
+            return self.ssn_data['ssn'][str(year)]
         else:
             return None
 
