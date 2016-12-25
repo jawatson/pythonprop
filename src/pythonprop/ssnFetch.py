@@ -36,7 +36,6 @@ import csv
 import json
 import io
 import urllib.request
-import pprint
 
 import gettext, locale, sys
 
@@ -91,15 +90,14 @@ class SSNFetch(Gtk.ListStore):
     WARNING: In the current version the connection to the internet
     is automatic and is performed without the users explicit consent.
     """
-    #ssn_dic = {}
+    # ssn datamodel
+    ssn_dm = {}
     final_url = 'http://sidc.oma.be/silso/INFO/snmstotcsv.php'
     pred_url = 'http://sidc.oma.be/silso/FORECASTS/prediSC.txt'
     out_fn = 'ssn.json'
     min_year = 2005
     save_location = ""
     s_bar = None
-
-    #pp = pprint.PrettyPrinter(indent=4)
 
     now = datetime.utcnow()
     ssn_data = {'retrieved': now.timestamp(), 'sources':[final_url, pred_url], 'ssn':{}}
@@ -112,8 +110,7 @@ class SSNFetch(Gtk.ListStore):
         #The model is structured as follows
         # 0 - year as text
         # 1-12: monthly ssn as text
-        # 13-25: foreground colour (used to highlight current month
-        columns = [GObject.TYPE_STRING]*26
+        columns = [GObject.TYPE_STRING]*13
         Gtk.ListStore.__init__( self, *columns )
 
         self.save_location = save_location
@@ -172,7 +169,6 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
         response = urllib.request.urlopen(self.pred_url)
         data = response.read()
         text = data.decode('utf-8')
-        print(text)
         #print ("Writing data to ssn.json")
         for line in text.splitlines():
             year = line[0:4]
@@ -193,22 +189,30 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
     def load_ssn_file(self):
         with open(self.save_location) as data_file:
             self.ssn_data = json.load(data_file)
+        self.populate_liststore()
+
+    def populate_liststore(self):
+        for year in sorted(self.ssn_data['ssn'].keys()):
+            _ssn_entry = [year]
+            for month in range(1,13):
+                if str(month) in self.ssn_data['ssn'][year]:
+                    _ssn_entry.append(str(self.ssn_data['ssn'][year][str(month)]))
+                else:
+                    _ssn_entry.append('-')
+            self.append(_ssn_entry)
 
 
     def get_data_range(self):
-        """Returns a tuple (first, last) of the years covered by the data.
         """
-        #keys = list(self.ssn_dic.keys())
-        #keys.sort()
-        #return (keys[0], keys[-1])
+        Returns a tuple (first, last) of the years covered by the data.
+        """
         min_year = int(min(int(y) for y in self.ssn_data['ssn'].keys()))
-        #min_month = int(min(int(m) for m in self.ssn_data[min_year].keys()))
-        #SSN_START_DATE = datetime.date(int(min_year), int(min_month), 15)
+        min_month = int(min(int(m) for m in self.ssn_data['ssn'][str(min_year)].keys()))
+        SSN_START_DATE = date(int(min_year), int(min_month), 15)
         max_year = int(max(int(y) for y in self.ssn_data['ssn'].keys()))
-        #max_month = int(max(int(m) for m in self.ssn_data[max_year].keys()))
-        #SSN_END_DATE = datetime.date(int(max_year), int(max_month), 15)
-        return(min_year, max_year)
-
+        max_month = int(max(int(m) for m in self.ssn_data['ssn'][str(max_year)].keys()))
+        SSN_END_DATE = date(int(max_year), int(max_month), 15)
+        return(SSN_START_DATE, SSN_END_DATE)
 
 
     def get_ssn(self, month, year):
@@ -228,7 +232,7 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
         d_list = []
         ssn_list = []
         first, last = self.get_data_range()
-        for year in range(first, last+1):
+        for year in range(first.year, last.year+1):
             for month in range(1,13):
                 d = date(year, month, 15)
                 if str(month) in self.ssn_data['ssn'][str(year)]:
@@ -240,11 +244,7 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
 
 
     def get_ssn_list(self, year=datetime.utcnow().year):
-        print('in get_ssn_list')
-        print(self.ssn_data['ssn'])
-        print(year)
         if str(year) in self.ssn_data['ssn']:
-            print('rereivig')
             return self.ssn_data['ssn'][str(year)]
         else:
             return None
@@ -255,6 +255,7 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
             return os.path.getmtime(self.save_location)
         else:
             return 0
+
 
     def get_file_data(self):
         _mod_time = time.ctime(self.get_ssn_mtime())
