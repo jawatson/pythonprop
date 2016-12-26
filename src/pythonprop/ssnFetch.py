@@ -25,7 +25,6 @@
 # returns a list of sunspot numbers for the given year
 #
 import urllib.request, urllib.parse, urllib.error, re
-#from gi.repository import Gtk
 import os.path
 import shutil
 import time
@@ -95,7 +94,7 @@ class SSNFetch(Gtk.ListStore):
     final_url = 'http://sidc.oma.be/silso/INFO/snmstotcsv.php'
     pred_url = 'http://sidc.oma.be/silso/FORECASTS/prediSC.txt'
     out_fn = 'ssn.json'
-    min_year = 2005
+    SSN_START_YEAR = 2005
     save_location = ""
     s_bar = None
 
@@ -134,8 +133,7 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
                 raise NoSSNData("User Cancelled SSN Fetch")
         #age = time.time() - self.get_ssn_mtime()
         #print "File was saved " + str(age) + "seconds ago."
-        else:
-            self.load_ssn_file()
+        self.open_ssn_file()
 
 
     def progress_reporthook(self, count, block_size, total_size):
@@ -149,6 +147,7 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
             while Gtk.events_pending():
                 Gtk.main_iteration()
 
+
     def build_ssn_file(self):
         print ("Requesting file from {:s}".format(self.final_url))
         final_ssn_data = urllib.request.urlopen(self.final_url)
@@ -156,8 +155,8 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
         ssn_list = list(datareader)
         for ssn_record in ssn_list:
             year = ssn_record[0].strip()
-            if (int(year) >= self.min_year) and (float(ssn_record[3]) > 0):
-                print(ssn_record)
+            if (int(year) >= self.SSN_START_YEAR) and (float(ssn_record[3]) > 0):
+                #print(ssn_record)
                 month = str(int(ssn_record[1]))
                 ssn = float(ssn_record[3])
                 if ssn_record[0] not in self.ssn_data['ssn']:
@@ -174,7 +173,6 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
             year = line[0:4]
             month = str(int(line[5:7]))
             ssn = float(line[20:25])
-
             if year not in self.ssn_data['ssn']:
                 self.ssn_data['ssn'].update({year:{month:ssn}})
             else:
@@ -186,10 +184,17 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
         print ("Saved to {:s}".format(self.save_location))
 
 
-    def load_ssn_file(self):
+    def open_ssn_file(self):
         with open(self.save_location) as data_file:
             self.ssn_data = json.load(data_file)
         self.populate_liststore()
+
+
+    def update_ssn_file(self):
+        self.build_ssn_file()
+        self.clear()
+        self.open_ssn_file()
+
 
     def populate_liststore(self):
         for year in sorted(self.ssn_data['ssn'].keys()):
@@ -208,11 +213,11 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
         """
         min_year = int(min(int(y) for y in self.ssn_data['ssn'].keys()))
         min_month = int(min(int(m) for m in self.ssn_data['ssn'][str(min_year)].keys()))
-        SSN_START_DATE = date(int(min_year), int(min_month), 15)
+        ssn_start_date = date(int(min_year), int(min_month), 15)
         max_year = int(max(int(y) for y in self.ssn_data['ssn'].keys()))
         max_month = int(max(int(m) for m in self.ssn_data['ssn'][str(max_year)].keys()))
-        SSN_END_DATE = date(int(max_year), int(max_month), 15)
-        return(SSN_START_DATE, SSN_END_DATE)
+        ssn_end_date = date(int(max_year), int(max_month), 15)
+        return(ssn_start_date, ssn_end_date)
 
 
     def get_ssn(self, month, year):
