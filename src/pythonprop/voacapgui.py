@@ -1467,7 +1467,7 @@ be processed, all other entries will be ignored.  Please delete some entries.'))
                 freq = model.get_value(iter, self.area_tv_idx_freq)
                 # ssn entries are named as months (jan_ssn_entry) so to be sure
                 # we're getting the correct one, we need to map them
-                ssn = self.ssn_repo.get_ssn(month_i, year)
+                ssn = self.ssn_repo.get_ssn(str(int(month_i)), year)
                 vf.add_plot((freq, utc, month_i, ssn))
                 iter = model.iter_next(iter)
                 i = i+1

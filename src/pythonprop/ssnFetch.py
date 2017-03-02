@@ -147,7 +147,11 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
             while Gtk.events_pending():
                 Gtk.main_iteration()
 
-
+    """
+    Collect values from the SIDC.  As of July 2015, these are around 45% higher
+    than those previously published by NOAA.  This function apply a correction
+    (1.45) to bring the values closer to the original NOAA values.
+    """
     def build_ssn_file(self):
         print ("Requesting file from {:s}".format(self.final_url))
         final_ssn_data = urllib.request.urlopen(self.final_url)
@@ -158,7 +162,7 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
             if (int(year) >= self.SSN_START_YEAR) and (float(ssn_record[3]) > 0):
                 #print(ssn_record)
                 month = str(int(ssn_record[1]))
-                ssn = float(ssn_record[3])
+                ssn = float("{:.1f}".format(float(ssn_record[3]) / 1.45))
                 if ssn_record[0] not in self.ssn_data['ssn']:
                     self.ssn_data['ssn'].update({year:{month:ssn}})
                 else:
@@ -173,6 +177,7 @@ to the internet to retrieve SSN data. Select OK to proceed.'))
             year = line[0:4]
             month = str(int(line[5:7]))
             ssn = float(line[20:25])
+            ssn = float("{:.1f}".format(ssn / 1.45))
             if year not in self.ssn_data['ssn']:
                 self.ssn_data['ssn'].update({year:{month:ssn}})
             else:
