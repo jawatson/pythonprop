@@ -1590,16 +1590,25 @@ all other entries will be ignored.'))
 
             try:
                 retcode = subprocess.call("voacapl -s " + voacapl_args, shell=True)
-                if run_type == 'c':
-                    result_dialog = VOATextFileViewDialog(file=self.itshfbc_path+os.sep+'run'+os.sep+output_filename,
-                                datadir=self.datadir,
-                                parent=self.main_window)
-                    return_code = result_dialog.run()
-                if run_type == 'g':
-                    graph = VOAP2PPlotGUI(self.itshfbc_path+os.sep+'run'+os.sep+output_filename,
-                        parent=self.main_window,
-                        datadir=self.datadir)
-                    graph.quit_application()
+                """
+                Return Codes:
+                0 - Success
+                127 - error while loading shared libraries
+                """
+                if retcode == 0:
+                    if run_type == 'c':
+                        result_dialog = VOATextFileViewDialog(file=self.itshfbc_path+os.sep+'run'+os.sep+output_filename,
+                                    datadir=self.datadir,
+                                    parent=self.main_window)
+                        return_code = result_dialog.run()
+                    if run_type == 'g':
+                        graph = VOAP2PPlotGUI(self.itshfbc_path+os.sep+'run'+os.sep+output_filename,
+                            parent=self.main_window,
+                            datadir=self.datadir)
+                        graph.quit_application()
+                else:
+                    self.show_msg_dialog("Error", "Voacapl error code: {:d}".format(retcode), msg_type="ERROR")
+
             except OSError as e:
                     print("Voacapl execution failed:", e)
 
