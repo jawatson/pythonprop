@@ -5,16 +5,16 @@ import sys, os, re
 
 class templates:
     ''' This class returns a set of templates to the caller.
-    This class serves the purpose of letting the no-code user write simple 
-    area templates in a text file. 
+    This class serves the purpose of letting the no-code user write simple
+    area templates in a text file.
     #--------------------------------------------------
-    # 
+    #
     #    format for area plot user defined templates:
     #    lines starting with # are ignored
     #    each line consist in three values separated by spaces
     #    each template is enclosed between "<template name>"
     #    and "</template>" tags.
-    #   
+    #
     #    month utchour freq
     #    11    22      14.250
     #    month: number month, 1=January
@@ -37,14 +37,16 @@ class templates:
     #   2010      11      00      14.10
     #   2010      12      00      14.10
     #   </template>
-    # 
-    #-------------------------------------------------- 
+    #
+    #--------------------------------------------------
     '''
 
     name = 'User Defined Templates'
     description = 'Set of templates defined by the user'
 
-    def __init__(self, main_window):
+    def __init__(self, parent, ssn_repo):
+        self.parent = parent
+        self.ssn_repo = ssn_repo
         self.ret_templates = {} # { templatename : [(month_i,utc,freq),...]}
         self.area_templates_file = None
 
@@ -75,28 +77,28 @@ class templates:
                 if line[0] == '\n': continue
                 if not len(line): continue
                 if line.isspace(): continue
-                # this is the template name tag, until next tag or EOF 
+                # this is the template name tag, until next tag or EOF
                 # all significative lines are part of this template
                 m = re_tag_name.match(line)
-                if m: 
+                if m:
                     templ_n = m.groups()[0].strip()
                     self.ret_templates[templ_n] = []
                     continue
-                # append line 
-                y,m,u,f = line.split()    
+                # append line
+                y,m,u,f = line.split()
                 try:
-                    tup = (int(y),int(m),int(u),float(f)) 
+                    tup = (int(y),int(m),int(u),float(f))
                 except Exception as X:
                     print(_("Can't convert values: <%s>") % line)
                     # could be better to remove the entire template here...
                     continue
                 if templ_n:
                     self.ret_templates[templ_n].append(tup)
-            return 
+            return
 
 
     def set_ini(self, model):
-        return 
+        return
     def run(self):
         return
 
@@ -114,7 +116,7 @@ class templates:
                 ok_bt.set_sensitive(False)
 
         dialog = Gtk.Dialog(_("Creating new area template"),
-                   self.main_window,
+                   self.parent,
                    Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
                    (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT))
         hb = Gtk.HBox(2)
@@ -125,7 +127,7 @@ class templates:
         hb.pack_start(nentry, True, True, 0)
         hb.show_all()
         dialog.vbox.pack_start(hb, True, True, 0)
-       
+
         ok_bt = Gtk.Button(None, Gtk.STOCK_OK)
         ok_bt.set_sensitive(False)
         ok_bt.show()
@@ -146,7 +148,7 @@ class templates:
                 fd.write('\n%02d      %02d      %.3f' % (m,u,float(f)))
                 iter = model.iter_next(iter)
             fd.write(_('\n#End of %s') % title)
-            fd.close() 
+            fd.close()
             # reload templates_file to repopulate templatescb, then
             # select this recently saved as the active one
             self.build_area_template_ts()
@@ -161,7 +163,7 @@ class templates:
 
 
 
-        
+
     def build_new_template_file(self):
         fn = os.path.join(self.prefs_dir,'area_templ.ex')
         s = _('''# rough format for area plot templates:
@@ -211,5 +213,3 @@ class templates:
         with open(fn, 'w') as templates_def_fd:
             templates_def_fd.write(s)
         self.area_templates_file = fn
-
-

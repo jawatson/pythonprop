@@ -949,7 +949,7 @@ class VOACAP_GUI():
         # http://stackoverflow.com/questions/3365740/how-to-import-all-submodules
         for loader, module_name, is_pkg in  pkgutil.walk_packages(templates.__path__):
             try:
-                t_o = loader.find_module(module_name).load_module(module_name).templates(self.main_window)
+                t_o = loader.find_module(module_name).load_module(module_name).templates(self.main_window, self.ssn_repo)
             except Exception as X:
                 print((" Failed to import module %s %s ") % (module_name, X))
                 continue

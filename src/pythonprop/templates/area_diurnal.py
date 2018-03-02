@@ -9,8 +9,9 @@ import calendar
 class templates:
     name = 'Diurnal'
 
-    def __init__(self, parent):
+    def __init__(self, parent, ssn_repo):
         self.parent = parent
+        self.ssn_repo = ssn_repo
         self.ret_templates = {} # { templatename : [(month_i,utc,freq),...]}
 
     def get_names(self):
@@ -74,13 +75,14 @@ class templates:
         adj = Gtk.Adjustment(current_year, 2000, 2020, 1, 1, 0)
         label = Gtk.Label(label=_('Year:'))
         label.set_alignment(0, 0.5)
-        #TODO restrict the range to the available ssn values
         year_spin_button = Gtk.SpinButton() #1.0, 3
         year_spin_button.set_adjustment(adj)
         year_spin_button.set_digits(0)
         year_spin_button.set_wrap(True)
         year_spin_button.set_numeric(True)
         year_spin_button.set_value(current_year)
+        _min, _max = self.ssn_repo.get_data_range()
+        year_spin_button.set_range(_min.year, _max.year)
         hb.pack_start(label, True, True, 0)
         hb.pack_end(year_spin_button, True, True, 0)
         vb.pack_start(hb, True, True, 0)

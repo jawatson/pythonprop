@@ -7,8 +7,9 @@ from dateutil.relativedelta import relativedelta
 class templates:
     name = 'Next N Months'
 
-    def __init__(self, parent):
+    def __init__(self, parent, ssn_repo):
         self.parent = parent
+        self.ssn_repo = ssn_repo
         self.ret_templates = {} # { templatename : [(month_i,utc,freq),...]}
         self.current_month = None
         self.current_year = None
