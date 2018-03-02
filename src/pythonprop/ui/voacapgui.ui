@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.19.0 -->
+<!-- Generated with glade 3.20.2 -->
 <interface>
   <requires lib="gtk+" version="3.12"/>
   <object class="GtkAdjustment" id="area_year_adjustment">
@@ -790,7 +790,6 @@
                             <property name="text" translatable="yes">1</property>
                             <property name="xalign">1</property>
                             <property name="adjustment">p2p_month_adjustment</property>
-                            <property name="wrap">True</property>
                             <property name="value">1</property>
                             <signal name="value-changed" handler="on_p2pmonthspinbutton_value_changed" swapped="no"/>
                           </object>
@@ -2225,6 +2224,9 @@
           </packing>
         </child>
       </object>
+    </child>
+    <child type="titlebar">
+      <placeholder/>
     </child>
   </object>
 </interface>

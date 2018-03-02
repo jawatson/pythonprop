@@ -293,7 +293,7 @@ class VOACAP_GUI():
 
             # notebook p2p page widgets event dict
             'on_p2pmonthspinbutton_value_changed' : self.p2p_set_days_range,
-            'on_p2pyearspinbutton_value_changed' : self.p2p_set_days_range,
+            'on_p2pyearspinbutton_value_changed' : self.p2p_set_months_range,
             'on_p2padd_mybt_clicked' : self.p2pmy_add_tv_row_from_user,
             'on_p2padd_freqbt_clicked' : self.p2pfreq_add_tv_row_from_user,
             'on_p2pmydelbt_clicked' : self.p2p_del_my_tv_row,
@@ -340,14 +340,37 @@ class VOACAP_GUI():
         cb.set_active(0)
 
 
+    def p2p_set_months_range(self, widget):
+        """
+        Called when the year changes and modifies the months range to values
+        that are in the ssn_repo.
+        """
+        _min, _max = self.ssn_repo.get_data_range()
+        current_month = self.p2pmonthspinbutton.get_value_as_int()
+        if (self.p2pyearspinbutton.get_value_as_int() == _min.year):
+            value = current_month
+            min_month = _min.month
+            max_month = 12
+        elif (self.p2pyearspinbutton.get_value_as_int() == _max.year):
+            value = _max.month
+            min_month = 1
+            max_month = _max.month
+        else:
+            value = current_month
+            min_month = 1
+            max_month = 12
+        #The following line emits a signal that triggers p2p_set_days_range()
+        self.p2pmonthspinbutton.get_adjustment().configure(value, min_month, max_month, 1, 0, 0)
+
+
     def p2p_set_days_range(self, widget):
         """
         Sets the adjustment of the 'days' spinbutton on the P2P panel, modifying the
         upper limit according to the values of the month/year.
         """
-        current_day = self.p2pdayspinbutton.get_value()
-        first_day, num_days = monthrange(int(self.p2pyearspinbutton.get_value()),\
-                                         int(self.p2pmonthspinbutton.get_value()))
+        current_day = self.p2pdayspinbutton.get_value_as_int()
+        first_day, num_days = monthrange(self.p2pyearspinbutton.get_value_as_int(),\
+                                         self.p2pmonthspinbutton.get_value_as_int())
         adjustment = Gtk.Adjustment(1, 1, num_days, 1, 10, 0)
         if current_day > num_days: current_day = num_days
         self.p2pdayspinbutton.set_adjustment(adjustment)
