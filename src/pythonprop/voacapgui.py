@@ -838,7 +838,7 @@ class VOACAP_GUI():
         year = self.p2pyearspinbutton.get_value_as_int()
         today = date(year, 1, 1)
         self.p2pmy_add_tv_rows([(day, today.month, today.year)])
-        mr = relativedelta(months=+(12/vals[0]))
+        mr = relativedelta(months=+int(12/vals[0]))
         if len(vals) == 1:
             next = today + mr
             for n in range(vals[0]-1):
