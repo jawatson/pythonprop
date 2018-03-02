@@ -79,6 +79,7 @@ class templates:
             ef.set_digits(3)
             ef.set_wrap(True)
             ef.set_numeric(True)
+            ef.set_value(7.1)
             hb.pack_start(l, True, True, 0)
             hb.pack_end(ef, True, True, 0)
             vb.pack_start(hb, True, True, 0)

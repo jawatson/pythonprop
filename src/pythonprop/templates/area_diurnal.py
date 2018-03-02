@@ -29,14 +29,14 @@ class templates:
     def run(self):
         tups = []
         current_time = datetime.now()
-        
+
         dialog = Gtk.Dialog(_("Diurnal"),
                    self.parent,
                    Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT | Gtk.WindowPosition.CENTER_ON_PARENT,
                    (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
         dialog.set_border_width(6)
         vb = Gtk.VBox()
-        
+
         hb = Gtk.HBox(2)
         label = Gtk.Label(label=_('Interval (hours):'))
         label.set_alignment(0, 0.5)
@@ -52,7 +52,7 @@ class templates:
         hb.pack_start(label, True, True, 0)
         hb.pack_end(interval_combo, True, True, 0)
         vb.pack_start(hb, True, True, 0)
-        
+
         hb = Gtk.HBox(2)
         label = Gtk.Label(label=_('Month:'))
         label.set_alignment(0, 0.5)
@@ -68,21 +68,23 @@ class templates:
         hb.pack_start(label, True, True, 0)
         hb.pack_end(month_combo, True, True, 0)
         vb.pack_start(hb, True, True, 0)
-        
+
         hb = Gtk.HBox(2)
         current_year = int(current_time.strftime("%Y"))
         adj = Gtk.Adjustment(current_year, 2000, 2020, 1, 1, 0)
         label = Gtk.Label(label=_('Year:'))
         label.set_alignment(0, 0.5)
+        #TODO restrict the range to the available ssn values
         year_spin_button = Gtk.SpinButton() #1.0, 3
         year_spin_button.set_adjustment(adj)
         year_spin_button.set_digits(0)
         year_spin_button.set_wrap(True)
         year_spin_button.set_numeric(True)
+        year_spin_button.set_value(current_year)
         hb.pack_start(label, True, True, 0)
         hb.pack_end(year_spin_button, True, True, 0)
         vb.pack_start(hb, True, True, 0)
-                  
+
         hb = Gtk.HBox(2)
         adj = Gtk.Adjustment(10.00, 3.0, 30.0, 0.1, 1.0, 0)
         label = Gtk.Label(label=_('Frequency (MHz):'))
@@ -92,6 +94,7 @@ class templates:
         ef.set_digits(3)
         ef.set_wrap(True)
         ef.set_numeric(True)
+        ef.set_value(7.1)
         hb.pack_start(label, True, True, 0)
         hb.pack_end(ef, True, True, 0)
         vb.pack_start(hb, True, True, 0)
@@ -106,7 +109,7 @@ class templates:
         if interval_iter != None:
             model = interval_combo.get_model()
             interval = int(model[interval_iter][0])
-            
+
         year = year_spin_button.get_value()
 
         dialog.destroy()
@@ -116,4 +119,3 @@ class templates:
         for hour in range(0, 24, interval ):
             tups.append((year, month, hour, freq))
         self.ret_templates[self.name] = tups
-
