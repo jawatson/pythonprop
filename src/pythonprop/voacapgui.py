@@ -360,7 +360,6 @@ class VOACAP_GUI():
             value = current_month
             min_month = 1
             max_month = 12
-        #The following line emits a signal that triggers p2p_set_days_range()
         self.monthspinbutton.get_adjustment().configure(value, min_month, max_month, 1, 0, 0)
 
 
