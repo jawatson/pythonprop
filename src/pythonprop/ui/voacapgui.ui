@@ -715,6 +715,7 @@
                             <property name="text" translatable="yes">1900</property>
                             <property name="xalign">1</property>
                             <property name="adjustment">p2p_year_adjustment</property>
+                            <property name="numeric">True</property>
                             <property name="value">1900</property>
                             <signal name="value-changed" handler="on_p2pyearspinbutton_value_changed" swapped="no"/>
                           </object>
@@ -790,6 +791,7 @@
                             <property name="text" translatable="yes">1</property>
                             <property name="xalign">1</property>
                             <property name="adjustment">p2p_month_adjustment</property>
+                            <property name="numeric">True</property>
                             <property name="value">1</property>
                             <signal name="value-changed" handler="on_p2pmonthspinbutton_value_changed" swapped="no"/>
                           </object>
@@ -1278,8 +1280,8 @@
                             <property name="xalign">1</property>
                             <property name="adjustment">area_year_adjustment</property>
                             <property name="numeric">True</property>
-                            <property name="wrap">True</property>
                             <property name="value">1900</property>
+                            <signal name="value-changed" handler="on_areayearspinbutton_value_changed" swapped="no"/>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -1295,7 +1297,7 @@
                             <property name="text" translatable="yes">1</property>
                             <property name="xalign">1</property>
                             <property name="adjustment">month_adjustment</property>
-                            <property name="wrap">True</property>
+                            <property name="numeric">True</property>
                             <property name="value">1</property>
                           </object>
                           <packing>

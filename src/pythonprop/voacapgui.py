@@ -3,7 +3,7 @@
 #
 # File: voacapgui
 #
-# Copyright (c) 2009-2013 J.Watson
+# Copyright (c) 2009-2018 J.Watson
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -282,6 +282,7 @@ class VOACAP_GUI():
 
             # notebook area page widgets event dict
             'on_notebook_switch_page' : self.nb_switch_page,
+            'on_areayearspinbutton_value_changed' : self.area_set_months_range,
             'on_area_addbt_clicked' : self.area_add_tv_row_from_user,
             'on_add_templ_btn_clicked' : self.area_add_template,
             'on_templatescb_changed' : self.area_templatescb_change,
@@ -338,6 +339,29 @@ class VOACAP_GUI():
         cb.add_attribute(cell, 'text', 0)
         #cb.set_wrap_width(20)
         cb.set_active(0)
+
+
+    def area_set_months_range(self, widget):
+        """
+        Called when the year changes and modifies the months range to values
+        that are in the ssn_repo.
+        """
+        _min, _max = self.ssn_repo.get_data_range()
+        current_month = self.monthspinbutton.get_value_as_int()
+        if (self.areayearspinbutton.get_value_as_int() == _min.year):
+            value = current_month
+            min_month = _min.month
+            max_month = 12
+        elif (self.areayearspinbutton.get_value_as_int() == _max.year):
+            value = _max.month
+            min_month = 1
+            max_month = _max.month
+        else:
+            value = current_month
+            min_month = 1
+            max_month = 12
+        #The following line emits a signal that triggers p2p_set_days_range()
+        self.monthspinbutton.get_adjustment().configure(value, min_month, max_month, 1, 0, 0)
 
 
     def p2p_set_months_range(self, widget):
