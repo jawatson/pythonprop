@@ -107,7 +107,7 @@ class templates:
         label.set_alignment(0, 0.5)
         self.year_spin_button.set_adjustment(adj)
         self.year_spin_button.set_digits(0)
-        self.year_spin_button.set_wrap(True)
+        self.year_spin_button.set_wrap(False)
         self.year_spin_button.set_numeric(True)
         self.year_spin_button.set_value(current_year)
         _min, _max = self.ssn_repo.get_data_range()
