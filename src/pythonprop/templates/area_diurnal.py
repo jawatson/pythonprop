@@ -36,7 +36,6 @@ class templates:
         that are in the ssn_repo.
         """
         _min, _max = self.ssn_repo.get_data_range()
-        months_store = Gtk.ListStore(str)
         active_month = self.month_combo.get_active()
         if (self.year_spin_button.get_value_as_int() == _min.year):
             min_month = _min.month
@@ -49,15 +48,12 @@ class templates:
         else:
             min_month = 1
             max_month = 12
-        months = calendar.month_name[min_month:max_month+1]
+
         months_store = self.month_combo.get_model()
         months_store.clear()
-        for month in months:
+        for month in calendar.month_name[min_month:max_month+1]:
             months_store.append([month])
-        renderer_text = Gtk.CellRendererText()
         self.month_combo.set_model(months_store)
-        self.month_combo.pack_start(renderer_text, True)
-        self.month_combo.add_attribute(renderer_text, "text", 0)
         self.month_combo.set_active(active_month)
 
 
