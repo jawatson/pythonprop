@@ -1,3 +1,7 @@
+0.28
+* Automake rules have been changed so that we only attempt to build the pdf if
+dblatex is installed.
+
 0.18
 Uses the codecs package to open files to read unicode directly.  This permits
 the use of non-ascii characters in site names.  Modifies the way in which we
