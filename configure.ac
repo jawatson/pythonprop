@@ -1,4 +1,4 @@
-AC_INIT(pythonprop, 0.26)
+AC_INIT(pythonprop, 0.27)
 
 AM_INIT_AUTOMAKE
 AM_PATH_PYTHON([3.4])
