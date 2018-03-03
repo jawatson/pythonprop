@@ -3,6 +3,14 @@ AC_INIT(pythonprop, 0.28b)
 AM_INIT_AUTOMAKE
 AM_PATH_PYTHON([3.4])
 
+# Check for presence of dblatex
+AC_CHECK_PROG(DBLATEX, dblatex, dblatex)
+if test -z "$DBLATEX"; then
+  AC_MSG_WARN([Unable to build pdf docs.])
+fi
+
+AM_CONDITIONAL([HAVE_DBLATEX], test -n "$DBLATEX")
+
 AC_ARG_WITH([online-help],
             [AS_HELP_STRING([--without-online-help],
               [disable support for online-help])],
