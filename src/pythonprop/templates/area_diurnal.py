@@ -13,6 +13,10 @@ class templates:
         self.parent = parent
         self.ssn_repo = ssn_repo
         self.ret_templates = {} # { templatename : [(month_i,utc,freq),...]}
+        self.year_spin_button = Gtk.SpinButton() #1.0, 3
+        self.month_combo = Gtk.ComboBox()
+
+
 
     def get_names(self):
         return [self.name,]
@@ -25,6 +29,36 @@ class templates:
 
     def set_ini(self, model):
         pass
+
+    def update_month_spin_range(self,widget):
+        """
+        Called when the year changes and modifies the months range to values
+        that are in the ssn_repo.
+        """
+        _min, _max = self.ssn_repo.get_data_range()
+        months_store = Gtk.ListStore(str)
+        active_month = self.month_combo.get_active()
+        if (self.year_spin_button.get_value_as_int() == _min.year):
+            min_month = _min.month
+            max_month = 12
+            active_month = max(active_month - min_month + 1, 0)
+        elif (self.year_spin_button.get_value_as_int() == _max.year):
+            min_month = 1
+            max_month = _max.month
+            active_month = min(active_month, min_month)
+        else:
+            min_month = 1
+            max_month = 12
+        months = calendar.month_name[min_month:max_month+1]
+        months_store = self.month_combo.get_model()
+        months_store.clear()
+        for month in months:
+            months_store.append([month])
+        renderer_text = Gtk.CellRendererText()
+        self.month_combo.set_model(months_store)
+        self.month_combo.pack_start(renderer_text, True)
+        self.month_combo.add_attribute(renderer_text, "text", 0)
+        self.month_combo.set_active(active_month)
 
 
     def run(self):
@@ -61,13 +95,13 @@ class templates:
         months = calendar.month_name[1:]
         for month in months:
             months_store.append([month])
-        month_combo = Gtk.ComboBox.new_with_model(months_store)
         renderer_text = Gtk.CellRendererText()
-        month_combo.pack_start(renderer_text, True)
-        month_combo.add_attribute(renderer_text, "text", 0)
-        month_combo.set_active(int(current_time.strftime("%m"))-1)
+        self.month_combo.set_model(months_store)
+        self.month_combo.pack_start(renderer_text, True)
+        self.month_combo.add_attribute(renderer_text, "text", 0)
+        self.month_combo.set_active(int(current_time.strftime("%m"))-1)
         hb.pack_start(label, True, True, 0)
-        hb.pack_end(month_combo, True, True, 0)
+        hb.pack_end(self.month_combo, True, True, 0)
         vb.pack_start(hb, True, True, 0)
 
         hb = Gtk.HBox(2)
@@ -75,16 +109,16 @@ class templates:
         adj = Gtk.Adjustment(current_year, 2000, 2020, 1, 1, 0)
         label = Gtk.Label(label=_('Year:'))
         label.set_alignment(0, 0.5)
-        year_spin_button = Gtk.SpinButton() #1.0, 3
-        year_spin_button.set_adjustment(adj)
-        year_spin_button.set_digits(0)
-        year_spin_button.set_wrap(True)
-        year_spin_button.set_numeric(True)
-        year_spin_button.set_value(current_year)
+        self.year_spin_button.set_adjustment(adj)
+        self.year_spin_button.set_digits(0)
+        self.year_spin_button.set_wrap(True)
+        self.year_spin_button.set_numeric(True)
+        self.year_spin_button.set_value(current_year)
         _min, _max = self.ssn_repo.get_data_range()
-        year_spin_button.set_range(_min.year, _max.year)
+        self.year_spin_button.set_range(_min.year, _max.year)
+        year_spin_updated_handler_id = self.year_spin_button.connect("value-changed", self.update_month_spin_range)
         hb.pack_start(label, True, True, 0)
-        hb.pack_end(year_spin_button, True, True, 0)
+        hb.pack_end(self.year_spin_button, True, True, 0)
         vb.pack_start(hb, True, True, 0)
 
         hb = Gtk.HBox(2)
@@ -105,14 +139,14 @@ class templates:
 
         ret = dialog.run()
         freq = ef.get_value()
-        month = 1 + month_combo.get_active()
+        month = 1 + self.month_combo.get_active()
 
         interval_iter = interval_combo.get_active_iter()
         if interval_iter != None:
             model = interval_combo.get_model()
             interval = int(model[interval_iter][0])
 
-        year = year_spin_button.get_value()
+        year = self.year_spin_button.get_value()
 
         dialog.destroy()
         if ret != Gtk.ResponseType.ACCEPT: return 1
