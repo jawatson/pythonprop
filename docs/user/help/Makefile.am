@@ -14,6 +14,7 @@ DOC_FIGURES = figures/antenna_chooser.png \
 	figures/p2p_tab.png \
 	figures/system_tab.png
 
+DOC_LINGUAS = en
 
 pdfdir = $(pkgdatadir)/docs
 
