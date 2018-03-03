@@ -79,7 +79,7 @@ class SSNFetch(Gtk.ListStore):
 
     http://sidc.oma.be/silso/INFO/snmstotcsv.php
 
-    http://sidc.oma.be/silso/FORECASTS/prediSC.txt
+    http://www.sidc.be/silso/FORECASTS/prediML.txt
 
     The ssn data is parsed and saved into a single file named ssn.json
     in the users configuration folder.  If this file is found, it is
@@ -92,7 +92,7 @@ class SSNFetch(Gtk.ListStore):
     # ssn datamodel
     ssn_dm = {}
     final_url = 'http://sidc.oma.be/silso/INFO/snmstotcsv.php'
-    pred_url = 'http://sidc.oma.be/silso/FORECASTS/prediSC.txt'
+    pred_url = 'http://www.sidc.be/silso/FORECASTS/prediML.txt'
     out_fn = 'ssn.json'
     SSN_START_YEAR = 2005
     save_location = ""
