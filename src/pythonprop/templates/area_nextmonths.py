@@ -4,6 +4,10 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 
+def diff_month(d1, d2):
+    return (d1.year - d2.year) * 12 + d1.month - d2.month
+
+
 class templates:
     name = 'Next N Months'
 
@@ -52,10 +56,13 @@ class templates:
             hb = Gtk.HBox(2)
             l = Gtk.Label(label=_('Number of months to add:'))
             l.set_alignment(0, 0.5)
-            adj = Gtk.Adjustment(float(self.iter) if self.iter else 12, 1, 12, 1, 5, 0)
+            _min, _max = self.ssn_repo.get_data_range()
+            max_month = diff_month(_max, datetime.now())
+            print()
+            adj = Gtk.Adjustment(float(self.iter) if self.iter else max_month, 1, max_month, 1, 5, 0)
             em = Gtk.SpinButton()
             em.set_adjustment(adj)
-            em.set_wrap(True)
+            em.set_wrap(False)
             em.set_numeric(True)
             em.set_value(1)
             hb.pack_start(l, True, True, 0)
