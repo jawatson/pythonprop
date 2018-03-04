@@ -43,7 +43,9 @@
 #
 # './voaP2PPlot.py -z 3 voacapx.out' Plots for a timezone of + 3 hours
 
+
 import matplotlib
+from matplotlib.colors import ListedColormap
 
 import sys
 import re
@@ -121,6 +123,7 @@ class VOAP2PPlot:
                 parent = None,
                 user_bands=None,
                 datadir=None):
+    
 
         """
         user_bands - a list of bands to be displayed.
@@ -135,6 +138,9 @@ class VOAP2PPlot:
         self.image_defs = self.IMG_TYPE_DICT[self.data_type]
         self.user_bands = user_bands
         #color_map = eval('P.cm.' + color_map)
+        #portland:[{index:0,rgb:[12,51,131]},{index:.25,rgb:[10,136,186]},{index:.5,rgb:[242,211,56]},{index:.75,rgb:[242,143,56]},{index:1,rgb:[217,30,30]}]
+        portland = ListedColormap(["#0C3383", "#0b599b","#0a7fb4","#57a18f","#bec255","#f2c438","#f2a638","#ef8235","#e4502a","#d91e1e"])
+        matplotlib.cm.register_cmap(name='portland', cmap=portland)
 
         if plot_groups[0]=='a':
             num_grp = self.df.get_number_of_groups()
@@ -425,8 +431,8 @@ def main(data_file, datadir=None):
         dest="color_map",
         default='jet',
         choices = [ 'autumn', 'bone', 'cool', 'copper', 'gray', \
-                'hot', 'hsv', 'jet', 'pink', 'spring','summer', 'winter' ],
-        help=_("COLOURMAP - may be one of 'autumn', 'bone', 'cool', 'copper', 'gray', 'hot', 'hsv', 'jet', 'pink', 'spring', 'summer', 'winter'.  Default = 'jet'"))
+                'hot', 'hsv', 'jet', 'pink', 'spring','summer', 'winter', 'portland' ],
+        help=_("COLOURMAP - may be one of 'autumn', 'bone', 'cool', 'copper', 'gray', 'hot', 'hsv', 'jet', 'pink', 'spring', 'summer', 'winter' or 'portland'.  Default = 'jet'"))
 
     parser.add_option("-o", "--outfile",
         dest="save_file",

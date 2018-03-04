@@ -83,7 +83,8 @@ class VOAP2PPlotGUI:
               'pink': _('pink'),
               'spring': _('spring'),
               'summer': _('summer'),
-              'winter': _('winter')}
+              'winter': _('winter'),
+              'portland': _('portland')}
 
 
     def __init__(self, data_source_filename, parent = None, datadir=""):
