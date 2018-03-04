@@ -41,6 +41,7 @@ import math
 import datetime
 
 import matplotlib
+from matplotlib.colors import ListedColormap
 from mpl_toolkits.basemap import Basemap
 
 
@@ -172,8 +173,12 @@ class VOAAreaPlot:
         #    print "-180 < Latitude < 180.0, -90 < Longitude < 90"
         #    sys.exit(1)
 
-        colString = 'matplotlib.cm.'+color_map
-        colMap = eval(colString)
+        #colString = 'matplotlib.cm.'+color_map
+        #colMap = eval(colString)
+        portland = ListedColormap(["#0C3383", "#0b599b","#0a7fb4","#57a18f","#bec255","#f2c438","#f2a638","#ef8235","#e4502a","#d91e1e"])
+        matplotlib.cm.register_cmap(name='portland', cmap=portland)
+        colMap = color_map
+
 
         self.subplots = []
         self.number_of_subplots = len(vg_files)
@@ -234,7 +239,7 @@ class VOAAreaPlot:
                     self.num_cols,
                     plot_ctr+1,
                     frame_on = self.show_subplot_frame,
-                    axisbg = 'white')
+                    facecolor = 'white')
 
             self.subplots.append(ax)
 
@@ -508,8 +513,8 @@ def main(in_file, datadir=None):
         dest = "color_map",
         default = 'jet',
         choices = [ 'autumn', 'bone', 'cool', 'copper', 'gray', \
-                'hot', 'hsv', 'jet', 'pink', 'spring','summer', 'winter' ],
-        help=_("COLOURMAP - may be one of 'autumn', 'bone', 'cool', 'copper', 'gray', 'hot', 'hsv', 'jet', 'pink', 'spring', 'summer', 'winter'.  Default = 'jet'"))
+                'hot', 'hsv', 'jet', 'pink', 'spring','summer', 'winter', 'portland' ],
+        help=_("COLOURMAP - may be one of 'autumn', 'bone', 'cool', 'copper', 'gray', 'hot', 'hsv', 'jet', 'pink', 'spring', 'summer', 'winter' or 'portland'.  Default = 'jet'"))
 
     parser.add_option("-n", "--interest",
         dest = "poi_file",
