@@ -16,14 +16,14 @@ DOC_FIGURES = figures/antenna_chooser.png \
 
 DOC_LINGUAS = en
 
+MANPDF = $(DOC_MODULE).pdf
+dist_doc_DATA = $(MANPDF) voacapgui-C.omf voacapgui-en.omf
 
 if HAVE_DBLATEX
-MANPDF = $(DOC_MODULE).pdf
-doc_DATA = $(MANPDF)
-EXTRA_DIST = $(MANPDF) 
 
-$(MANPDF): C/voacapgui.xml 
+$(MANPDF): C/voacapgui.xml
 	$(DBLATEX) C/voacapgui.xml -o voacapgui.pdf
 
 CLEANFILES = $(MANPDF)
+
 endif
