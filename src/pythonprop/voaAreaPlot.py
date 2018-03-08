@@ -226,16 +226,16 @@ class VOAAreaPlot:
         self.num_cols = int(math.ceil(float(self.number_of_subplots)/float(self.num_rows)))
 
         #self.fig=Figure()
+        #https://github.com/SciTools/cartopy/issues/899
         proj=ccrs.PlateCarree()
-        self.fig, ax = plt.subplots(1, 1, subplot_kw=dict(projection=proj))
+        self.fig, axes = plt.subplots(1, 1, squeeze=False, subplot_kw=dict(projection=proj))
+
         self.main_title_label = self.fig.suptitle(str(self.image_defs['title']), fontsize=self.main_title_fontsize)
 
         #plt.cla()
 
-        if projection == 'ortho':
-            self.show_subplot_frame = False
-
-        for plot_ctr, vg_file in enumerate(vg_files):
+        for plot_idx, vg_file in enumerate(vg_files):
+            print('Doing plot ',plot_idx)
             points = np.zeros([grid,grid], float)
 
             lons = np.arange(area_rect.get_sw_lon(), area_rect.get_ne_lon()+0.001,(area_rect.get_ne_lon()-area_rect.get_sw_lon())/float(grid-1))
@@ -251,7 +251,8 @@ class VOAAreaPlot:
 
             self.subplots.append(ax)
             """
-            ax.label_outer()
+
+            axes[int(plot_idx/self.num_cols)][plot_idx%self.num_cols].label_outer()
             if in_file.endswith('.vgz'):
                 base_filename = get_base_filename(in_file)
                 zf = zipfile.ZipFile(in_file)
@@ -272,52 +273,27 @@ class VOAAreaPlot:
             if 'zf' in locals():
                 zf.close()
 
-            m_args={}
-            if projection in ('cyl', 'mill', 'gall'):
-                m_args.update({"llcrnrlon":area_rect.get_sw_lon(),
-                    "llcrnrlat":area_rect.get_sw_lat(),
-                    "urcrnrlon":area_rect.get_ne_lon(),
-                    "urcrnrlat":area_rect.get_ne_lat()})
-
-            if projection in ('robin', 'vandg', 'sinu', 'mbtfpq', 'eck4',
-                            'kav7', 'moll', 'hammer', 'gnom',
-                            'laea', 'aeqd', 'cea', 'merc'):
-                m_args.update({"lat_0":plot_centre_location.get_latitude(),
-                    "lon_0":plot_centre_location.get_longitude()})
-                if projection in ('cea', 'merc'):
-                    m_args['lat_ts']=0
-
-            #m = Basemap(ax=ax, projection=projection, resolution=resolution, **m_args)
-
-            ax.coastlines()
-            #m.drawcountries(color='grey')
-            #m.drawmapboundary(color='black', linewidth=1.0)
+            axes[int(plot_idx/self.num_cols)][plot_idx%self.num_cols].coastlines()
 
             #points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
             #colMap.set_under(color ='k', alpha=0.0)
             lons, lats  = np.meshgrid(lons, lats)
             points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
-            print(len(lats))
-            print(len(lons))
-            print(len(points))
-            
+
             if (filled_contours):
                 im = plt.contourf(lons, lats, points, self.image_defs['y_labels'],
-                    #latlon=True,
-                    #cmap = colMap,
+                    cmap = colMap,
                     transform=ccrs.PlateCarree())
                 plot_contours = True
             else:
                 im = plt.pcolormesh(lons, lats, points,
-                    #latlon=True,
                     vmin = self.image_defs['min'],
                     vmax = self.image_defs['max'],
                     cmap = colMap,
-                    shading='gouraud')
+                    transform=ccrs.PlateCarree())
 
             if plot_contours:
                 ct = plt.contour(lons, lats, points, self.image_defs['y_labels'][1:],
-                    #latlon=True,
                     linestyles='solid',
                     linewidths=0.5,
                     colors='k',
@@ -365,13 +341,13 @@ class VOAAreaPlot:
             """
 
             #add a title
-            title_str = plot_parameters.get_plot_description_string(vg_files[plot_ctr]-1, self.image_defs['plot_type'], time_zone)
+            title_str = plot_parameters.get_plot_description_string(vg_files[plot_idx]-1, self.image_defs['plot_type'], time_zone)
             if self.number_of_subplots == 1:
-                title_str = plot_parameters.get_plot_description_string(vg_files[plot_ctr]-1, self.image_defs['plot_type'], time_zone)
-                title_str = title_str + "\n" + plot_parameters.get_detailed_plot_description_string(vg_files[plot_ctr]-1)
+                title_str = plot_parameters.get_plot_description_string(vg_files[plot_idx]-1, self.image_defs['plot_type'], time_zone)
+                title_str = title_str + "\n" + plot_parameters.get_detailed_plot_description_string(vg_files[plot_idx]-1)
             else :
-                title_str = plot_parameters.get_minimal_plot_description_string(vg_files[plot_ctr]-1, self.image_defs['plot_type'], time_zone)
-            self.subplot_title_label = ax.set_title(title_str)
+                title_str = plot_parameters.get_minimal_plot_description_string(vg_files[plot_idx]-1, self.image_defs['plot_type'], time_zone)
+            self.subplot_title_label = axes[int(plot_idx/self.num_cols)][plot_idx%self.num_cols].set_title(title_str)
 
         # Add a colorbar on the right hand side, aligned with the
         # top of the uppermost plot and the bottom of the lowest
