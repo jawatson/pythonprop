@@ -236,23 +236,16 @@ class VOAAreaPlot:
 
         for plot_idx, vg_file in enumerate(vg_files):
             print('Doing plot ',plot_idx)
+            col_idx = int(plot_idx/self.num_cols)
+            row_idx = plot_idx%self.num_cols
             points = np.zeros([grid,grid], float)
 
             lons = np.arange(area_rect.get_sw_lon(), area_rect.get_ne_lon()+0.001,(area_rect.get_ne_lon()-area_rect.get_sw_lon())/float(grid-1))
             lons[-1] = min(180.0, lons[-1])
             lats = np.arange(area_rect.get_sw_lat(), area_rect.get_ne_lat()+0.001,(area_rect.get_ne_lat()-area_rect.get_sw_lat())/float(grid-1))
             lats[-1] = min(90.0, lats[-1])
-            """
-            ax = self.fig.add_subplot(self.num_rows,
-                    self.num_cols,
-                    plot_ctr+1,
-                    frame_on = self.show_subplot_frame,
-                    facecolor = 'white')
 
-            self.subplots.append(ax)
-            """
-
-            axes[int(plot_idx/self.num_cols)][plot_idx%self.num_cols].label_outer()
+            axes[col_idx][row_idx].label_outer()
             if in_file.endswith('.vgz'):
                 base_filename = get_base_filename(in_file)
                 zf = zipfile.ZipFile(in_file)
@@ -273,7 +266,16 @@ class VOAAreaPlot:
             if 'zf' in locals():
                 zf.close()
 
-            axes[int(plot_idx/self.num_cols)][plot_idx%self.num_cols].coastlines()
+            def resize_colorbar(event):
+                plt.draw()
+                posn = axes[col_idx][row_idx].get_position()
+                cbar_ax.set_position([posn.x0 + posn.width + 0.01, posn.y0,
+                                      0.02, posn.height])
+
+            self.fig.canvas.mpl_connect('resize_event', resize_colorbar)
+
+
+            axes[col_idx][row_idx].coastlines()
 
             #points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
             #colMap.set_under(color ='k', alpha=0.0)
@@ -281,19 +283,19 @@ class VOAAreaPlot:
             points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
 
             if (filled_contours):
-                im = plt.contourf(lons, lats, points, self.image_defs['y_labels'],
+                im = axes[col_idx][row_idx].contourf(lons, lats, points, self.image_defs['y_labels'],
                     cmap = colMap,
                     transform=ccrs.PlateCarree())
                 plot_contours = True
             else:
-                im = plt.pcolormesh(lons, lats, points,
+                im = axes[col_idx][row_idx].pcolormesh(lons, lats, points,
                     vmin = self.image_defs['min'],
                     vmax = self.image_defs['max'],
                     cmap = colMap,
                     transform=ccrs.PlateCarree())
 
             if plot_contours:
-                ct = plt.contour(lons, lats, points, self.image_defs['y_labels'][1:],
+                ct = axes[col_idx][row_idx].contour(lons, lats, points, self.image_defs['y_labels'][1:],
                     linestyles='solid',
                     linewidths=0.5,
                     colors='k',
@@ -347,7 +349,7 @@ class VOAAreaPlot:
                 title_str = title_str + "\n" + plot_parameters.get_detailed_plot_description_string(vg_files[plot_idx]-1)
             else :
                 title_str = plot_parameters.get_minimal_plot_description_string(vg_files[plot_idx]-1, self.image_defs['plot_type'], time_zone)
-            self.subplot_title_label = axes[int(plot_idx/self.num_cols)][plot_idx%self.num_cols].set_title(title_str)
+            self.subplot_title_label = axes[col_idx][row_idx].set_title(title_str)
 
         # Add a colorbar on the right hand side, aligned with the
         # top of the uppermost plot and the bottom of the lowest
@@ -371,9 +373,23 @@ class VOAAreaPlot:
         for t in self.cb_ax.get_yticklabels():
             t.set_fontsize(colorbar_fontsize)
         """
+        # Add the colorbar axes anywhere in the figure. Its position will be
+        # re-calculated at each figure resize.
+        cbar_ax = self.fig.add_axes([0, 0, 0.1, 0.1])
+        cbar_ax.tick_params(labelsize=10)
+
+        self.fig.subplots_adjust(hspace=0, wspace=0, top=0.925, left=0.05)
+
+        plt.colorbar(im,
+            cax=cbar_ax,
+            ticks = self.image_defs['y_labels'],
+            format = FuncFormatter(eval('self.'+self.image_defs['formatter'])))
+
         #self.fig.tight_layout()
         canvas = FigureCanvas(self.fig)
         #self.fig.canvas.mpl_connect('draw_event', self.on_draw)
+        resize_colorbar(None)
+
         canvas.show()
 
         if save_file :
