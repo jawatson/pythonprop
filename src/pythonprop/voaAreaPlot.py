@@ -41,8 +41,11 @@ import math
 import datetime
 
 import matplotlib
+import matplotlib.pyplot as plt
+
 from matplotlib.colors import ListedColormap
-from mpl_toolkits.basemap import Basemap
+#from mpl_toolkits.basemap import Basemap
+import cartopy.crs as ccrs
 
 
 import gi
@@ -176,7 +179,7 @@ class VOAAreaPlot:
         #colString = 'matplotlib.cm.'+color_map
         #colMap = eval(colString)
         portland = ListedColormap(["#0C3383", "#0b599b","#0a7fb4","#57a18f","#bec255","#f2c438","#f2a638","#ef8235","#e4502a","#d91e1e"])
-        matplotlib.cm.register_cmap(name='portland', cmap=portland)
+        plt.register_cmap(name='portland', cmap=portland)
         colMap = color_map
 
 
@@ -221,8 +224,13 @@ class VOAAreaPlot:
             #self.x_axes_ticks = P.arange(0,25,4)
 
         self.num_cols = int(math.ceil(float(self.number_of_subplots)/float(self.num_rows)))
-        self.fig=Figure()
+
+        #self.fig=Figure()
+        proj=ccrs.PlateCarree()
+        self.fig, ax = plt.subplots(1, 1, subplot_kw=dict(projection=proj))
         self.main_title_label = self.fig.suptitle(str(self.image_defs['title']), fontsize=self.main_title_fontsize)
+
+        #plt.cla()
 
         if projection == 'ortho':
             self.show_subplot_frame = False
@@ -234,7 +242,7 @@ class VOAAreaPlot:
             lons[-1] = min(180.0, lons[-1])
             lats = np.arange(area_rect.get_sw_lat(), area_rect.get_ne_lat()+0.001,(area_rect.get_ne_lat()-area_rect.get_sw_lat())/float(grid-1))
             lats[-1] = min(90.0, lats[-1])
-
+            """
             ax = self.fig.add_subplot(self.num_rows,
                     self.num_cols,
                     plot_ctr+1,
@@ -242,7 +250,7 @@ class VOAAreaPlot:
                     facecolor = 'white')
 
             self.subplots.append(ax)
-
+            """
             ax.label_outer()
             if in_file.endswith('.vgz'):
                 base_filename = get_base_filename(in_file)
@@ -279,48 +287,54 @@ class VOAAreaPlot:
                 if projection in ('cea', 'merc'):
                     m_args['lat_ts']=0
 
-            m = Basemap(ax=ax, projection=projection, resolution=resolution, **m_args)
+            #m = Basemap(ax=ax, projection=projection, resolution=resolution, **m_args)
 
-            m.drawcoastlines(color='black')
-            m.drawcountries(color='grey')
-            m.drawmapboundary(color='black', linewidth=1.0)
+            ax.coastlines()
+            #m.drawcountries(color='grey')
+            #m.drawmapboundary(color='black', linewidth=1.0)
 
             #points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
             #colMap.set_under(color ='k', alpha=0.0)
             lons, lats  = np.meshgrid(lons, lats)
             points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
+            print(len(lats))
+            print(len(lons))
+            print(len(points))
+            
             if (filled_contours):
-                im = m.contourf(lons, lats, points, self.image_defs['y_labels'],
-                    latlon=True,
-                    cmap = colMap)
+                im = plt.contourf(lons, lats, points, self.image_defs['y_labels'],
+                    #latlon=True,
+                    #cmap = colMap,
+                    transform=ccrs.PlateCarree())
                 plot_contours = True
             else:
-                im = m.pcolormesh(lons, lats, points,
-                    latlon=True,
+                im = plt.pcolormesh(lons, lats, points,
+                    #latlon=True,
                     vmin = self.image_defs['min'],
                     vmax = self.image_defs['max'],
                     cmap = colMap,
                     shading='gouraud')
 
             if plot_contours:
-                ct = m.contour(lons, lats, points, self.image_defs['y_labels'][1:],
-                    latlon=True,
+                ct = plt.contour(lons, lats, points, self.image_defs['y_labels'][1:],
+                    #latlon=True,
                     linestyles='solid',
                     linewidths=0.5,
                     colors='k',
                     vmin=self.image_defs['min'],
-                    vmax=self.image_defs['max'] )
-
+                    vmax=self.image_defs['max'],
+                    transform=ccrs.PlateCarree())
             #######################
             # Plot greyline
             #######################
-            if plot_nightshade:
-                m.nightshade(plot_parameters.get_daynight_datetime(vg_files[plot_ctr]-1))
+            #if plot_nightshade:
+            #    m.nightshade(plot_parameters.get_daynight_datetime(vg_files[plot_ctr]-1))
 
 
             ##########################
             # Points of interest
             ##########################
+            """
             for location in self.points_of_interest:
                 if area_rect.contains(location.get_latitude(), location.get_longitude()):
                     xpt,ypt = m(location.get_longitude(),location.get_latitude())
@@ -348,7 +362,7 @@ class VOAAreaPlot:
                     m.drawparallels(parallels)
                 else:
                     m.drawparallels(parallels,labels=[1,1,0,1])
-
+            """
 
             #add a title
             title_str = plot_parameters.get_plot_description_string(vg_files[plot_ctr]-1, self.image_defs['plot_type'], time_zone)
@@ -364,24 +378,26 @@ class VOAAreaPlot:
         # plot.
         # create an axes on the right side of ax. The width of cax will be 5%
         # of ax and the padding between cax and ax will be fixed at 0.05 inch.
+        """
         if self.number_of_subplots > 1:
             self.cb_ax = self.fig.add_axes(self.get_cb_axes())
         else:
             divider = make_axes_locatable(ax)
             self.cb_ax = divider.append_axes("right", size="5%", pad=0.05)
-
         self.fig.colorbar(im, cax=self.cb_ax,
                     orientation='vertical',
                     ticks=self.image_defs['y_labels'],
                     format = FuncFormatter(eval('self.'+self.image_defs['formatter'])))
+        """
 
         #print self.image_defs['y_labels']
+        """
         for t in self.cb_ax.get_yticklabels():
             t.set_fontsize(colorbar_fontsize)
-
+        """
         #self.fig.tight_layout()
         canvas = FigureCanvas(self.fig)
-        self.fig.canvas.mpl_connect('draw_event', self.on_draw)
+        #self.fig.canvas.mpl_connect('draw_event', self.on_draw)
         canvas.show()
 
         if save_file :
