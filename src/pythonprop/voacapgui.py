@@ -36,9 +36,6 @@ from calendar import monthrange
 
 from configparser import *
 
-from mpl_toolkits.basemap import Basemap
-from mpl_toolkits.mplot3d import Axes3D
-
 try:
     import gi
     gi.require_version("Gtk", "3.0")

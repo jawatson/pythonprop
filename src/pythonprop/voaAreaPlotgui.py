@@ -25,8 +25,6 @@ import os
 import datetime
 import subprocess
 
-from mpl_toolkits.basemap import Basemap
-
 try:
     import gi
     gi.require_version("Gtk", "3.0")
@@ -135,7 +133,7 @@ class VOAAreaPlotGUI:
         #todo check the file exists
         #TODO: this needs to be more robust...
         # consider capitalisation
-        
+
         in_file = VOAFile(self.voa_filename)
         in_file.parse_file()
         self.num_plots = in_file.get_num_plots()
