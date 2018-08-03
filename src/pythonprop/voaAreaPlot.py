@@ -235,7 +235,7 @@ class VOAAreaPlot:
         #plt.cla()
 
         for plot_idx, vg_file in enumerate(vg_files):
-            print('Doing plot ',plot_idx)
+            print('Doing plot ', plot_idx)
             col_idx = int(plot_idx/self.num_cols)
             row_idx = plot_idx%self.num_cols
             points = np.zeros([grid,grid], float)
@@ -281,6 +281,11 @@ class VOAAreaPlot:
             #colMap.set_under(color ='k', alpha=0.0)
             lons, lats  = np.meshgrid(lons, lats)
             points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
+
+            axes[col_idx][row_idx].set_extent([area_rect.get_sw_lon(),
+                                                area_rect.get_ne_lon(),
+                                                area_rect.get_sw_lat(),
+                                                area_rect.get_ne_lat()], ccrs.PlateCarree())
 
             if (filled_contours):
                 im = axes[col_idx][row_idx].contourf(lons, lats, points, self.image_defs['y_labels'],
