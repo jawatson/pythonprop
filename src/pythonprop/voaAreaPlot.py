@@ -283,7 +283,17 @@ class VOAAreaPlot:
 
             m.drawcoastlines(color='black')
             m.drawcountries(color='grey')
-            m.drawmapboundary(color='black', linewidth=1.0)
+            """
+            Basemap appears to make some calls to deprecated matplotlib features.
+            The following post describes how to fix this so we'll wrap the call
+            to drawmapboundary() in a try so that users who make the required mods
+            will still get a border.
+            https://stackoverflow.com/questions/50691151/axessubplot-object-has-no-attribute-get-axis-bgcolor
+            """
+            try:
+                m.drawmapboundary()
+            except AttributeError:
+                pass
 
             #points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
             #colMap.set_under(color ='k', alpha=0.0)
