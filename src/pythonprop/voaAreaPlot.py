@@ -46,6 +46,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 #from mpl_toolkits.basemap import Basemap
 import cartopy.crs as ccrs
+from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 
 
 import gi
@@ -53,6 +54,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 import matplotlib.colors as colors
+import matplotlib.ticker as mticker
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
 
@@ -73,7 +75,6 @@ from .hamlocation import HamLocation
 from .voaPlotWindow import *
 
 from .vgzArchive import get_base_filename
-
 
 import gettext
 import locale
@@ -113,7 +114,7 @@ class VOAAreaPlot:
                     vg_files = [1],
                     data_type = 1,
                     projection = 'cyl',
-                    color_map = 'jet',
+                    color_map = 'portland',
                     face_colour = "white",
                     time_zone = 0,
                     filled_contours = False,
@@ -322,7 +323,15 @@ class VOAAreaPlot:
                     xpt,ypt = m(location.get_longitude(),location.get_latitude())
                     ax.plot([xpt],[ypt],'ro')
                     ax.text(xpt+100000,ypt+100000,location.get_name())
-
+            """
+            gl = axes[col_idx][row_idx].gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
+                  linewidth=1, color='black', alpha=0.75)
+            gl.xlabels_top = False
+            gl.xlabels_bottom = False
+            gl.ylabels_left = False
+            gl.ylabels_right = False
+            gl.xlines = False
+            gl.ylines = False
             if plot_meridians:
                 if (area_rect.get_lon_delta() <= 90.0):
                     meridians = np.arange(-180, 190.0, 10.0)
@@ -330,21 +339,23 @@ class VOAAreaPlot:
                     meridians = np.arange(-180.0, 210.0, 30.0)
                 else:
                     meridians = np.arange(-180, 240.0, 60.0)
-                if ((projection == 'ortho')    or (projection == 'vandg')):
-                    m.drawmeridians(meridians)
-                else:
-                    m.drawmeridians(meridians,labels=[1,1,0,1])
+                gl.xlines = True
+                gl.xlabels_bottom = True
+                gl.xformatter = LONGITUDE_FORMATTER
+                gl.xlocator = mticker.FixedLocator(meridians)
 
             if plot_parallels:
                 if (area_rect.get_lat_delta() <= 90.0):
                     parallels = np.arange(-90.0, 120.0, 60.0)
                 else:
                     parallels = np.arange(-90.0, 120.0, 30.0)
-                if ((projection == 'ortho')    or (projection == 'vandg')):
-                    m.drawparallels(parallels)
-                else:
-                    m.drawparallels(parallels,labels=[1,1,0,1])
-            """
+                gl.ylines = True
+                gl.ylabels_right = True
+                gl.yformatter = LATITUDE_FORMATTER
+                gl.ylocator = mticker.FixedLocator(parallels)
+
+
+
 
             #add a title
             title_str = plot_parameters.get_plot_description_string(vg_files[plot_idx]-1, self.image_defs['plot_type'], time_zone)
