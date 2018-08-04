@@ -226,10 +226,9 @@ class VOAAreaPlot:
 
         self.num_cols = int(math.ceil(float(self.number_of_subplots)/float(self.num_rows)))
 
-        #self.fig=Figure()
         #https://github.com/SciTools/cartopy/issues/899
         proj=ccrs.PlateCarree()
-        self.fig, axes = plt.subplots(self.num_cols, self.num_rows, squeeze=False, subplot_kw=dict(projection=proj))
+        self.fig, axes = plt.subplots(self.num_rows, self.num_cols, squeeze=False, subplot_kw=dict(projection=proj))
 
         self.main_title_label = self.fig.suptitle(str(self.image_defs['title']), fontsize=self.main_title_fontsize)
 
@@ -353,9 +352,6 @@ class VOAAreaPlot:
                 gl.ylabels_right = True
                 gl.yformatter = LATITUDE_FORMATTER
                 gl.ylocator = mticker.FixedLocator(parallels)
-
-
-
 
             #add a title
             title_str = plot_parameters.get_plot_description_string(vg_files[plot_idx]-1, self.image_defs['plot_type'], time_zone)
