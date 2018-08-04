@@ -464,20 +464,20 @@ class VOAFile:
             hour = hour + 24
 
         if (time_zone == 0):
-            hour_str = "%02d00 UTC" % (hour)
+            hour_str = "%02d:00" % (hour)
         else:
             _sign = '+' if (time_zone >= 0) else ''
-            hour_str = "%02d00 UTC%s%s : " % (hour, _sign, time_zone)
+            hour_str = "%02d:00%s%s : " % (hour, _sign, time_zone)
         theSSN = str(self.ssns[int(field)])
 
 
         if (plot_type == 'MUF'):
-            return _month + ', ' + hour_str
+            return _month + ' ' + hour_str
             #return hour_str + _month+ ' : SSN ' + theSSN + ' : ' +thePower
         else:
             # Add the frequency to the data string
-            theFrequency = "%.3f MHz" % self.frequencies[int(field)]
-            return _month + ', ' + hour_str + ', ' + theFrequency
+            theFrequency = "%.3fMHz" % self.frequencies[int(field)]
+            return _month + ' ' + hour_str + ' ' + theFrequency
 
     # The following method is failing for Jari
     def get_plot_description_string(self, field, plot_type, time_zone=0):

@@ -193,7 +193,8 @@ class VOAAreaPlot:
         #matplotlib.rcParams['figure.figsize'] = (6, 10)
         matplotlib.rcParams['figure.subplot.hspace'] = 0.45
         matplotlib.rcParams['figure.subplot.wspace'] = 0.35
-        matplotlib.rcParams['figure.subplot.right'] = 0.85
+        #matplotlib.rcParams['figure.subplot.left'] = 0.8
+        #matplotlib.rcParams['figure.subplot.right'] = 0.85
         colorbar_fontsize = 12
 
         if number_of_subplots <= 1:
@@ -216,7 +217,7 @@ class VOAAreaPlot:
             #self.x_axes_ticks = P.arange(0,25,4)
         else:
             num_rows = 3
-            self.main_title_fontsize = 16
+            self.main_title_fontsize = 10
             matplotlib.rcParams['legend.fontsize'] = 8
             matplotlib.rcParams['axes.labelsize'] = 8
             matplotlib.rcParams['axes.titlesize'] = 10
@@ -226,31 +227,25 @@ class VOAAreaPlot:
 
         num_cols = int(math.ceil(float(number_of_subplots)/float(num_rows)))
 
+        plt.subplots_adjust(left=0, wspace=0.1)
+
         #https://github.com/SciTools/cartopy/issues/899
         proj=ccrs.PlateCarree()
         self.fig, axes = plt.subplots(num_rows, num_cols, squeeze=False, subplot_kw=dict(projection=proj))
 
         self.main_title_label = self.fig.suptitle(str(self.image_defs['title']), fontsize=self.main_title_fontsize)
 
-        #plt.cla()
-        # hide the unused rectangle
+        # Hide any unused subplots
         # https://stackoverflow.com/questions/10035446/how-can-i-make-a-blank-subplot-in-matplotlib
-
-
-
         for plot_idx in range(number_of_subplots, (num_rows*num_cols)):
             col_idx = int(plot_idx/num_cols)
             row_idx = plot_idx%num_cols
-            print(plot_idx, col_idx, row_idx)
-            axes[col_idx, row_idx].axis('off')
+            axes[col_idx, row_idx].set_visible(False)
 
-        # or better yet, only create the axis we actually use;
-        # https://stackoverflow.com/questions/10035446/how-can-i-make-a-blank-subplot-in-matplotlib
 
         for plot_idx, vg_file in enumerate(vg_files):
             col_idx = int(plot_idx/num_cols)
             row_idx = plot_idx%num_cols
-            print(plot_idx, col_idx, row_idx)
 
             points = np.zeros([grid,grid], float)
 
@@ -284,23 +279,21 @@ class VOAAreaPlot:
                 plt.draw()
                 # left, bottom, width, height
                 if number_of_subplots == num_cols*num_rows:
-                    print('cb on the side')
-                    top_posn = axes[0][num_cols-1].get_position()
+                    top_posn = axes[0, num_cols-1].get_position()
                     bottom_posn = axes[col_idx, row_idx].get_position()
                     cb_height = top_posn.y0 + top_posn.height - bottom_posn.y0
                     cbar_ax.set_position([top_posn.x0 + top_posn.width + 0.01, bottom_posn.y0, 0.02, cb_height])
                 else:
-                    print('inserted cb')
                     posn = axes[col_idx][row_idx+1].get_position()
                     # fig.subplotpars.hspace, fig.subplotpars.wspace
+                    print(self.fig.subplotpars.hspace)
+                    print(self.fig.subplotpars.wspace)
                     cbar_ax.set_position([posn.x0, posn.y0, 0.02, posn.height])
 
             self.fig.canvas.mpl_connect('resize_event', resize_colorbar)
 
             axes[col_idx, row_idx].coastlines()
 
-            #points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
-            #colMap.set_under(color ='k', alpha=0.0)
             lons, lats  = np.meshgrid(lons, lats)
             points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
 
@@ -332,9 +325,11 @@ class VOAAreaPlot:
             #######################
             # Plot greyline
             #######################
-            #if plot_nightshade:
-            #    m.nightshade(plot_parameters.get_daynight_datetime(vg_files[plot_ctr]-1))
-
+            if plot_nightshade:
+                self.fill_dark_side(axes[col_idx, row_idx],
+                            time=plot_parameters.get_daynight_datetime(vg_files[plot_idx]-1),
+                            color='black',
+                            alpha=0.75)
 
             ##########################
             # Points of interest
@@ -385,22 +380,6 @@ class VOAAreaPlot:
                 title_str = plot_parameters.get_minimal_plot_description_string(vg_files[plot_idx]-1, self.image_defs['plot_type'], time_zone)
             self.subplot_title_label = axes[col_idx, row_idx].set_title(title_str)
 
-        # Add a colorbar on the right hand side, aligned with the
-        # top of the uppermost plot and the bottom of the lowest
-        # plot.
-        # create an axes on the right side of ax. The width of cax will be 5%
-        # of ax and the padding between cax and ax will be fixed at 0.05 inch.
-        """
-        if self.number_of_subplots > 1:
-            self.cb_ax = self.fig.add_axes(self.get_cb_axes())
-        else:
-            divider = make_axes_locatable(ax)
-            self.cb_ax = divider.append_axes("right", size="5%", pad=0.05)
-        self.fig.colorbar(im, cax=self.cb_ax,
-                    orientation='vertical',
-                    ticks=self.image_defs['y_labels'],
-                    format = FuncFormatter(eval('self.'+self.image_defs['formatter'])))
-        """
 
         #print self.image_defs['y_labels']
         """
@@ -420,13 +399,10 @@ class VOAAreaPlot:
             ticks = self.image_defs['y_labels'],
             format = FuncFormatter(eval('self.'+self.image_defs['formatter'])))
 
-        #self.fig.tight_layout()
         canvas = FigureCanvas(self.fig)
         #self.fig.canvas.mpl_connect('draw_event', self.on_draw)
         resize_colorbar(None)
 
-        #plt.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
-        #plt.tight_layout()
         canvas.show()
 
         if save_file :
@@ -437,6 +413,88 @@ class VOAAreaPlot:
             dia = VOAPlotWindow('pythonProp - ' + self.image_defs['title'], canvas, parent=parent, datadir=self.datadir)
         return
 
+    """
+    The following routine is taken from;
+    https://scitools.org.uk/cartopy/docs/latest/gallery/aurora_forecast.html
+    """
+    def sun_pos(self, dt=None):
+        """This function computes a rough estimate of the coordinates for
+        the point on the surface of the Earth where the Sun is directly
+        overhead at the time dt. Precision is down to a few degrees. This
+        means that the equinoxes (when the sign of the latitude changes)
+        will be off by a few days.
+
+        The function is intended only for visualization. For more precise
+        calculations consider for example the PyEphem package.
+
+        Parameters
+        ----------
+        dt: datetime
+            Defaults to datetime.utcnow()
+
+        Returns
+        -------
+        lat, lng: tuple of floats
+            Approximate coordinates of the point where the sun is
+            in zenith at the time dt.
+
+        """
+        if dt is None:
+            dt = datetime.datetime.utcnow()
+
+        axial_tilt = 23.4
+        ref_solstice = datetime.datetime(2016, 6, 21, 22, 22)
+        days_per_year = 365.2425
+        seconds_per_day = 24*60*60.0
+
+        days_since_ref = (dt - ref_solstice).total_seconds()/seconds_per_day
+        lat = axial_tilt*np.cos(2*np.pi*days_since_ref/days_per_year)
+        sec_since_midnight = (dt - datetime.datetime(dt.year, dt.month, dt.day)).seconds
+        lng = -(sec_since_midnight/seconds_per_day - 0.5)*360
+        return lat, lng
+
+    """
+    The following routine is taken from;
+    https://scitools.org.uk/cartopy/docs/latest/gallery/aurora_forecast.html
+    """
+    def fill_dark_side(self, ax, time=None, *args, **kwargs):
+        """
+        Plot a fill on the dark side of the planet (without refraction).
+
+        Parameters
+        ----------
+            ax : Matplotlib axes
+                The axes to plot on.
+            time : datetime
+                The time to calculate terminator for. Defaults to datetime.utcnow()
+            **kwargs :
+                Passed on to Matplotlib's ax.fill()
+
+        """
+        lat, lng = self.sun_pos(time)
+        pole_lng = lng
+        if lat > 0:
+            pole_lat = -90 + lat
+            central_rot_lng = 180
+        else:
+            pole_lat = 90 + lat
+            central_rot_lng = 0
+
+        rotated_pole = ccrs.RotatedPole(pole_latitude=pole_lat,
+                                        pole_longitude=pole_lng,
+                                        central_rotated_longitude=central_rot_lng)
+
+        x = np.empty(360)
+        y = np.empty(360)
+        x[:180] = -90
+        y[:180] = np.arange(-90, 90.)
+        x[180:] = 90
+        y[180:] = np.arange(90, -90., -1)
+
+        ax.fill(x, y, transform=rotated_pole, **kwargs)
+
+
+    """
     def on_draw(self, event):
         top = self.fig.subplotpars.top
         bottom = self.fig.subplotpars.bottom
@@ -466,7 +524,7 @@ class VOAAreaPlot:
             self.cb_ax.set_position(self.get_cb_axes())
             self.fig.canvas.draw()
         return False
-
+    """
 
     def save_plot(self, canvas, filename=None):
         canvas.print_figure(filename, dpi=self.dpi, facecolor=self.fig.get_facecolor(), edgecolor='none')
