@@ -236,10 +236,22 @@ class VOAAreaPlot:
         # hide the unused rectangle
         # https://stackoverflow.com/questions/10035446/how-can-i-make-a-blank-subplot-in-matplotlib
 
-        for plot_idx, vg_file in enumerate(vg_files):
-            print(plot_idx)
+
+
+        for plot_idx in range(number_of_subplots, (num_rows*num_cols)):
             col_idx = int(plot_idx/num_cols)
             row_idx = plot_idx%num_cols
+            print(plot_idx, col_idx, row_idx)
+            axes[col_idx, row_idx].axis('off')
+
+        # or better yet, only create the axis we actually use;
+        # https://stackoverflow.com/questions/10035446/how-can-i-make-a-blank-subplot-in-matplotlib
+
+        for plot_idx, vg_file in enumerate(vg_files):
+            col_idx = int(plot_idx/num_cols)
+            row_idx = plot_idx%num_cols
+            print(plot_idx, col_idx, row_idx)
+
             points = np.zeros([grid,grid], float)
 
             lons = np.arange(area_rect.get_sw_lon(), area_rect.get_ne_lon()+0.001,(area_rect.get_ne_lon()-area_rect.get_sw_lon())/float(grid-1))
@@ -247,7 +259,7 @@ class VOAAreaPlot:
             lats = np.arange(area_rect.get_sw_lat(), area_rect.get_ne_lat()+0.001,(area_rect.get_ne_lat()-area_rect.get_sw_lat())/float(grid-1))
             lats[-1] = min(90.0, lats[-1])
 
-            axes[col_idx][row_idx].label_outer()
+            axes[col_idx, row_idx].label_outer()
             if in_file.endswith('.vgz'):
                 base_filename = get_base_filename(in_file)
                 zf = zipfile.ZipFile(in_file)
@@ -274,7 +286,7 @@ class VOAAreaPlot:
                 if number_of_subplots == num_cols*num_rows:
                     print('cb on the side')
                     top_posn = axes[0][num_cols-1].get_position()
-                    bottom_posn = axes[col_idx][row_idx].get_position()
+                    bottom_posn = axes[col_idx, row_idx].get_position()
                     cb_height = top_posn.y0 + top_posn.height - bottom_posn.y0
                     cbar_ax.set_position([top_posn.x0 + top_posn.width + 0.01, bottom_posn.y0, 0.02, cb_height])
                 else:
@@ -285,32 +297,32 @@ class VOAAreaPlot:
 
             self.fig.canvas.mpl_connect('resize_event', resize_colorbar)
 
-            axes[col_idx][row_idx].coastlines()
+            axes[col_idx, row_idx].coastlines()
 
             #points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
             #colMap.set_under(color ='k', alpha=0.0)
             lons, lats  = np.meshgrid(lons, lats)
             points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
 
-            axes[col_idx][row_idx].set_extent([area_rect.get_sw_lon(),
+            axes[col_idx, row_idx].set_extent([area_rect.get_sw_lon(),
                                                 area_rect.get_ne_lon(),
                                                 area_rect.get_sw_lat(),
                                                 area_rect.get_ne_lat()], ccrs.PlateCarree())
 
             if (filled_contours):
-                im = axes[col_idx][row_idx].contourf(lons, lats, points, self.image_defs['y_labels'],
+                im = axes[col_idx, row_idx].contourf(lons, lats, points, self.image_defs['y_labels'],
                     cmap = colMap,
                     transform=ccrs.PlateCarree())
                 plot_contours = True
             else:
-                im = axes[col_idx][row_idx].pcolormesh(lons, lats, points,
+                im = axes[col_idx, row_idx].pcolormesh(lons, lats, points,
                     vmin = self.image_defs['min'],
                     vmax = self.image_defs['max'],
                     cmap = colMap,
                     transform=ccrs.PlateCarree())
 
             if plot_contours:
-                ct = axes[col_idx][row_idx].contour(lons, lats, points, self.image_defs['y_labels'][1:],
+                ct = axes[col_idx, row_idx].contour(lons, lats, points, self.image_defs['y_labels'][1:],
                     linestyles='solid',
                     linewidths=0.5,
                     colors='k',
@@ -334,7 +346,7 @@ class VOAAreaPlot:
                     ax.plot([xpt],[ypt],'ro')
                     ax.text(xpt+100000,ypt+100000,location.get_name())
             """
-            gl = axes[col_idx][row_idx].gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
+            gl = axes[col_idx, row_idx].gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                   linewidth=1, color='black', alpha=0.75)
             gl.xlabels_top = False
             gl.xlabels_bottom = False
@@ -371,7 +383,7 @@ class VOAAreaPlot:
                 title_str = title_str + "\n" + plot_parameters.get_detailed_plot_description_string(vg_files[plot_idx]-1)
             else :
                 title_str = plot_parameters.get_minimal_plot_description_string(vg_files[plot_idx]-1, self.image_defs['plot_type'], time_zone)
-            self.subplot_title_label = axes[col_idx][row_idx].set_title(title_str)
+            self.subplot_title_label = axes[col_idx, row_idx].set_title(title_str)
 
         # Add a colorbar on the right hand side, aligned with the
         # top of the uppermost plot and the bottom of the lowest
