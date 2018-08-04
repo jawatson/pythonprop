@@ -228,14 +228,13 @@ class VOAAreaPlot:
         #self.fig=Figure()
         #https://github.com/SciTools/cartopy/issues/899
         proj=ccrs.PlateCarree()
-        self.fig, axes = plt.subplots(1, 1, squeeze=False, subplot_kw=dict(projection=proj))
+        self.fig, axes = plt.subplots(self.num_cols, self.num_rows, squeeze=False, subplot_kw=dict(projection=proj))
 
         self.main_title_label = self.fig.suptitle(str(self.image_defs['title']), fontsize=self.main_title_fontsize)
 
         #plt.cla()
 
         for plot_idx, vg_file in enumerate(vg_files):
-            print('Doing plot ', plot_idx)
             col_idx = int(plot_idx/self.num_cols)
             row_idx = plot_idx%self.num_cols
             points = np.zeros([grid,grid], float)
@@ -395,6 +394,8 @@ class VOAAreaPlot:
         #self.fig.canvas.mpl_connect('draw_event', self.on_draw)
         resize_colorbar(None)
 
+        #plt.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
+        plt.tight_layout()
         canvas.show()
 
         if save_file :
