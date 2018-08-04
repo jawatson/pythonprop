@@ -185,7 +185,7 @@ class VOAAreaPlot:
 
 
         self.subplots = []
-        self.number_of_subplots = len(vg_files)
+        number_of_subplots = len(vg_files)
 
         matplotlib.rcParams['axes.edgecolor'] = 'gray'
         matplotlib.rcParams['axes.facecolor'] = 'white'
@@ -196,8 +196,8 @@ class VOAAreaPlot:
         matplotlib.rcParams['figure.subplot.right'] = 0.85
         colorbar_fontsize = 12
 
-        if self.number_of_subplots <= 1:
-            self.num_rows = 1
+        if number_of_subplots <= 1:
+            num_rows = 1
             self.main_title_fontsize = 24
             matplotlib.rcParams['legend.fontsize'] = 12
             matplotlib.rcParams['axes.labelsize'] = 12
@@ -205,8 +205,8 @@ class VOAAreaPlot:
             matplotlib.rcParams['xtick.labelsize'] = 10
             matplotlib.rcParams['ytick.labelsize'] = 10
             matplotlib.rcParams['figure.subplot.top'] = 0.8 # single figure plots have a larger title so require more space at the top.
-        elif ((self.number_of_subplots >= 2) and (self.number_of_subplots <= 6 )):
-            self.num_rows = 2
+        elif ((number_of_subplots >= 2) and (number_of_subplots <= 6 )):
+            num_rows = 2
             self.main_title_fontsize = 18
             matplotlib.rcParams['legend.fontsize'] = 10
             matplotlib.rcParams['axes.labelsize'] = 10
@@ -215,7 +215,7 @@ class VOAAreaPlot:
             matplotlib.rcParams['ytick.labelsize'] = 8
             #self.x_axes_ticks = P.arange(0,25,4)
         else:
-            self.num_rows = 3
+            num_rows = 3
             self.main_title_fontsize = 16
             matplotlib.rcParams['legend.fontsize'] = 8
             matplotlib.rcParams['axes.labelsize'] = 8
@@ -224,19 +224,22 @@ class VOAAreaPlot:
             matplotlib.rcParams['ytick.labelsize'] = 6
             #self.x_axes_ticks = P.arange(0,25,4)
 
-        self.num_cols = int(math.ceil(float(self.number_of_subplots)/float(self.num_rows)))
+        num_cols = int(math.ceil(float(number_of_subplots)/float(num_rows)))
 
         #https://github.com/SciTools/cartopy/issues/899
         proj=ccrs.PlateCarree()
-        self.fig, axes = plt.subplots(self.num_rows, self.num_cols, squeeze=False, subplot_kw=dict(projection=proj))
+        self.fig, axes = plt.subplots(num_rows, num_cols, squeeze=False, subplot_kw=dict(projection=proj))
 
         self.main_title_label = self.fig.suptitle(str(self.image_defs['title']), fontsize=self.main_title_fontsize)
 
         #plt.cla()
+        # hide the unused rectangle
+        # https://stackoverflow.com/questions/10035446/how-can-i-make-a-blank-subplot-in-matplotlib
 
         for plot_idx, vg_file in enumerate(vg_files):
-            col_idx = int(plot_idx/self.num_cols)
-            row_idx = plot_idx%self.num_cols
+            print(plot_idx)
+            col_idx = int(plot_idx/num_cols)
+            row_idx = plot_idx%num_cols
             points = np.zeros([grid,grid], float)
 
             lons = np.arange(area_rect.get_sw_lon(), area_rect.get_ne_lon()+0.001,(area_rect.get_ne_lon()-area_rect.get_sw_lon())/float(grid-1))
@@ -267,12 +270,20 @@ class VOAAreaPlot:
 
             def resize_colorbar(event):
                 plt.draw()
-                posn = axes[col_idx][row_idx].get_position()
-                cbar_ax.set_position([posn.x0 + posn.width + 0.01, posn.y0,
-                                      0.02, posn.height])
+                # left, bottom, width, height
+                if number_of_subplots == num_cols*num_rows:
+                    print('cb on the side')
+                    top_posn = axes[0][num_cols-1].get_position()
+                    bottom_posn = axes[col_idx][row_idx].get_position()
+                    cb_height = top_posn.y0 + top_posn.height - bottom_posn.y0
+                    cbar_ax.set_position([top_posn.x0 + top_posn.width + 0.01, bottom_posn.y0, 0.02, cb_height])
+                else:
+                    print('inserted cb')
+                    posn = axes[col_idx][row_idx+1].get_position()
+                    # fig.subplotpars.hspace, fig.subplotpars.wspace
+                    cbar_ax.set_position([posn.x0, posn.y0, 0.02, posn.height])
 
             self.fig.canvas.mpl_connect('resize_event', resize_colorbar)
-
 
             axes[col_idx][row_idx].coastlines()
 
@@ -355,7 +366,7 @@ class VOAAreaPlot:
 
             #add a title
             title_str = plot_parameters.get_plot_description_string(vg_files[plot_idx]-1, self.image_defs['plot_type'], time_zone)
-            if self.number_of_subplots == 1:
+            if number_of_subplots == 1:
                 title_str = plot_parameters.get_plot_description_string(vg_files[plot_idx]-1, self.image_defs['plot_type'], time_zone)
                 title_str = title_str + "\n" + plot_parameters.get_detailed_plot_description_string(vg_files[plot_idx]-1)
             else :
@@ -387,9 +398,10 @@ class VOAAreaPlot:
         # Add the colorbar axes anywhere in the figure. Its position will be
         # re-calculated at each figure resize.
         cbar_ax = self.fig.add_axes([0, 0, 0.1, 0.1])
+
         cbar_ax.tick_params(labelsize=10)
 
-        self.fig.subplots_adjust(hspace=0, wspace=0, top=0.925, left=0.05)
+        #self.fig.subplots_adjust(hspace=0, wspace=0, top=0.925, left=0.05)
 
         plt.colorbar(im,
             cax=cbar_ax,
@@ -402,7 +414,7 @@ class VOAAreaPlot:
         resize_colorbar(None)
 
         #plt.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
-        plt.tight_layout()
+        #plt.tight_layout()
         canvas.show()
 
         if save_file :
