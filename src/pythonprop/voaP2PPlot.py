@@ -50,11 +50,13 @@ import re
 import sys
 
 import matplotlib
+import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg
 from matplotlib.figure import Figure
 from matplotlib.font_manager import FontProperties
 from matplotlib.ticker import FuncFormatter
+from mpl_toolkits.axes_grid1 import AxesGrid
 
 import numpy as np
 
@@ -129,14 +131,11 @@ class VOAP2PPlot:
         self.data_type = data_type
         self.run_quietly = run_quietly
         self.dpi=dpi
-        self.face_colour = face_colour
         self.plot_filled_contours = filled_contours
         self.df = VOAOutFile(data_file, time_zone=time_zone, data_type=self.data_type, quiet=run_quietly)
 
         self.image_defs = self.IMG_TYPE_DICT[self.data_type]
         self.user_bands = user_bands
-        #color_map = eval('P.cm.' + color_map)
-        #portland:[{index:0,rgb:[12,51,131]},{index:.25,rgb:[10,136,186]},{index:.5,rgb:[242,211,56]},{index:.75,rgb:[242,143,56]},{index:1,rgb:[217,30,30]}]
         portland = ListedColormap(["#0C3383", "#0b599b","#0a7fb4","#57a18f","#bec255","#f2c438","#f2a638","#ef8235","#e4502a","#d91e1e"])
         matplotlib.cm.register_cmap(name='portland', cmap=portland)
 
@@ -144,10 +143,8 @@ class VOAP2PPlot:
             num_grp = self.df.get_number_of_groups()
             plot_groups = list(range(0,num_grp))
 
-        self.subplots = []
         number_of_subplots = len(plot_groups)
 
-        #print matplotlib.get_backend()
         matplotlib.rcParams['axes.edgecolor'] = 'gray'
         matplotlib.rcParams['axes.facecolor'] = 'white'
         matplotlib.rcParams['axes.grid'] = True
@@ -159,7 +156,7 @@ class VOAP2PPlot:
         colorbar_fontsize = 12
 
         if number_of_subplots <= 1:
-            self.num_rows = 1
+            num_rows = 1
             self.main_title_fontsize = 24
             matplotlib.rcParams['legend.fontsize'] = 12
             matplotlib.rcParams['axes.labelsize'] = 12
@@ -169,7 +166,7 @@ class VOAP2PPlot:
             matplotlib.rcParams['figure.subplot.top'] = 0.79 # single figure plots have a larger title so require more space at the top.
             self.x_axes_ticks = np.arange(0,25,2)
         elif ((number_of_subplots >= 2) and (number_of_subplots <= 6 )):
-            self.num_rows = 2
+            num_rows = 2
             self.main_title_fontsize = 18
             matplotlib.rcParams['legend.fontsize'] = 10
             matplotlib.rcParams['axes.labelsize'] = 10
@@ -178,7 +175,7 @@ class VOAP2PPlot:
             matplotlib.rcParams['ytick.labelsize'] = 8
             self.x_axes_ticks = np.arange(0,25,4)
         else:
-            self.num_rows = 3
+            num_rows = 3
             self.main_title_fontsize = 16
             matplotlib.rcParams['legend.fontsize'] = 8
             matplotlib.rcParams['axes.labelsize'] = 8
@@ -187,18 +184,21 @@ class VOAP2PPlot:
             matplotlib.rcParams['ytick.labelsize'] = 6
             self.x_axes_ticks = np.arange(0,25,4)
 
-        self.num_cols = int(math.ceil(float(number_of_subplots)/float(self.num_rows)))
-        self.fig=Figure(figsize=(7,6.5), facecolor=face_colour)
-        self.main_title_label = self.fig.suptitle(plot_label+str(self.image_defs['title']), fontsize=self.main_title_fontsize)
+        num_cols = int(math.ceil(float(number_of_subplots)/float(num_rows)))
+        fig = plt.figure()
+        axgr = AxesGrid(fig, 111, 
+                    nrows_ncols=(num_rows, num_cols),
+                    axes_pad=0.6,
+                    cbar_location='right',
+                    cbar_mode='single',
+                    cbar_pad=0.2,
+                    cbar_size='3%',
+                    label_mode='')
+                    
+        self.main_title_label = fig.suptitle(plot_label+str(self.image_defs['title']), fontsize=self.main_title_fontsize)
 
-        for chan_grp in plot_groups:
+        for ax, chan_grp in zip(axgr, plot_groups):
             (group_name, group_info, fot, muf, hpf, image_buffer) = self.df.get_group_data(chan_grp)
-
-            ax = self.fig.add_subplot(self.num_rows,
-                    self.num_cols,
-                    plot_groups.index(chan_grp)+1)
-
-            self.subplots.append(ax)
 
             if number_of_subplots > 4:
                 #save a little space by only labelling the outer edges of the plot
@@ -215,7 +215,6 @@ class VOAP2PPlot:
                 y_max = max(plot_max_freq, 5.0)
             else :
                 y_max = math.ceil(plot_max_freq / 5.0) * 5.0
-            #resize the image
             image_buffer = image_buffer[0:int(y_max-1),:]
 
             y_ticks = [2, 5]
@@ -261,25 +260,22 @@ class VOAP2PPlot:
                 for ch in self.user_bands:
                     ax.axhspan(ch-0.04, ch+0.04, alpha=0.5, ec='0.5', fc='0.5')
 
+        # Hide any unused subplots        
+        for ax in axgr[number_of_subplots:]:
+            ax.set_visible(False)
+
         if (self.data_type > 0):
-            self.cb_ax = self.fig.add_axes(self.get_cb_axes())
-            self.fig.colorbar(im, cax=self.cb_ax,
-                    orientation='vertical',
+            axgr.cbar_axes[0].colorbar(im,
                     format = FuncFormatter(eval('self.'+self.image_defs['formatter'])))
-            for t in self.cb_ax.get_yticklabels():
-                t.set_fontsize(colorbar_fontsize)
-
-        # TODO tight_layout looks a neater way to layout the grid
-        #self.fig.tight_layout()
-        canvas = FigureCanvasGTK3Agg(self.fig)
-        self.fig.canvas.mpl_connect('draw_event', self.on_draw)
-        canvas.show()
-
+            #for t in self.cb_ax.get_yticklabels():
+            ###    t.set_fontsize(colorbar_fontsize)
+        
         if save_file :
-            self.save_plot(save_file)
+            fig.savefig(save_file, dpi=self.dpi, facecolor=fig.get_facecolor(), edgecolor='none')
 
         if not self.run_quietly:
-            # TODO consider using a scrolled pane here...
+            canvas = FigureCanvasGTK3Agg(fig)
+            canvas.show()
             dia = VOAPlotWindow('pythonProp - ' + self.image_defs['title'],
                         canvas,
                         parent=parent,
@@ -292,63 +288,10 @@ class VOAP2PPlot:
         print("creating a png")
         self.save_plot("test.png")
 
-
-    def on_draw(self, event):
-        top = self.fig.subplotpars.top
-        bottom = self.fig.subplotpars.bottom
-        hspace = self.fig.subplotpars.hspace
-        wspace = self.fig.subplotpars.wspace
-
-        needs_adjusting = False
-
-        # Calculate the area required at the top of the plot
-        # (Main title and subplot title)
-        subplot_title_height = 0
-        main_title_height = 0
-
-        for subplot in self.subplots:
-            if subplot.is_first_row():
-                bbox = subplot.title.get_window_extent()
-                transformed_bbox = bbox.inverse_transformed(self.fig.transFigure)
-                subplot_title_height = max(transformed_bbox.height, subplot_title_height)
-
-        #print 'title = ', self.fig.get_label()
-
-        bbox = self.main_title_label.get_window_extent()
-        main_title_height = bbox.inverse_transformed(self.fig.transFigure).height
-
-        preferred_top_space = 1.25*(subplot_title_height + main_title_height)
-
-        if ((1 - top) < preferred_top_space) or (((1 - top) - preferred_top_space)>0.11):
-            top = 0.99 - preferred_top_space
-            needs_adjusting = True
-
-        if needs_adjusting:
-            #print 'adjusting'
-            #todo if the colorbar dosn't exist, ignore this.
-            self.fig.subplots_adjust(top = top, bottom = bottom, hspace = hspace, wspace = wspace)
-            self.cb_ax.set_position(self.get_cb_axes())
-            self.fig.canvas.draw()
-
-        return False
-
     def add_legend(self, ax):
         leg = ax.legend(('MUF', 'FOT'),ncol=1)
         leg.get_frame().set_alpha(0.75)
         return leg
-
-    def save_plot(self, filename=None):
-        #canvas.print_figure(filename, dpi=150, facecolor='white', edgecolor='white')
-        self.fig.savefig(filename, dpi=self.dpi, facecolor=self.fig.get_facecolor(), edgecolor='none')
-
-    def get_cb_axes(self):
-        # an equivalent of get_tightbox would be really useful here...
-        #bbox = self.subplots[0].get_window_extent()
-        bbox = self.subplots[0].get_yaxis().get_clip_box()
-        axis_upper_y = bbox.inverse_transformed(self.fig.transFigure).ymax
-        bbox = self.subplots[-1].get_window_extent()
-        axis_lower_y = bbox.inverse_transformed(self.fig.transFigure).ymin
-        return [0.9, axis_lower_y, 0.02, axis_upper_y-axis_lower_y]
 
     #def percentFormat(x, pos):
     #    'The two args are the value and tick position'
@@ -463,7 +406,7 @@ def main(data_file, datadir=None):
     if args.data_type:
         if int(args.data_type) not in VOAP2PPlot.IMG_TYPE_DICT:
             print(_("Unrecognised plot type: Defaulting to MUF days"))
-            options.data_type = 1
+            args.data_type = 1
 
     if args.plot_bands:
         if int(args.plot_bands) == 1: bands = VOAP2PPlot.SWL_BANDS
@@ -487,13 +430,13 @@ def main(data_file, datadir=None):
 
     if args.dpi:
         try:
-            args.dpi=int(options.dpi)
+            args.dpi=int(args.dpi)
         except:
             print("failed to read dpi")
             args.dpi=150
 
     if args.time_zone:
-        time_zone = int(options.time_zone)
+        time_zone = int(args.time_zone)
         if time_zone > 12: time_zone = 0
         if time_zone < -12: time_zone = 0
     else:
