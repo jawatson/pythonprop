@@ -32,25 +32,23 @@ import re
 import sys
 import zipfile
 
-import matplotlib
-import matplotlib.pyplot as plt
-
 import cartopy.crs as ccrs
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
+from cartopy.mpl.geoaxes import GeoAxes
+
+import matplotlib
+import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
+from mpl_toolkits.axes_grid1 import AxesGrid
+from matplotlib.colors import ListedColormap
+from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
+from matplotlib.font_manager import FontProperties
+
+import numpy as np
 
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-
-import matplotlib.ticker as mticker
-from matplotlib.colors import ListedColormap
-from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
-from matplotlib.font_manager import FontProperties
-from mpl_toolkits.axes_grid1 import make_axes_locatable
-
-
-import numpy as np
-#import numpy.ma as ma
 
 from .hamlocation import HamLocation
 from .voaAreaRect import VOAAreaRect
@@ -72,6 +70,8 @@ gettext.bindtextdomain(GETTEXT_DOMAIN, LOCALE_PATH)
 gettext.textdomain(GETTEXT_DOMAIN)
 lang = gettext.translation(GETTEXT_DOMAIN, LOCALE_PATH, languages=langs, fallback=True)
 lang.install()
+
+# https://scitools.org.uk/cartopy/docs/latest/gallery/axes_grid_basic.html#sphx-glr-gallery-axes-grid-basic-py
 
 class VOAAreaPlot:
 
@@ -144,14 +144,13 @@ class VOAAreaPlot:
         #    print "-180 < Latitude < 180.0, -90 < Longitude < 90"
         #    sys.exit(1)
 
-        #colString = 'matplotlib.cm.'+color_map
-        #colMap = eval(colString)
         portland = ListedColormap(["#0C3383", "#0b599b","#0a7fb4","#57a18f","#bec255","#f2c438","#f2a638","#ef8235","#e4502a","#d91e1e"])
         plt.register_cmap(name='portland', cmap=portland)
         colMap = color_map
 
+        projection = ccrs.PlateCarree()
+        axes_class = (GeoAxes,dict(map_projection=projection))
 
-        self.subplots = []
         number_of_subplots = len(vg_files)
 
         matplotlib.rcParams['axes.edgecolor'] = 'gray'
@@ -194,25 +193,23 @@ class VOAAreaPlot:
 
         num_cols = int(math.ceil(float(number_of_subplots)/float(num_rows)))
 
-        plt.subplots_adjust(left=0, wspace=0.1)
+        fig = plt.figure()
+        axgr = AxesGrid(fig, 111, axes_class=axes_class,
+                    nrows_ncols=(num_rows, num_cols),
+                    axes_pad=0.6,
+                    cbar_location='right',
+                    cbar_mode='single',
+                    cbar_pad=0.2,
+                    cbar_size='3%',
+                    label_mode='')
         
-        #https://github.com/SciTools/cartopy/issues/899
-        proj=ccrs.PlateCarree()
-        fig, axes = plt.subplots(num_rows, num_cols, squeeze=False, subplot_kw=dict(projection=proj))
-
         self.main_title_label = fig.suptitle(str(self.image_defs['title']), fontsize=self.main_title_fontsize)
 
-        # Hide any unused subplots
-        # https://stackoverflow.com/questions/10035446/how-can-i-make-a-blank-subplot-in-matplotlib
-        for plot_idx in range(number_of_subplots, (num_rows*num_cols)):
-            col_idx = int(plot_idx/num_cols)
-            row_idx = plot_idx%num_cols
-            axes[col_idx, row_idx].set_visible(False)
 
-        for plot_idx, vg_file in enumerate(vg_files):
-            col_idx = int(plot_idx/num_cols)
-            row_idx = plot_idx%num_cols
-
+        
+        #for plot_idx, vg_file in enumerate(vg_files):
+        for plot_idx, ax, vg_file in zip(range(number_of_subplots), axgr, vg_files):
+            
             points = np.zeros([img_grid_size,img_grid_size], float)
 
             lons = np.arange(area_rect.get_sw_lon(), area_rect.get_ne_lon()+0.001,(area_rect.get_ne_lon()-area_rect.get_sw_lon())/float(img_grid_size-1))
@@ -220,7 +217,7 @@ class VOAAreaPlot:
             lats = np.arange(area_rect.get_sw_lat(), area_rect.get_ne_lat()+0.001,(area_rect.get_ne_lat()-area_rect.get_sw_lat())/float(img_grid_size-1))
             lats[-1] = min(90.0, lats[-1])
 
-            axes[col_idx, row_idx].label_outer()
+            #ax.label_outer()
             if in_file.endswith('.vgz'):
                 base_filename = get_base_filename(in_file)
                 zf = zipfile.ZipFile(in_file)
@@ -241,63 +238,39 @@ class VOAAreaPlot:
             if 'zf' in locals():
                 zf.close()
             
-            def resize_colorbar(event):
-                print('resizing colorbar')
-                plt.draw()
-                # left, bottom, width, height
-                if number_of_subplots == num_cols*num_rows:
-                    print('doing 1x1')
-                    top_posn = axes[0, num_cols-1].get_position(original=False)
-                    print(top_posn)
-                    bottom_posn = axes[col_idx, row_idx].get_position(original=False)
-                    print(bottom_posn.height)
-                    cb_height = top_posn.y0 + top_posn.height - bottom_posn.y0
-                    print(cb_height)
-                    cbar_ax.set_position([top_posn.x0 + top_posn.width + 0.01, bottom_posn.y0, 0.02, cb_height])
-                else:
-                    posn = axes[col_idx][row_idx+1].get_position()
-                    # fig.subplotpars.hspace, fig.subplotpars.wspace
-                    print(fig.subplotpars.hspace)
-                    print(fig.subplotpars.wspace)
-                    cbar_ax.set_position([posn.x0, posn.y0, 0.02, posn.height])
-            
-            #fig.canvas.mpl_connect('resize_event', resize_colorbar)
-
-            axes[col_idx, row_idx].coastlines()
+            ax.set_extent([area_rect.get_sw_lon(),
+                        area_rect.get_ne_lon(),
+                        area_rect.get_sw_lat(),
+                        area_rect.get_ne_lat()], projection)
+                        
+            ax.coastlines()
 
             lons, lats  = np.meshgrid(lons, lats)
             points = np.clip(points, self.image_defs['min'], self.image_defs['max'])
 
-            axes[col_idx, row_idx].set_extent([area_rect.get_sw_lon(),
-                                                area_rect.get_ne_lon(),
-                                                area_rect.get_sw_lat(),
-                                                area_rect.get_ne_lat()], ccrs.PlateCarree())
-
             if (filled_contours):
-                im = axes[col_idx, row_idx].contourf(lons, lats, points, self.image_defs['y_labels'],
+                im = ax.contourf(lons, lats, points, self.image_defs['y_labels'],
                     cmap = colMap,
-                    transform=ccrs.PlateCarree())
+                    transform=projection)
                 plot_contours = True
             else:
-                im = axes[col_idx, row_idx].pcolormesh(lons, lats, points,
+                im = ax.pcolormesh(lons, lats, points,
                     vmin = self.image_defs['min'],
                     vmax = self.image_defs['max'],
                     cmap = colMap,
-                    transform=ccrs.PlateCarree())
+                    transform=projection)
 
             if plot_contours:
-                ct = axes[col_idx, row_idx].contour(lons, lats, points, self.image_defs['y_labels'][1:],
+                ct = ax.contour(lons, lats, points, self.image_defs['y_labels'][1:],
                     linestyles='solid',
                     linewidths=0.5,
                     colors='k',
                     vmin=self.image_defs['min'],
                     vmax=self.image_defs['max'],
-                    transform=ccrs.PlateCarree())
-            #######################
-            # Plot greyline
-            #######################
+                    transform=projection)
+                    
             if plot_nightshade:
-                self.fill_dark_side(axes[col_idx, row_idx],
+                self.fill_dark_side(ax,
                             time=plot_parameters.get_daynight_datetime(vg_files[plot_idx]-1),
                             color='black',
                             alpha=0.4)
@@ -312,7 +285,7 @@ class VOAAreaPlot:
                     ax.plot([xpt],[ypt],'ro')
                     ax.text(xpt+100000,ypt+100000,location.get_name())
             """
-            gl = axes[col_idx, row_idx].gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
+            gl = ax.gridlines(crs=projection, draw_labels=True,
                   linewidth=1, color='black', alpha=0.75)
             gl.xlabels_top = False
             gl.xlabels_bottom = False
@@ -346,45 +319,26 @@ class VOAAreaPlot:
             title_str = plot_parameters.get_plot_description_string(vg_files[plot_idx]-1, self.image_defs['plot_type'])
             if number_of_subplots == 1:
                 title_str = plot_parameters.get_plot_description_string(vg_files[plot_idx]-1, self.image_defs['plot_type'])
-                title_str = title_str + "\n" + plot_parameters.get_detailed_plot_description_string(vg_files[plot_idx]-1)
+                #title_str = title_str + "\n" + plot_parameters.get_detailed_plot_description_string(vg_files[plot_idx]-1)
             else :
                 title_str = plot_parameters.get_minimal_plot_description_string(vg_files[plot_idx]-1, self.image_defs['plot_type'])
-            self.subplot_title_label = axes[col_idx, row_idx].set_title(title_str)
+            self.subplot_title_label = ax.set_title(title_str)
 
+        # Hide any unused subplots        
+        for ax in axgr[number_of_subplots:]:
+            ax.set_visible(False)
 
-        #print self.image_defs['y_labels']
-        """
-        for t in self.cb_ax.get_yticklabels():
-            t.set_fontsize(colorbar_fontsize)
-        """
-        # Add the colorbar axes anywhere in the figure. Its position will be
-        # re-calculated at each figure resize.
-        #cbar_ax = fig.add_axes([0, 0, 0.1, 0.1])
-        divider = make_axes_locatable(axes[col_idx, row_idx])
-        cbar_ax = divider.new_horizontal(size="3%", pad=0.1, axes_class=plt.Axes)
-        cbar_ax = fig.add_axes(cbar_ax)
-        cbar_ax.tick_params(labelsize=10)
-        #fig.colorbar(im, cax=cbar_ax)
-
-        #fig.subplots_adjust(hspace=0, wspace=0, top=0.925, left=0.05)
-
-        fig.colorbar(im,
-            cax=cbar_ax,
+        axgr.cbar_axes[0].colorbar(im,
             ticks = self.image_defs['y_labels'],
             format = mticker.FuncFormatter(eval('self.'+self.image_defs['formatter'])))
-
-        gtk_canvas = FigureCanvas(fig)
-        gtk_canvas.draw()
-        #fig.canvas.mpl_connect('resize_event', resize_colorbar)
-        #fig.canvas.show()
-
+        
         if save_file :
-            #resize_colorbar(None)
             plt.savefig(save_file, dpi=self.dpi, facecolor=fig.get_facecolor(), edgecolor='none')
-            #plt.savefig(save_file, dpi=self.dpi, bbox_inches='tight', facecolor=fig.get_facecolor(), edgecolor='none')
 
         #todo this ought to a command line param
         if not self.run_quietly:
+            gtk_canvas = FigureCanvas(fig)
+            gtk_canvas.show()
             dia = VOAPlotWindow('pythonProp - ' + self.image_defs['title'], gtk_canvas, parent=parent, datadir=self.datadir)
         return
 
@@ -468,12 +422,6 @@ class VOAAreaPlot:
 
         ax.fill(x, y, transform=rotated_pole, **kwargs)
 
-    def get_cb_axes(self):
-        bbox = self.subplots[0].get_window_extent()
-        axis_upper_y = bbox.inverse_transformed(fig.transFigure).ymax
-        bbox = self.subplots[-1].get_window_extent()
-        axis_lower_y = bbox.inverse_transformed(fig.transFigure).ymin
-        return [0.87, axis_lower_y, 0.02, axis_upper_y-axis_lower_y]
 
     def percent_format(self, x, pos):
         return '%(percent)3d%%' % {'percent':x*100}
@@ -497,14 +445,11 @@ class VOAAreaPlot:
             #return _('%(value)ddBW (%(s_value)s)') %{'value':x, 's_value':S_DICT[x]}
         else : return '%3d' % x
 
-
     def frequency_format(self, x, pos):
         return '%2dMHz' % x
 
-
     def default_format(self, x, pos):
         return '%d' % x
-
 
 def main(in_file, datadir=None):
     parser = argparse.ArgumentParser(description="Plot voacap area data")
@@ -646,7 +591,6 @@ def main(in_file, datadir=None):
             except:
                 print(_("Error reading vg files, resetting to '1'"))
                 vg_files = [1]
-        #print(_("The following %d files have been selected: ") % (len(vg_files)), vg_files)
 
     VOAAreaPlot(in_file,
                     vg_files = vg_files,
