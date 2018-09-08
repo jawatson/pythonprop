@@ -43,22 +43,20 @@
 #
 # './voaP2PPlot.py -z 3 voacapx.out' Plots for a timezone of + 3 hours
 
+import argparse
+import math
+import os
+import re
+import sys
 
 import matplotlib
 from matplotlib.colors import ListedColormap
-
-import sys
-import re
-import os
-import math
-from optparse import OptionParser
-
-import numpy as np
 from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg
-import matplotlib.transforms as mtransforms
 from matplotlib.figure import Figure
 from matplotlib.font_manager import FontProperties
 from matplotlib.ticker import FuncFormatter
+
+import numpy as np
 
 from .voaOutFile import VOAOutFile
 from .voaPlotWindow import VOAPlotWindow
@@ -387,129 +385,129 @@ class VOAP2PPlot:
 
 
 def main(data_file, datadir=None):
-    parser = OptionParser(usage=_("%voaP2PPlot [options] file"), version="%voaP2PPlot 0.9")
-
-    #tested ok
-    parser.add_option("-b", "--band",
+    parser = argparse.ArgumentParser(description="Plot voacap p2p data")
+    parser.add_argument("in_file",
+        help = _("Path to the .out file."))
+    parser.add_argument("-b", "--band",
         dest = "plot_bands",
         choices = ['1', '2', '3'],
         help = _("Display a band plan indicated by the integer 1, 2 or 3 (e.g. 1:SWL 2:UK AMATEUR BANDS 3:KSA AMATEUR BANDS)"))
 
-    parser.add_option("-c", "--contour",
+    parser.add_argument("-c", "--contour",
         dest="plot_contours",
         default=False,
         action="store_true",
         help=_("Print contour lines on the plot"))
 
-    parser.add_option("-f", "--freqmax",
+    parser.add_argument("-f", "--freqmax",
         dest = "y_max",
         default = '30.0',
         help=_("Maximum frequency for the Y axis"))
 
-    parser.add_option("--filled-contour",
+    parser.add_argument("--filled-contour",
         dest = "plot_filled_contours",
         action = "store_true",
         default = False,
         help = _("Produces a filled contour plot.") )
 
-    parser.add_option("-g", "--group",
+    parser.add_argument("-g", "--group",
         dest="plotGroups",
         default='1',
         help=_("Group(s) to plot. e.g '-g 1,3,5,6'. (default = 1)"))
 
-    parser.add_option("-k", "--background",
+    parser.add_argument("-k", "--background",
         dest="face_colour",
         default='white',
         help=_("Specify the colour of the background. Any legal HTML color specification is supported e.g '-k red', '-k #eeefff', (default = white)"))
 
-    parser.add_option("-l", "--label",
+    parser.add_argument("-l", "--label",
         dest = "plot_label",
         default = "",
         help = _("A text label, printed in the main title block"))
 
-    parser.add_option("-m", "--cmap",
+    parser.add_argument("-m", "--cmap",
         dest="color_map",
         default='jet',
         choices = [ 'autumn', 'bone', 'cool', 'copper', 'gray', \
                 'hot', 'hsv', 'jet', 'pink', 'spring','summer', 'winter', 'portland' ],
         help=_("COLOURMAP - may be one of 'autumn', 'bone', 'cool', 'copper', 'gray', 'hot', 'hsv', 'jet', 'pink', 'spring', 'summer', 'winter' or 'portland'.  Default = 'jet'"))
 
-    parser.add_option("-o", "--outfile",
+    parser.add_argument("-o", "--outfile",
         dest="save_file",
         help="Save to FILE.", metavar="FILE")
 
-    parser.add_option("-q", "--quiet",
+    parser.add_argument("-q", "--quiet",
         dest="run_quietly",
         action="store_true",
         default=False,
         help=_("Process quietly (don't display plot on the screen)"))
 
-    parser.add_option("-r", "--resolution",
+    parser.add_argument("-r", "--resolution",
         dest="dpi",
         default=150,
         help=_("Dots per inch (dpi) of saved file."))
 
-    parser.add_option("-t", "--datatype",
+    parser.add_argument("-t", "--datatype",
         dest="data_type",
         default=1,
         help=_("Image type 0:None 1:MUFday 2:REL 3:SNR 4:S DBW (default = 1)"))
 
 
-    parser.add_option("-z", "--timezone",
+    parser.add_argument("-z", "--timezone",
         dest="time_zone",
         default=0,
         help=_("Time zone (integer, default = 0)"))
 
-    (options, args) = parser.parse_args()
+    args = parser.parse_args()
 
-    if options.data_type:
-        if int(options.data_type) not in VOAP2PPlot.IMG_TYPE_DICT:
+    if args.data_type:
+        if int(args.data_type) not in VOAP2PPlot.IMG_TYPE_DICT:
             print(_("Unrecognised plot type: Defaulting to MUF days"))
             options.data_type = 1
 
-    if options.plot_bands:
-        if int(options.plot_bands) == 1: bands = VOAP2PPlot.SWL_BANDS
-        elif int(options.plot_bands) == 2: bands = VOAP2PPlot.UK_BANDS
-        elif int(options.plot_bands) == 3: bands = VOAP2PPlot.KSA_BANDS
+    if args.plot_bands:
+        if int(args.plot_bands) == 1: bands = VOAP2PPlot.SWL_BANDS
+        elif int(args.plot_bands) == 2: bands = VOAP2PPlot.UK_BANDS
+        elif int(args.plot_bands) == 3: bands = VOAP2PPlot.KSA_BANDS
         else: bands = None
     else:
         bands = None
 
-    if options.y_max:
-        if options.y_max == 'a':
+    if args.y_max:
+        if args.y_max == 'a':
             plot_max_freq = VOAP2PPlot.AUTOSCALE
         else:
             try:
-                plot_max_freq = float(options.y_max)
+                plot_max_freq = float(args.y_max)
             except:
                 print(_("-f arguments must be either 'a' or a decimal in the range 5.0 - 30.0"))
                 os._exit(1)
             plot_max_freq = min(plot_max_freq, 30.0)
             plot_max_freq = max(plot_max_freq, 5.0)
 
-    if options.dpi:
+    if args.dpi:
         try:
-            options.dpi=int(options.dpi)
+            args.dpi=int(options.dpi)
         except:
             print("failed to read dpi")
-            options.dpi=150
+            args.dpi=150
 
-    if options.time_zone:
+    if args.time_zone:
         time_zone = int(options.time_zone)
         if time_zone > 12: time_zone = 0
         if time_zone < -12: time_zone = 0
     else:
         time_zone = 0
 
-    if options.plotGroups:
-        if options.plotGroups == 'a':
+    if args.plotGroups:
+        if args.plotGroups == 'a':
             plot_groups = ['a']
         else:
             try:
-                if options.plotGroups.find(','):
-                    plot_groups = options.plotGroups.split(',')
+                if args.plotGroups.find(','):
+                    plot_groups = args.plotGroups.split(',')
                 else:
-                    plot_groups = [int(options.plotGroups)]
+                    plot_groups = [int(args.plotGroups)]
                 #convert to integers
                 for i in range(0, len(plot_groups)):
                     try:
@@ -529,19 +527,19 @@ def main(data_file, datadir=None):
 #        print "%d groups have been selected: " % (len(plot_groups)), plot_groups
 
     plot = VOAP2PPlot(data_file,
-                    data_type = int(options.data_type),
+                    data_type = int(args.data_type),
                     plot_groups = plot_groups,
-                    plot_contours = options.plot_contours,
-                    face_colour = options.face_colour,
-                    filled_contours = options.plot_filled_contours,
-                    plot_label = options.plot_label,
-                    color_map=options.color_map,
+                    plot_contours = args.plot_contours,
+                    face_colour = args.face_colour,
+                    filled_contours = args.plot_filled_contours,
+                    plot_label = args.plot_label,
+                    color_map= args.color_map,
                     time_zone = time_zone,
                     plot_max_freq = plot_max_freq,
                     plot_bands = bands,
-                    run_quietly = options.run_quietly,
-                    save_file = options.save_file,
-                    dpi = options.dpi,
+                    run_quietly = args.run_quietly,
+                    save_file = args.save_file,
+                    dpi = args.dpi,
                     datadir=datadir)
 
 
