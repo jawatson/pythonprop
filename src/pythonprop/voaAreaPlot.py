@@ -93,6 +93,7 @@ class VOAAreaPlot:
     def __init__(self, in_file,
                     vg_files = [1],
                     data_type = 1,
+                    time_zone = 0,
                     color_map = 'portland',
                     face_colour = "white",
                     filled_contours = False,
@@ -316,12 +317,12 @@ class VOAAreaPlot:
                 gl.ylocator = mticker.FixedLocator(parallels)
 
             #add a title
-            title_str = plot_parameters.get_plot_description_string(vg_files[plot_idx]-1, self.image_defs['plot_type'])
+            title_str = plot_parameters.get_plot_description_string(vg_files[plot_idx]-1, self.image_defs['plot_type'], time_zone=time_zone)
             if number_of_subplots == 1:
-                title_str = plot_parameters.get_plot_description_string(vg_files[plot_idx]-1, self.image_defs['plot_type'])
+                title_str = plot_parameters.get_plot_description_string(vg_files[plot_idx]-1, self.image_defs['plot_type'], time_zone=time_zone)
                 #title_str = title_str + "\n" + plot_parameters.get_detailed_plot_description_string(vg_files[plot_idx]-1)
             else :
-                title_str = plot_parameters.get_minimal_plot_description_string(vg_files[plot_idx]-1, self.image_defs['plot_type'])
+                title_str = plot_parameters.get_minimal_plot_description_string(vg_files[plot_idx]-1, self.image_defs['plot_type'], time_zone=time_zone)
             self.subplot_title_label = ax.set_title(title_str)
 
         # Hide any unused subplots        
@@ -333,7 +334,10 @@ class VOAAreaPlot:
             format = mticker.FuncFormatter(eval('self.'+self.image_defs['formatter'])))
         
         if save_file :
-            plt.savefig(save_file, dpi=self.dpi, facecolor=fig.get_facecolor(), edgecolor='none')
+            plt.savefig(save_file, 
+                dpi=self.dpi, 
+                facecolor=fig.get_facecolor(), 
+                edgecolor='none')
 
         #todo this ought to a command line param
         if not self.run_quietly:
@@ -535,6 +539,11 @@ def main(in_file, datadir=None):
         default = '1',
         help=_("VG_FILES number of plots to process, e.g '-v 1,3,5,6' or use '-v a' to print all plots.") )
 
+    parser.add_argument("-z", "--timezone",
+        dest="timezone",
+        default=0,
+        help=_("Time zone (integer, default = 0)"))
+
     #args = parser.parse_intermixed_args()
     args = parser.parse_args()
 
@@ -591,10 +600,18 @@ def main(in_file, datadir=None):
             except:
                 print(_("Error reading vg files, resetting to '1'"))
                 vg_files = [1]
+                
+    if args.timezone:
+        time_zone = int(args.timezone)
+        if time_zone > 12: time_zone = 0
+        if time_zone < -12: time_zone = 0
+    else :
+        time_zone = 0
 
     VOAAreaPlot(in_file,
                     vg_files = vg_files,
                     data_type = args.data_type,
+                    time_zone = time_zone,
                     color_map = args.color_map,
                     face_colour = args.face_colour,
                     filled_contours = args.plot_filled_contours,
