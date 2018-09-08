@@ -20,13 +20,6 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 #
-# Work well:    cyl mill sinu
-# Displays ok    ortho eqdc robin moll tmerc
-# Displays ?:    lcc aea
-# Crashes:    geos aeqd cass poly gnom stere laea
-# Additional parameters required : splaea nplaea merc npstere  spstere npaeqd omerc spaeqd
-#    print options.projection
-
 
 #todo
 # Label size need reducing on small plots
@@ -65,7 +58,7 @@ from matplotlib.ticker import FuncFormatter
 import numpy as np
 import numpy.ma as ma
 
-from optparse import OptionParser
+import argparse
 
 import zipfile
 
@@ -113,13 +106,11 @@ class VOAAreaPlot:
     def __init__(self, in_file,
                     vg_files = [1],
                     data_type = 1,
-                    projection = 'cyl',
                     color_map = 'portland',
                     face_colour = "white",
                     time_zone = 0,
                     filled_contours = False,
                     plot_contours = False,
-                    plot_center = 't',
                     plot_meridians = True,
                     plot_parallels = True,
                     plot_nightshade = True,
@@ -144,21 +135,9 @@ class VOAAreaPlot:
                 print("Invalid .vgz file")
                 sys.exit(1)
 
-        if (plot_parameters.get_projection() != 'cyl'):
-            print(_("Error: Only lat/lon (type 1) input files are supported"))
-            sys.exit(1)
-
         grid = plot_parameters.get_gridsize()
         self.image_defs = VOAAreaPlot.IMG_TYPE_DICT[int(data_type)]
 
-        # TODO This needs a little more work... what if the pcenter card is not specified
-
-        if plot_center == 'p':
-            plot_centre_location = plot_parameters.get_location(plot_parameters.P_CENTRE)
-        else:
-            plot_centre_location = plot_parameters.get_location(plot_parameters.TX_SITE)
-
-        self.points_of_interest = [plot_centre_location]
         if len(points_of_interest) > 0:
             self.points_of_interest.extend(points_of_interest)
 
@@ -494,41 +473,8 @@ class VOAAreaPlot:
         ax.fill(x, y, transform=rotated_pole, **kwargs)
 
 
-    """
-    def on_draw(self, event):
-        top = self.fig.subplotpars.top
-        bottom = self.fig.subplotpars.bottom
-        hspace = self.fig.subplotpars.hspace
-        wspace = self.fig.subplotpars.wspace
-
-        fig_height = self.fig.get_figheight()
-
-        needs_adjusting = False
-
-        # Area required at the top of the plot (Main title and subplot title)
-        bbox = self.subplot_title_label.get_window_extent()
-        subplot_title_bbox = bbox.inverse_transformed(self.fig.transFigure)
-
-        bbox = self.main_title_label.get_window_extent()
-        main_title_bbox = bbox.inverse_transformed(self.fig.transFigure)
-
-        _preferred_top_space = 1.25*(subplot_title_bbox.height + main_title_bbox.height)
-        _actual_top_space = 1-top
-
-        if (_actual_top_space < _preferred_top_space) or ((_actual_top_space - _preferred_top_space)>0.11):
-            top = 0.99 - _preferred_top_space
-            needs_adjusting = True
-
-        if needs_adjusting:
-            self.fig.subplots_adjust(top = top, bottom = bottom, hspace = hspace, wspace = wspace)
-            self.cb_ax.set_position(self.get_cb_axes())
-            self.fig.canvas.draw()
-        return False
-    """
-
     def save_plot(self, canvas, filename=None):
         canvas.print_figure(filename, dpi=self.dpi, facecolor=self.fig.get_facecolor(), edgecolor='none')
-
 
     def get_cb_axes(self):
         bbox = self.subplots[0].get_window_extent()
@@ -536,7 +482,6 @@ class VOAAreaPlot:
         bbox = self.subplots[-1].get_window_extent()
         axis_lower_y = bbox.inverse_transformed(self.fig.transFigure).ymin
         return [0.87, axis_lower_y, 0.02, axis_upper_y-axis_lower_y]
-
 
     def percent_format(self, x, pos):
         return '%(percent)3d%%' % {'percent':x*100}
@@ -570,105 +515,93 @@ class VOAAreaPlot:
 
 
 def main(in_file, datadir=None):
-    parser = OptionParser(usage="%voaAreaPlot [options] file")
-    parser.disable_interspersed_args()
+    parser = argparse.ArgumentParser(description="Plot voacap area data")
+    #parser.disable_interspersed_args()
     #tested ok
-    parser.add_option("-c", "--contours",
+    parser.add_argument("-c", "--contours",
         dest = "plot_contours",
         action = "store_true",
         default = False,
         help = _("Enables contour plotting.") )
     #tested ok
-    parser.add_option("-d", "--datatype",
+    parser.add_argument("-d", "--datatype",
         dest="data_type",
         default=1,
         help=_("DATATYPE - an integer number representing the data to plot. Valid values are 1 (MUF), 2 (REL) and 3 3 (SNR) 4 (SNRxx), 5 (SDBW) and 6 (SDBW - formatted as S-Meter values).  Default value is 1 (MUF).") )
 
-    parser.add_option("-e", "--centre",
-        dest="plot_centre",
-        default='t',
-        choices = [ 'p', 't'],
-        help = _("Defines the plot centre on circular (e.g. ortho) plots.  Ignored on cylindrical plots.  Valid values are 't' (Tx. Site), 'p' (PCenter).  Default is 't'"))
-
-    parser.add_option("--filled-contour",
+    parser.add_argument("--filled-contour",
         dest = "plot_filled_contours",
         action = "store_true",
         default = False,
         help = _("Produces a filled contour plot.") )
 
-    parser.add_option("-i", "--meridian",
+    parser.add_argument("-i", "--meridian",
         dest="plot_meridians",
         action="store_true",
         default=False,
         help=_("Plot meridians."))
-    parser.add_option("-k", "--background",
+    parser.add_argument("-k", "--background",
         dest="face_colour",
         default='white',
         help=_("Specify the colour of the background. Any legal HTML color specification is supported e.g '-k red', '-k #eeefff' (default = white)"))
     #tested ok
-    parser.add_option("-l", "--parallels",
+    parser.add_argument("-l", "--parallels",
         dest="plot_parallels",
         action="store_true",
         default=False,
         help=_("Plot meridians."))
 
-    parser.add_option("-m", "--cmap",
+    parser.add_argument("-m", "--cmap",
         dest = "color_map",
         default = 'jet',
         choices = [ 'autumn', 'bone', 'cool', 'copper', 'gray', \
                 'hot', 'hsv', 'jet', 'pink', 'spring','summer', 'winter', 'portland' ],
         help=_("COLOURMAP - may be one of 'autumn', 'bone', 'cool', 'copper', 'gray', 'hot', 'hsv', 'jet', 'pink', 'spring', 'summer', 'winter' or 'portland'.  Default = 'jet'"))
 
-    parser.add_option("-n", "--interest",
+    parser.add_argument("-n", "--interest",
         dest = "poi_file",
         default = '',
         help = "poi_file is a text file with points to plot on the map.")
 
-    parser.add_option("-o", "--outfile",
+    parser.add_argument("-o", "--outfile",
         dest="save_file",
         help="Save to FILE.",
         metavar="FILE")
 
-    parser.add_option("-p", "--projection",
-        dest="projection",
-        default = 'cyl',
-        choices = ['cyl', 'mill', 'gall', 'robin', 'vandg', 'sinu', 'mbtfpq',
-                    'eck4', 'kav7', 'moll', 'hammer', 'cass', 'poly', 'gnom',
-                    'laea', 'aeqd', 'cea', 'merc'])
-
-    parser.add_option("-q", "--quiet",
+    parser.add_argument("-q", "--quiet",
         dest="run_quietly",
         action="store_true",
         default=False,
         help=_("Process quietly (don't display plot on the screen)"))
 
-    parser.add_option("-r", "--resolution",
+    parser.add_argument("-r", "--resolution",
         dest="resolution",
         default = 'c',
         choices = ['c', 'l', 'i', 'h', 'f'],
         help=_("RESOLUTION - may be one of 'c' (crude), 'l' (low), 'i' (intermediate), 'h' (high), 'f' (full)"))
 
-    parser.add_option("-s", "--size",
+    parser.add_argument("-s", "--size",
         dest="dpi",
         default=150,
         help=_("Dots per inch (dpi) of saved file."))
 
-    parser.add_option("-t", "--terminator",
+    parser.add_argument("-t", "--terminator",
         dest="plot_nightshade",
         action="store_true",
         default = False,
         help=_("Plot day/night regions on the map"))
 
-    parser.add_option("-v", "--vg_files",
+    parser.add_argument("-v", "--vg_files",
         dest = "vg_files",
         default = '1',
         help=_("VG_FILES number of plots to process, e.g '-v 1,3,5,6' or use '-v a' to print all plots.") )
     #tested ok
-    parser.add_option("-z", "--timezone",
+    parser.add_argument("-z", "--timezone",
         dest="timezone",
         default=0,
         help=_("Time zone (integer, default = 0)"))
 
+    #(options, args) = parser.parse_intermixed_args()
     (options, args) = parser.parse_args()
 
     points_of_interest = []
@@ -736,7 +669,6 @@ def main(in_file, datadir=None):
                     vg_files = vg_files,
                     time_zone = time_zone,
                     data_type = options.data_type,
-                    projection = options.projection,
                     color_map = options.color_map,
                     face_colour = options.face_colour,
                     filled_contours = options.plot_filled_contours,
