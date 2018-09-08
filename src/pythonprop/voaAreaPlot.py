@@ -108,14 +108,13 @@ class VOAAreaPlot:
                     data_type = 1,
                     color_map = 'portland',
                     face_colour = "white",
-                    time_zone = 0,
                     filled_contours = False,
                     plot_contours = False,
                     plot_meridians = True,
                     plot_parallels = True,
                     plot_nightshade = True,
                     resolution = 'c',
-                    points_of_interest = [],
+                    #points_of_interest = [],
                     save_file = '',
                     run_quietly = False,
                     dpi = 150,
@@ -138,9 +137,11 @@ class VOAAreaPlot:
         grid = plot_parameters.get_gridsize()
         self.image_defs = VOAAreaPlot.IMG_TYPE_DICT[int(data_type)]
 
+        """
         if len(points_of_interest) > 0:
             self.points_of_interest.extend(points_of_interest)
-
+        """
+        
         imageBuf = np.zeros([grid, grid], float)
 
         area_rect = plot_parameters.get_area_rect()
@@ -308,7 +309,7 @@ class VOAAreaPlot:
                 self.fill_dark_side(axes[col_idx, row_idx],
                             time=plot_parameters.get_daynight_datetime(vg_files[plot_idx]-1),
                             color='black',
-                            alpha=0.75)
+                            alpha=0.4)
 
             ##########################
             # Points of interest
@@ -351,12 +352,12 @@ class VOAAreaPlot:
                 gl.ylocator = mticker.FixedLocator(parallels)
 
             #add a title
-            title_str = plot_parameters.get_plot_description_string(vg_files[plot_idx]-1, self.image_defs['plot_type'], time_zone)
+            title_str = plot_parameters.get_plot_description_string(vg_files[plot_idx]-1, self.image_defs['plot_type'])
             if number_of_subplots == 1:
-                title_str = plot_parameters.get_plot_description_string(vg_files[plot_idx]-1, self.image_defs['plot_type'], time_zone)
+                title_str = plot_parameters.get_plot_description_string(vg_files[plot_idx]-1, self.image_defs['plot_type'])
                 title_str = title_str + "\n" + plot_parameters.get_detailed_plot_description_string(vg_files[plot_idx]-1)
             else :
-                title_str = plot_parameters.get_minimal_plot_description_string(vg_files[plot_idx]-1, self.image_defs['plot_type'], time_zone)
+                title_str = plot_parameters.get_minimal_plot_description_string(vg_files[plot_idx]-1, self.image_defs['plot_type'])
             self.subplot_title_label = axes[col_idx, row_idx].set_title(title_str)
 
 
@@ -516,20 +517,21 @@ class VOAAreaPlot:
 
 def main(in_file, datadir=None):
     parser = argparse.ArgumentParser(description="Plot voacap area data")
-    #parser.disable_interspersed_args()
-    #tested ok
+    parser.add_argument("in_file",
+        help = _("Path to the .voa file.  This should be in the same directory as the associated .vgx files."))
+    
     parser.add_argument("-c", "--contours",
         dest = "plot_contours",
         action = "store_true",
         default = False,
         help = _("Enables contour plotting.") )
-    #tested ok
+
     parser.add_argument("-d", "--datatype",
         dest="data_type",
         default=1,
         help=_("DATATYPE - an integer number representing the data to plot. Valid values are 1 (MUF), 2 (REL) and 3 3 (SNR) 4 (SNRxx), 5 (SDBW) and 6 (SDBW - formatted as S-Meter values).  Default value is 1 (MUF).") )
 
-    parser.add_argument("--filled-contour",
+    parser.add_argument("-f", "--filled-contour",
         dest = "plot_filled_contours",
         action = "store_true",
         default = False,
@@ -540,11 +542,12 @@ def main(in_file, datadir=None):
         action="store_true",
         default=False,
         help=_("Plot meridians."))
+        
     parser.add_argument("-k", "--background",
         dest="face_colour",
         default='white',
         help=_("Specify the colour of the background. Any legal HTML color specification is supported e.g '-k red', '-k #eeefff' (default = white)"))
-    #tested ok
+
     parser.add_argument("-l", "--parallels",
         dest="plot_parallels",
         action="store_true",
@@ -557,12 +560,12 @@ def main(in_file, datadir=None):
         choices = [ 'autumn', 'bone', 'cool', 'copper', 'gray', \
                 'hot', 'hsv', 'jet', 'pink', 'spring','summer', 'winter', 'portland' ],
         help=_("COLOURMAP - may be one of 'autumn', 'bone', 'cool', 'copper', 'gray', 'hot', 'hsv', 'jet', 'pink', 'spring', 'summer', 'winter' or 'portland'.  Default = 'jet'"))
-
+    """
     parser.add_argument("-n", "--interest",
         dest = "poi_file",
         default = '',
         help = "poi_file is a text file with points to plot on the map.")
-
+    """
     parser.add_argument("-o", "--outfile",
         dest="save_file",
         help="Save to FILE.",
@@ -595,20 +598,16 @@ def main(in_file, datadir=None):
         dest = "vg_files",
         default = '1',
         help=_("VG_FILES number of plots to process, e.g '-v 1,3,5,6' or use '-v a' to print all plots.") )
-    #tested ok
-    parser.add_argument("-z", "--timezone",
-        dest="timezone",
-        default=0,
-        help=_("Time zone (integer, default = 0)"))
 
-    #(options, args) = parser.parse_intermixed_args()
-    (options, args) = parser.parse_args()
+    #args = parser.parse_intermixed_args()
+    args = parser.parse_args()
 
-    points_of_interest = []
+    #points_of_interest = []
     vg_files = []
-    if options.poi_file:
+    """
+    if args.poi_file:
         try:
-            f = open(options.poi_file, 'r')
+            f = open(args.poi_file, 'r')
             for line in f:
                 if len(line) > 3:
                     tokens = line.strip().split(',', 2)
@@ -619,20 +618,20 @@ def main(in_file, datadir=None):
                                                 lon = float(tokens[0].strip()),
                                                 name = tokens[2].strip()))
         except:
-            print(_("Error reading points of interest file: %s") % options.poi_file)
+            print(_("Error reading points of interest file: %s") % args.poi_file)
             print(sys.exc_info()[0])
             points_of_interest = []
     else:
         points_of_interest = []
-
-    if options.data_type:
-        if int(options.data_type) not in VOAAreaPlot.IMG_TYPE_DICT:
+    """
+    if args.data_type:
+        if int(args.data_type) not in VOAAreaPlot.IMG_TYPE_DICT:
             print(_("Unrecognised plot type: Defaulting to MUF"))
-            options.dataType = 1
+            args.dataType = 1
 
-    if options.vg_files:
-        options.vg_files.strip()
-        if options.vg_files == 'a':
+    if args.vg_files:
+        args.vg_files.strip()
+        if args.vg_files == 'a':
             #'all' option see if the file exists and add it to the list
             for file_num in range (1, 13):
                 if os.path.exists(in_file+'.vg'+str(file_num)):
@@ -640,10 +639,10 @@ def main(in_file, datadir=None):
                     vg_files.append(file_num)
         else:
             try:
-                if options.vg_files.find(','):
-                    vg_files = options.vg_files.split(',')
+                if args.vg_files.find(','):
+                    vg_files = args.vg_files.split(',')
                 else:
-                    vg_files = [options.vg_files]
+                    vg_files = [args.vg_files]
 
                 for i in range(0, len(vg_files)):
                     try:
@@ -658,29 +657,21 @@ def main(in_file, datadir=None):
                 vg_files = [1]
         #print(_("The following %d files have been selected: ") % (len(vg_files)), vg_files)
 
-    if options.timezone:
-        time_zone = int(options.timezone)
-        if time_zone > 12: time_zone = 0
-        if time_zone < -12: time_zone = 0
-    else :
-        time_zone = 0
-
     VOAAreaPlot(in_file,
                     vg_files = vg_files,
-                    time_zone = time_zone,
-                    data_type = options.data_type,
-                    color_map = options.color_map,
-                    face_colour = options.face_colour,
-                    filled_contours = options.plot_filled_contours,
-                    plot_contours = options.plot_contours,
-                    plot_meridians = options.plot_meridians,
-                    plot_parallels = options.plot_parallels,
-                    plot_nightshade = options.plot_nightshade,
-                    resolution = options.resolution,
-                    points_of_interest = points_of_interest,
-                    save_file = options.save_file,
-                    run_quietly = options.run_quietly,
-                    dpi = options.dpi,
+                    data_type = args.data_type,
+                    color_map = args.color_map,
+                    face_colour = args.face_colour,
+                    filled_contours = args.plot_filled_contours,
+                    plot_contours = args.plot_contours,
+                    plot_meridians = args.plot_meridians,
+                    plot_parallels = args.plot_parallels,
+                    plot_nightshade = args.plot_nightshade,
+                    resolution = args.resolution,
+                    #points_of_interest = points_of_interest,
+                    save_file = args.save_file,
+                    run_quietly = args.run_quietly,
+                    dpi = args.dpi,
                     datadir=datadir)
 
 
