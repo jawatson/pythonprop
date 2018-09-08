@@ -26,51 +26,43 @@
 # Try and delete the frame on ortho plots
 # All defaults should be defined in the same way, in the same place
 # The matplotlib AxesGrid toolkit is a collection of helper classes to ease displaying multiple images in matplotlib. The AxesGrid toolkit is distributed with matplotlib source. DOH!
+import argparse
+import datetime
+import gettext
 import io
+import locale
+import math
 import os
 import re
 import sys
-import math
-import datetime
+import zipfile
 
 import matplotlib
+matplotlib.use('GTK3Agg')
 import matplotlib.pyplot as plt
 
-from matplotlib.colors import ListedColormap
-#from mpl_toolkits.basemap import Basemap
 import cartopy.crs as ccrs
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
-
 
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import matplotlib.colors as colors
 import matplotlib.ticker as mticker
-from mpl_toolkits.axes_grid1 import make_axes_locatable
+from matplotlib.colors import ListedColormap
 from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
-
-from matplotlib.figure import Figure
 from matplotlib.font_manager import FontProperties
 
-from matplotlib.ticker import FuncFormatter
 import numpy as np
-import numpy.ma as ma
+#import numpy.ma as ma
 
-import argparse
-
-import zipfile
-
+from .hamlocation import HamLocation
 from .voaAreaRect import VOAAreaRect
 from .voaFile import VOAFile
-from .hamlocation import HamLocation
 from .voaPlotWindow import *
-
 from .vgzArchive import get_base_filename
 
-import gettext
-import locale
+
 GETTEXT_DOMAIN = 'voacapgui'
 LOCALE_PATH = os.path.join(os.path.realpath(os.path.dirname(sys.argv[0])), 'po')
 
@@ -256,12 +248,17 @@ class VOAAreaPlot:
                 zf.close()
 
             def resize_colorbar(event):
+                print('resizing colorbar')
                 plt.draw()
                 # left, bottom, width, height
                 if number_of_subplots == num_cols*num_rows:
-                    top_posn = axes[0, num_cols-1].get_position()
-                    bottom_posn = axes[col_idx, row_idx].get_position()
+                    print('doing 1x1')
+                    top_posn = axes[0, num_cols-1].get_position(original=False)
+                    print(top_posn)
+                    bottom_posn = axes[col_idx, row_idx].get_position(original=False)
+                    print(bottom_posn.height)
                     cb_height = top_posn.y0 + top_posn.height - bottom_posn.y0
+                    print(cb_height)
                     cbar_ax.set_position([top_posn.x0 + top_posn.width + 0.01, bottom_posn.y0, 0.02, cb_height])
                 else:
                     posn = axes[col_idx][row_idx+1].get_position()
@@ -270,7 +267,7 @@ class VOAAreaPlot:
                     print(self.fig.subplotpars.wspace)
                     cbar_ax.set_position([posn.x0, posn.y0, 0.02, posn.height])
 
-            self.fig.canvas.mpl_connect('resize_event', resize_colorbar)
+            #self.fig.canvas.mpl_connect('resize_event', resize_colorbar)
 
             axes[col_idx, row_idx].coastlines()
 
@@ -374,23 +371,24 @@ class VOAAreaPlot:
 
         #self.fig.subplots_adjust(hspace=0, wspace=0, top=0.925, left=0.05)
 
-        plt.colorbar(im,
+        self.fig.colorbar(im,
             cax=cbar_ax,
             ticks = self.image_defs['y_labels'],
-            format = FuncFormatter(eval('self.'+self.image_defs['formatter'])))
+            format = mticker.FuncFormatter(eval('self.'+self.image_defs['formatter'])))
 
-        canvas = FigureCanvas(self.fig)
-        #self.fig.canvas.mpl_connect('draw_event', self.on_draw)
-        resize_colorbar(None)
-
-        canvas.show()
+        gtk_canvas = FigureCanvas(self.fig)
+        gtk_canvas.mpl_connect('resize_event', resize_colorbar)
+        self.fig.canvas.mpl_connect('resize_event', resize_colorbar)
+        self.fig.canvas.show()
 
         if save_file :
-            self.save_plot(canvas, save_file)
+            resize_colorbar(None)
+            plt.savefig(save_file, dpi=self.dpi, facecolor=self.fig.get_facecolor(), edgecolor='none')
+            #plt.savefig(save_file, dpi=self.dpi, bbox_inches='tight', facecolor=self.fig.get_facecolor(), edgecolor='none')
 
         #todo this ought to a command line param
         if not self.run_quietly:
-            dia = VOAPlotWindow('pythonProp - ' + self.image_defs['title'], canvas, parent=parent, datadir=self.datadir)
+            dia = VOAPlotWindow('pythonProp - ' + self.image_defs['title'], gtk_canvas, parent=parent, datadir=self.datadir)
         return
 
     """
@@ -472,10 +470,6 @@ class VOAAreaPlot:
         y[180:] = np.arange(90, -90., -1)
 
         ax.fill(x, y, transform=rotated_pole, **kwargs)
-
-
-    def save_plot(self, canvas, filename=None):
-        canvas.print_figure(filename, dpi=self.dpi, facecolor=self.fig.get_facecolor(), edgecolor='none')
 
     def get_cb_axes(self):
         bbox = self.subplots[0].get_window_extent()
