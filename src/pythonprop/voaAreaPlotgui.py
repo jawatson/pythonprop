@@ -209,12 +209,10 @@ class VOAAreaPlotGUI:
         	_vg_files = list(range(1,self.num_plots+1))
         else:
         	_vg_files = [self.group_combobox.get_active()]
-        _time_zone = self.tz_spinbutton.get_value_as_int()
         plot_parent = self.parent if self.parent else self.win
         plot = VOAAreaPlot(self.voa_filename,
                         data_type = _data_type,
                         vg_files = _vg_files,
-                        time_zone = _time_zone,
                         color_map = _color_map,
                         filled_contours = self.contour_checkbutton.get_active(),
                         plot_meridians = self.meridians_checkbutton.get_active(),
