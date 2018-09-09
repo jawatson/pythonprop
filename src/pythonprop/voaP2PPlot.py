@@ -148,6 +148,7 @@ class VOAP2PPlot:
         matplotlib.rcParams['axes.edgecolor'] = 'gray'
         matplotlib.rcParams['axes.facecolor'] = 'white'
         matplotlib.rcParams['axes.grid'] = True
+        matplotlib.rcParams['grid.alpha'] = 0.4
         matplotlib.rcParams['legend.fancybox'] = True
         matplotlib.rcParams['legend.shadow'] = True
         matplotlib.rcParams['figure.subplot.hspace'] = 0.45
