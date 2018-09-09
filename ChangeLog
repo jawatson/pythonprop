@@ -1,8 +1,9 @@
 0.29
 * Replaces basemap with cartopy for the geo plotting.
 * Removes some of the lesser used options from the area plotting script.
-* Replaces the deprecated optparse with argparse.
-* Uses the mpl imagegrid to implrove the layout of multiple plots.
+* Replaces optparse (deprecated) with argparse in the plotting utilities.
+* Uses the mpl imagegrid to improve the layout of multiple area and p2p plots.
+* Fixes a bug in the docs makefile that was preventing the legal.xml file from loading.
 
 0.28
 * Automake rules have been changed so that we only attempt to build the pdf if
