@@ -2,13 +2,11 @@
 
 ## http://www.micahcarrick.com/tutorials/autotools-tutorial-python-gtk/getting-started.html#section_4
 
-SUBDIRS = data src docs/user/help
+SUBDIRS = data src 
 
 man_MANS = \
 	man/voaAreaPlot.1 \
 	man/voaP2PPlot.1
 
 EXTRA_DIST=\
-	$(man_MANS) 
-
-
+	$(man_MANS)
