@@ -270,7 +270,7 @@ class VOACAP_GUI():
             #"on_mi_circuit_activate" : self.verify_input_data,
             #"on_mi_graph_activate" : self.verify_input_data,
             "on_mi_run_activate": self.run_prediction,
-            "on_mi_show_yelp_activate": self.show_yelp,
+            #"on_mi_show_yelp_activate": self.show_yelp,
             "on_mi_about_activate" : self.show_about_dialog,
             "on_mi_open_vgz_activate": self.open_vgz_file,
             "on_mi_quit_activate" : self.quit_application,
@@ -1655,10 +1655,11 @@ all other entries will be ignored.'))
             except OSError as e:
                     print("Voacapl execution failed:", e)
 
-
+    """
     def show_yelp(self, widget):
         #subprocess.call(["yelp", os.path.join(self.datadir, "help", "C", "voacapgui.xml")])
         Gtk.show_uri(None, "ghelp:voacapgui", Gdk.CURRENT_TIME)
+    """
 
     def show_about_dialog(self, widget):
         about = Gtk.AboutDialog(parent=self.main_window,

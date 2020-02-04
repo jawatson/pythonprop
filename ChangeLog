@@ -1,3 +1,8 @@
+0.30
+* Removes the online help.  Support for the legacy gnome help system is 
+causing a lot of issues for users and it's removal should streamline the
+installation process.  This is an interim solution, help will be reinstated in anotehr form in the next release.
+
 0.29
 * Replaces basemap with cartopy for the geo plotting.
 * Removes some of the lesser used options from the area plotting script.
