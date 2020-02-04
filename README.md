@@ -12,28 +12,19 @@ version of the application .
 The application requires the following dependancies;
 * python3-matplotlib
 * python3-cartopy
-* python3-matplotlib-gtk3
-* python3-cairocffi
-* rarian-compat
-* gnome-doc-utils
-* pkg-config
-* yelp
+* python3-scipy
 
+These can be installed on Fedora (31) with the following command;
 
-These can be installed on Fedora 28 with the following command;
+    $ sudo dnf install automake python3-matplotlib python3-cartopy python3-scipy
 
-    $ sudo dnf install yelp rarian-compat gnome-doc-utils \
-      pkgconfig python3-dateutil python3-cartopy \
-      python3-cairocffi python3-cffi python3-matplotlib-gtk3
+Ubuntu (19.10) users can install these dependencies with the following command;
 
-Debian / Ubuntu users can install these dependencies with the following command;
-
-    $ sudo apt-get install yelp python3-gi python3-gi-cairo rarian-compat \
-      gnome-doc-utils pkg-config python3-dateutil python3-cartopy \
-      python3-cairocffi python3-matplotlib-gtk3
+    $ sudo apt-get install automake python3-matplotlib python3-cartopy python3-scipy
 
 The following commands will install the pythonProp tools from the .tar.gz file.
 
+    $ ./autogen.sh
     $ ./configure
     $ sudo make install
 
