@@ -20,12 +20,13 @@ These can be installed on Fedora (31) with the following command;
 
 Ubuntu (19.10) users can install these dependencies with the following command;
 
-    $ sudo apt-get install automake python3-matplotlib python3-cartopy python3-scipy
+    $ sudo apt-get install build-essential python3-matplotlib python3-cartopy python3-scipy
 
 The following commands will install the pythonProp tools from the .tar.gz file.
 
     $ ./autogen.sh
     $ ./configure
+    $ make
     $ sudo make install
 
 Typing 'voacapgui' from the command line or the Gnome desktop will start the main application.
