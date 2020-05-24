@@ -1,17 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
 "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
-<!ENTITY appname          "voacapgui">
-<!ENTITY app "<application>voacapgui</application>">
+<!ENTITY legal SYSTEM "legal.xml">
 <!ENTITY appversion   "0.22">
 <!ENTITY manrevision  "0.2">
 <!ENTITY date "February 2016">
-<!-- Information about the entities
-Use the app and appname entities to specify the name of the application.
-Use the appversion entity to specify the version of the application.
-Use the manrevision entity to specify the revision number of this manual.
-Use the date entity to specify the release date of this manual.
--->
+<!ENTITY app "<application>voacapgui</application>">
+<!ENTITY appname          "voacapgui">
 ]>
 <!--
 Maintained by the GNOME Documentation Project
@@ -29,7 +24,7 @@ Template last modified 2006-11-21
     </abstract>
 
     <copyright>
-      <year>2014</year>
+      <year>2014-2020</year>
       <holder>J.Watson</holder>
     </copyright>
 
@@ -38,10 +33,11 @@ Template last modified 2006-11-21
       <publishername>J.Watson</publishername>
     </publisher>
 
-    <xi:include href="legal.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <!-- <xi:include href="legal.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/> -->
     <!-- The file legal.xml contains link to license for the documentation,
     and other legal stuff such as "NO WARRANTY" statement.
     Please do not change any of this. -->
+    &legal;
 
     <authorgroup>
       <author>
