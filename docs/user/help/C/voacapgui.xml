@@ -40,13 +40,9 @@ Template last modified 2006-11-21
     &legal;
 
     <authorgroup>
-      <author>
+      <author role="maintainer">
         <firstname>James</firstname>
         <surname>Watson</surname>
-        <!--
-        <affiliation>
-          <orgname>GNOME Documentation Project</orgname>
-        </affiliation> -->
       </author>
     </authorgroup>
 
