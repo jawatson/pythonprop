@@ -9,4 +9,9 @@ man_MANS = \
 	man/voaP2PPlot.1
 
 EXTRA_DIST=\
-	$(man_MANS)
+	$(man_MANS) \
+	gnome-doc-utils.make \
+	m4
+	
+DISTCLEANFILES = gnome-doc-utils.make
+DISTCHECK_CONFIGURE_FLAGS = --disable-scrollkeeper
