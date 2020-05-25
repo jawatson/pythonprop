@@ -14,9 +14,13 @@ HELP_MEDIA = figures/antenna_chooser.png \
 	figures/p2p_tab.png \
 	figures/system_tab.png
 
-HELP_LINGUAS = en
+HELP_LINGUAS = 
 
+if HAVE_DBLATEX
 MANPDF = $(HELP_ID).pdf
+else
+MANPDF = 
+endif
 
 dist_doc_DATA = $(MANPDF)
 
