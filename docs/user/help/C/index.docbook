@@ -61,7 +61,7 @@ Template last modified 2006-11-21
     <!-- to V3.0, and so on. -->
     <revhistory>
       <revision>
-        <revnumber>&app; Manual v&manrevision;</revnumber>
+        <revnumber>v&manrevision;</revnumber>
         <date>2016-02-01</date>
         <revdescription>
           <para role="author">J.Watson
