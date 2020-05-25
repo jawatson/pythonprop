@@ -18,7 +18,7 @@ AC_ARG_WITH([online-help],
             [with_online_help=yes])
 
 AC_CONFIG_MACRO_DIR([m4])
-GNOME_DOC_INIT
+YELP_HELP_INIT
 
 AC_CONFIG_FILES([
 	Makefile

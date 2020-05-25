@@ -1658,7 +1658,9 @@ all other entries will be ignored.'))
 
     def show_yelp(self, widget):
         #subprocess.call(["yelp", os.path.join(self.datadir, "help", "C", "voacapgui.xml")])
-        Gtk.show_uri(None, "ghelp:voacapgui", Gdk.CURRENT_TIME)
+        Gtk.show_uri(None, "help:voacapgui", Gdk.CURRENT_TIME)
+        #Gtk.show_uri(None, "/usr/local/share/help/C/voacapgui/voacapgui.xml", Gdk.CURRENT_TIME)
+        #/usr/local/share/help/C/voacapgui/voacapgui.xml
 
 
     def show_about_dialog(self, widget):

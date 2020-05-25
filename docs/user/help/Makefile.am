@@ -1,10 +1,10 @@
-include $(top_srcdir)/gnome-doc-utils.make
-dist-hook: doc-dist-hook
+@YELP_HELP_RULES@
 
-DOC_MODULE = voacapgui
-DOC_ENTITIES = legal.xml
+HELP_ID = voacapgui
+HELP_FILES = index.docbook \
+	legal.xml
 
-DOC_FIGURES = figures/antenna_chooser.png \
+HELP_MEDIA = figures/antenna_chooser.png \
 	figures/main_window.png \
 	figures/site_chooser.png \
 	figures/area_plot_configure.png \
@@ -14,15 +14,16 @@ DOC_FIGURES = figures/antenna_chooser.png \
 	figures/p2p_tab.png \
 	figures/system_tab.png
 
-DOC_LINGUAS = en
+HELP_LINGUAS = en
 
-MANPDF = $(DOC_MODULE).pdf
-dist_doc_DATA = $(MANPDF) voacapgui-C.omf voacapgui-en.omf
+MANPDF = $(HELP_ID).pdf
+
+dist_doc_DATA = $(MANPDF)
 
 if HAVE_DBLATEX
 
-$(MANPDF): C/voacapgui.xml
-	$(DBLATEX) C/voacapgui.xml -o voacapgui.pdf
+$(MANPDF): C/index.docbook
+	$(DBLATEX) C/index.docbook -o voacapgui.pdf
 
 CLEANFILES = $(MANPDF)
 

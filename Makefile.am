@@ -2,7 +2,7 @@
 
 ## http://www.micahcarrick.com/tutorials/autotools-tutorial-python-gtk/getting-started.html#section_4
 
-SUBDIRS = data src 
+SUBDIRS = data src docs/user/help
 
 man_MANS = \
 	man/voaAreaPlot.1 \
@@ -10,8 +10,5 @@ man_MANS = \
 
 EXTRA_DIST=\
 	$(man_MANS) \
-	gnome-doc-utils.make \
 	m4
 	
-DISTCLEANFILES = gnome-doc-utils.make
-DISTCHECK_CONFIGURE_FLAGS = --disable-scrollkeeper

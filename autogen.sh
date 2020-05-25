@@ -2,7 +2,7 @@
 
 mkdir -p m4 \
   && aclocal -I m4 \
-  && gnome-doc-prepare \
+  && yelp-build \
   && aclocal -I m4
 
 aclocal \
