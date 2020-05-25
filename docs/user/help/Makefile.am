@@ -16,11 +16,7 @@ HELP_MEDIA = figures/antenna_chooser.png \
 
 HELP_LINGUAS = 
 
-if HAVE_DBLATEX
 MANPDF = $(HELP_ID).pdf
-else
-MANPDF = 
-endif
 
 dist_doc_DATA = $(MANPDF)
 
