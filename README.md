@@ -14,13 +14,13 @@ The application requires the following dependancies;
 * python3-cartopy
 * python3-scipy
 
-These can be installed on Fedora (31) with the following command;
+These can be installed on Fedora (32) with the following command;
 
-    $ sudo dnf install automake python3-matplotlib python3-cartopy python3-scipy
+    $ sudo dnf install automake python3-matplotlib python3-cartopy python3-scipy yelp-tools
 
-Ubuntu (19.10) users can install these dependencies with the following command;
+Ubuntu (20.04) users can install these dependencies with the following command;
 
-    $ sudo apt-get install build-essential python3-matplotlib python3-cartopy python3-scipy
+    $ sudo apt-get install build-essential python3-matplotlib python3-cartopy python3-scipy yelp-tools
 
 The following commands will install the pythonProp tools from the .tar.gz file.
 
@@ -46,4 +46,3 @@ The following command will create the build structure from a fresh checkout;
 The application may be started by typing 'voacapgui' at the command line. v0.16
 includes a .desktop file allowing the application to be started from the system
 application launcher.
-
