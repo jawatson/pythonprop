@@ -27,6 +27,4 @@ if HAVE_DBLATEX
 $(MANPDF): C/index.docbook
 	$(DBLATEX) C/index.docbook -o voacapgui.pdf
 
-CLEANFILES = $(MANPDF)
-
 endif
