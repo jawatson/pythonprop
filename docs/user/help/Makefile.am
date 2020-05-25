@@ -25,6 +25,6 @@ if HAVE_DBLATEX
 .PHONY: $(MANPDF)
 	
 $(MANPDF): C/index.docbook
-	$(DBLATEX) C/index.docbook -o voacapgui.pdf
+	$(DBLATEX) C/index.docbook -o $(HELP_ID).pdf
 
 endif
