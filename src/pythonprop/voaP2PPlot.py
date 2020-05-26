@@ -145,7 +145,7 @@ class VOAP2PPlot:
 
         number_of_subplots = len(plot_groups)
 
-        matplotlib.rcParams['mpl_toolkits.legacy_colorbar'] = False
+        #matplotlib.rcParams['mpl_toolkits.legacy_colorbar'] = False
 
         matplotlib.rcParams['axes.edgecolor'] = 'gray'
         matplotlib.rcParams['axes.facecolor'] = 'white'
