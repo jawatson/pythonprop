@@ -200,12 +200,12 @@ class VOAP2PPlot:
                     label_mode='')
         """
         #fig, axs = plt.subplots(nrows=num_rows, ncols=num_cols)
-        
+
         self.main_title_label = fig.suptitle(plot_label+str(self.image_defs['title']), fontsize=self.main_title_fontsize)
 
         #for ax, chan_grp in zip(axs, plot_groups):
         for idx, chan_grp in enumerate(plot_groups):
-            ax = plt.subplot('22'+str(idx+1))
+            ax = plt.subplot(num_cols, num_rows, idx+1)
             (group_name, group_info, fot, muf, hpf, image_buffer) = self.df.get_group_data(chan_grp)
 
             if number_of_subplots > 4:
