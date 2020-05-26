@@ -189,17 +189,6 @@ class VOAP2PPlot:
 
         num_cols = int(math.ceil(float(number_of_subplots)/float(num_rows)))
         fig = plt.figure()
-        """
-        axgr = AxesGrid(fig, 111,
-                    nrows_ncols=(num_rows, num_cols),
-                    axes_pad=0.6,
-                    cbar_location='right',
-                    cbar_mode='single',
-                    cbar_pad=0.2,
-                    cbar_size='3%',
-                    label_mode='')
-        """
-        #fig, axs = plt.subplots(nrows=num_rows, ncols=num_cols)
 
         self.main_title_label = fig.suptitle(plot_label+str(self.image_defs['title']), fontsize=self.main_title_fontsize)
 
@@ -268,15 +257,12 @@ class VOAP2PPlot:
                 for ch in self.user_bands:
                     ax.axhspan(ch-0.04, ch+0.04, alpha=0.5, ec='0.5', fc='0.5')
 
-        # Hide any unused subplots
-        #for ax in axgr[number_of_subplots:]:
-        #    ax.set_visible(False)
-
         if (self.data_type > 0):
+            plt.subplots_adjust(bottom=0.1, right=0.8, top=0.9)
+            cax = plt.axes([0.85, 0.1, 0.075, 0.8])
             plt.colorbar(im,
-                    format = FuncFormatter(eval('self.'+self.image_defs['formatter'])))
-            #for t in self.cb_ax.get_yticklabels():
-            ###    t.set_fontsize(colorbar_fontsize)
+                        cax=cax,
+                        format = FuncFormatter(eval('self.'+self.image_defs['formatter'])))
 
         if save_file :
             fig.savefig(save_file, dpi=self.dpi, facecolor=fig.get_facecolor(), edgecolor='none')
