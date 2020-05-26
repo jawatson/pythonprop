@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.18.3 -->
+<!-- Generated with glade 3.36.0 -->
 <interface>
-  <requires lib="gtk+" version="3.10"/>
+  <requires lib="gtk+" version="3.20"/>
   <object class="GtkAdjustment" id="tz_adjustment">
     <property name="lower">-12</property>
     <property name="upper">12</property>
@@ -27,7 +27,7 @@
             <property name="width_request">40</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_left">12</property>
+            <property name="margin_bottom">1</property>
             <property name="label" translatable="yes">Plot Type</property>
             <property name="width_chars">2</property>
             <property name="xalign">1</property>
@@ -41,7 +41,6 @@
           <object class="GtkLabel" id="group_label">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_left">12</property>
             <property name="label" translatable="yes">Group</property>
             <property name="xalign">1</property>
           </object>
@@ -74,7 +73,6 @@
           <object class="GtkLabel" id="timezone_label">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_left">12</property>
             <property name="label" translatable="yes">Timezone</property>
             <property name="xalign">1</property>
           </object>
@@ -87,7 +85,6 @@
           <object class="GtkLabel" id="contour_label">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_left">12</property>
             <property name="label" translatable="yes">Contour Plot</property>
             <property name="ellipsize">start</property>
             <property name="xalign">1</property>
@@ -101,7 +98,6 @@
           <object class="GtkLabel" id="cmap_label">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_left">12</property>
             <property name="label" translatable="yes">Colour Map</property>
             <property name="xalign">1</property>
           </object>
@@ -141,7 +137,6 @@
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="tooltip_text" translatable="yes">Produce a filled contour plot.</property>
-            <property name="xalign">0</property>
             <property name="draw_indicator">True</property>
           </object>
           <packing>
@@ -153,7 +148,6 @@
           <object class="GtkLabel" id="label2">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_left">6</property>
             <property name="margin_top">12</property>
             <property name="label" translatable="yes">&lt;b&gt;Appearance&lt;/b&gt;</property>
             <property name="use_markup">True</property>

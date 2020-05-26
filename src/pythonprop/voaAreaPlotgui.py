@@ -94,15 +94,15 @@ class VOAAreaPlotGUI:
             datadir=""):
         self.voa_filename = data_source_filename
         self.parent = parent
-        self.ui_file = os.path.join(datadir, "ui", "voaAreaPlotBox.ui")
+        self.ui_file = os.path.join(datadir, "ui", "voaAreaPlotDialog.ui")
         self.wTree = Gtk.Builder()
         self.wTree.add_from_file(self.ui_file)
 
-        self.get_objects("main_box", "type_combobox", "group_combobox",
+        self.get_objects("area_plot_dialog", "type_combobox", "group_combobox",
                         "tz_spinbutton", "cmap_combobox", "contour_checkbutton",
                         "greyline_checkbutton", "parallels_checkbutton",
                         "meridians_checkbutton", "save_button")
-
+        """
         if not self.parent:
             self.win = Gtk.Window()
             self.win.set_title(_("Plot Control"))
@@ -111,7 +111,8 @@ class VOAAreaPlotGUI:
         else:
             self.win = Gtk.Dialog("Plot Control", self.parent)
             self.win.get_content_area().add(self.main_box)
-
+        """
+        
         self.populate_combo(self.type_combobox, self.plot_type_d, 'value')
         model = self.type_combobox.get_model()
         iter = model.get_iter_first()
@@ -153,18 +154,13 @@ class VOAAreaPlotGUI:
         self.wTree.connect_signals(event_dic)
         self.save_button.connect("clicked", self.on_save_clicked)
 
-        if self.parent:
-            if not enable_save:
-                self.save_button.hide()
-            self.win.run()
-        else:
-            self.win.show_all()
-            if not enable_save:
-                self.save_button.hide()
-            Gtk.main()
+        self.area_plot_dialog.show_all()
+        if not enable_save:
+            self.save_button.hide()
+        Gtk.main()
 
     def on_save_clicked(self, widget):
-        dialog = Gtk.FileChooserDialog("Save prediction data", self.win,
+        dialog = Gtk.FileChooserDialog("Save prediction data", self.area_plot_dialog,
             Gtk.FileChooserAction.SAVE,
             (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
              "Select", Gtk.ResponseType.OK))
@@ -193,7 +189,7 @@ class VOAAreaPlotGUI:
             for vg_file_num in range(1, self.num_plots+1):
                 fn = "{:s}.vg{:d}".format(base_filename, vg_file_num)
                 vgzip.write(fn, os.path.basename(fn), zipfile.ZIP_DEFLATED)
-        dialog = Gtk.MessageDialog(self.win, 0, Gtk.MessageType.INFO,
+        dialog = Gtk.MessageDialog(self.area_plot_dialog, 0, Gtk.MessageType.INFO,
             Gtk.ButtonsType.OK, "VGZ File Saved")
         dialog.format_secondary_text(
             "Saved as {:s}".format(vgz_filename))
@@ -209,7 +205,6 @@ class VOAAreaPlotGUI:
         	_vg_files = list(range(1,self.num_plots+1))
         else:
         	_vg_files = [self.group_combobox.get_active()]
-        plot_parent = self.parent if self.parent else self.win
         plot = VOAAreaPlot(self.voa_filename,
                         data_type = _data_type,
                         vg_files = _vg_files,
@@ -218,7 +213,7 @@ class VOAAreaPlotGUI:
                         plot_meridians = self.meridians_checkbutton.get_active(),
                         plot_parallels = self.parallels_checkbutton.get_active(),
                         plot_nightshade = self.greyline_checkbutton.get_active(),
-                        parent = plot_parent)
+                        parent = self.area_plot_dialog)
 
 
     def populate_combo(self, cb, d, sort_by='value'):
@@ -248,7 +243,7 @@ class VOAAreaPlotGUI:
 
 
     def quit_application(self, *args):
-        self.win.destroy()
+        self.area_plot_dialog.destroy()
         #only emit main_quit if we're running as a standalone app
         #todo do we need to do anyother clean-up here if we're _not_
         #running as a standalone app
