@@ -189,6 +189,7 @@ class VOAP2PPlot:
 
         num_cols = int(math.ceil(float(number_of_subplots)/float(num_rows)))
         fig = plt.figure()
+        """
         axgr = AxesGrid(fig, 111,
                     nrows_ncols=(num_rows, num_cols),
                     axes_pad=0.6,
@@ -197,10 +198,14 @@ class VOAP2PPlot:
                     cbar_pad=0.2,
                     cbar_size='3%',
                     label_mode='')
-
+        """
+        #fig, axs = plt.subplots(nrows=num_rows, ncols=num_cols)
+        
         self.main_title_label = fig.suptitle(plot_label+str(self.image_defs['title']), fontsize=self.main_title_fontsize)
 
-        for ax, chan_grp in zip(axgr, plot_groups):
+        #for ax, chan_grp in zip(axs, plot_groups):
+        for idx, chan_grp in enumerate(plot_groups):
+            ax = plt.subplot('22'+str(idx+1))
             (group_name, group_info, fot, muf, hpf, image_buffer) = self.df.get_group_data(chan_grp)
 
             if number_of_subplots > 4:
@@ -208,8 +213,8 @@ class VOAP2PPlot:
                 ax.label_outer()
 
             _sign = '+' if (time_zone >= 0) else ''
-            self.x_label = ax.set_xlabel(_('Time (UTC%(sig)s%(tz)s)') % {'sig':_sign, 'tz':time_zone})
-            self.y_label = ax.set_ylabel(_('Frequency (MHz)'))
+            #self.x_label = ax.set_xlabel(_('Time (UTC%(sig)s%(tz)s)') % {'sig':_sign, 'tz':time_zone})
+            #self.y_label = ax.set_ylabel(_('Frequency (MHz)'))
 
             ## Autoscale y (frequency axis)
             if (plot_max_freq==self.AUTOSCALE) :
@@ -264,11 +269,11 @@ class VOAP2PPlot:
                     ax.axhspan(ch-0.04, ch+0.04, alpha=0.5, ec='0.5', fc='0.5')
 
         # Hide any unused subplots
-        for ax in axgr[number_of_subplots:]:
-            ax.set_visible(False)
+        #for ax in axgr[number_of_subplots:]:
+        #    ax.set_visible(False)
 
         if (self.data_type > 0):
-            axgr.cbar_axes[0].colorbar(im,
+            plt.colorbar(im,
                     format = FuncFormatter(eval('self.'+self.image_defs['formatter'])))
             #for t in self.cb_ax.get_yticklabels():
             ###    t.set_fontsize(colorbar_fontsize)
