@@ -145,8 +145,6 @@ class VOAP2PPlot:
 
         number_of_subplots = len(plot_groups)
 
-        #matplotlib.rcParams['mpl_toolkits.legacy_colorbar'] = False
-
         matplotlib.rcParams['axes.edgecolor'] = 'gray'
         matplotlib.rcParams['axes.facecolor'] = 'white'
         matplotlib.rcParams['axes.grid'] = True
@@ -157,9 +155,16 @@ class VOAP2PPlot:
         matplotlib.rcParams['figure.subplot.wspace'] = 0.35
         matplotlib.rcParams['figure.subplot.right'] = 0.85
         colorbar_fontsize = 12
+        subplot_left = 0.125
+        subplot_right = 0.9
+        subplot_bottom = 0.1
+        subplot_top = 0.9
+        subplot_wspace = 0.2
+        subplot_hspace = 0.2
 
         if number_of_subplots <= 1:
             num_rows = 1
+            num_cols = 1
             self.main_title_fontsize = 24
             matplotlib.rcParams['legend.fontsize'] = 12
             matplotlib.rcParams['axes.labelsize'] = 12
@@ -168,8 +173,11 @@ class VOAP2PPlot:
             matplotlib.rcParams['ytick.labelsize'] = 10
             matplotlib.rcParams['figure.subplot.top'] = 0.79 # single figure plots have a larger title so require more space at the top.
             self.x_axes_ticks = np.arange(0,25,2)
+            
+            
         elif ((number_of_subplots >= 2) and (number_of_subplots <= 6 )):
             num_rows = 2
+            num_cols = int(math.ceil(float(number_of_subplots)/float(num_rows)))
             self.main_title_fontsize = 18
             matplotlib.rcParams['legend.fontsize'] = 10
             matplotlib.rcParams['axes.labelsize'] = 10
@@ -177,8 +185,10 @@ class VOAP2PPlot:
             matplotlib.rcParams['xtick.labelsize'] = 8
             matplotlib.rcParams['ytick.labelsize'] = 8
             self.x_axes_ticks = np.arange(0,25,4)
+            
         else:
             num_rows = 3
+            num_cols = int(math.ceil(float(number_of_subplots)/float(num_rows)))
             self.main_title_fontsize = 16
             matplotlib.rcParams['legend.fontsize'] = 8
             matplotlib.rcParams['axes.labelsize'] = 8
@@ -186,15 +196,16 @@ class VOAP2PPlot:
             matplotlib.rcParams['xtick.labelsize'] = 6
             matplotlib.rcParams['ytick.labelsize'] = 6
             self.x_axes_ticks = np.arange(0,25,4)
+            cbar_ax = [0.85, 0.1, 0.04, 0.675]
 
-        num_cols = int(math.ceil(float(number_of_subplots)/float(num_rows)))
         fig = plt.figure()
+        #fig, ax = plt.subplots(nrows=num_rows, ncols=num_cols)
 
         self.main_title_label = fig.suptitle(plot_label+str(self.image_defs['title']), fontsize=self.main_title_fontsize)
 
         #for ax, chan_grp in zip(axs, plot_groups):
         for idx, chan_grp in enumerate(plot_groups):
-            ax = plt.subplot(num_cols, num_rows, idx+1)
+            ax = plt.subplot(num_rows, num_cols, idx+1)
             (group_name, group_info, fot, muf, hpf, image_buffer) = self.df.get_group_data(chan_grp)
 
             if number_of_subplots > 4:
@@ -224,7 +235,8 @@ class VOAP2PPlot:
             ax.set_xticks(self.x_axes_ticks)
             ax.set_yticks(y_ticks)
 
-            self.add_legend(ax)
+            if idx==0:
+                self.add_legend(ax)
             title_str = group_info.strip()
             if number_of_subplots > 1:
                 title_str = self.get_small_title(title_str)
@@ -258,8 +270,17 @@ class VOAP2PPlot:
                     ax.axhspan(ch-0.04, ch+0.04, alpha=0.5, ec='0.5', fc='0.5')
 
         if (self.data_type > 0):
-            plt.subplots_adjust(bottom=0.1, right=0.8, top=0.9)
-            cax = plt.axes([0.85, 0.1, 0.075, 0.8])
+            
+            if number_of_subplots == 1:
+                plt.subplots_adjust(right=0.85, top=0.775)
+                cax = plt.axes([0.85, 0.1, 0.04, 0.675]) # [left, bottom, width, height]
+            elif number_of_subplots >=2 and number_of_subplots <=6:
+                plt.subplots_adjust(right=0.85, top=0.9)
+                cax = plt.axes([0.875, 0.1, 0.04, 0.8]) 
+            else:
+                plt.subplots_adjust(right=0.85, top=0.9)
+                cax = plt.axes([0.875, 0.1, 0.04, 0.8]) 
+                
             plt.colorbar(im,
                         cax=cax,
                         format = FuncFormatter(eval('self.'+self.image_defs['formatter'])))
