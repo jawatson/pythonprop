@@ -4,9 +4,9 @@
 <!ENTITY legal SYSTEM "legal.xml">
 <!ENTITY appversion   "0.22">
 <!ENTITY manrevision  "0.2">
-<!ENTITY date "February 2016">
-<!ENTITY app "<application>voacapgui</application>">
-<!ENTITY appname          "voacapgui">
+<!ENTITY date         "February 2016">
+<!ENTITY app          "<application>voacapgui</application>">
+<!ENTITY appname      "voacapgui">
 ]>
 <!--
 Maintained by the GNOME Documentation Project

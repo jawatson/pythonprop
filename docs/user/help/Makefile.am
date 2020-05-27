@@ -21,8 +21,6 @@ MANPDF = $(HELP_ID).pdf
 dist_doc_DATA = $(MANPDF)
 
 if HAVE_DBLATEX
-
-.PHONY: $(MANPDF)
 	
 $(MANPDF): C/index.docbook
 	$(DBLATEX) C/index.docbook -o $(MANPDF)
