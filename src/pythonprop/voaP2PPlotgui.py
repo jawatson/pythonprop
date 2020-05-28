@@ -93,11 +93,9 @@ class VOAP2PPlotGUI:
         #todo check the file exists
         in_file = VOAOutFile(self.in_filename)
 
-        #self.uifile = os.path.join(os.path.realpath(os.path.dirname(sys.argv[0])), "voaP2PPlotgui.ui")
         self.parent = parent
         
-        #self.wTree = Gtk.Builder.new_from_file(self.ui_file)
-        self.ui_file = os.path.join(self.datadir, "ui", "voaP2PPlotDialog.ui")
+        self.ui_file = os.path.join(self.datadir, "ui", "voaP2PPlotViewDialog.ui")
 
         self.wTree = Gtk.Builder()
         self.wTree.add_from_file(self.ui_file)
@@ -107,7 +105,8 @@ class VOAP2PPlotGUI:
                 "group_combobox",
                 "tz_spinbutton",
                 "contour_checkbutton",
-                "cmap_combobox")
+                "cmap_combobox",
+                "plot_viewport")
         
         if in_file.get_number_of_groups() >= 2:
             self.plot_type_d[5] = _('3D: MUF')
@@ -137,19 +136,24 @@ class VOAP2PPlotGUI:
 
         event_dic = { "on_dialog_destroy" : self.quit_application,
                       "on_cancel_button_clicked" : self.quit_application,
-                      "on_ok_button_clicked" : self.run_plot}
+                      "on_ok_button_clicked" : self.run_plot,
+                      "on_type_combobox_changed" : self.run_plot,
+                      "on_group_combobox_changed" : self.run_plot,
+                      "on_tz_spinbutton_value_changed" : self.run_plot,
+                      "on_cmap_combobox_changed" : self.run_plot,
+                      "on_contour_checkbutton_toggled" : self.run_plot}
+
         self.wTree.connect_signals(event_dic)
         self.type_combobox.connect("changed", self.on_type_combo_changed)
 
         self.p2p_plot_dialog.connect('delete_event', self.quit_application)
         
         self.p2p_plot_dialog.show_all()
+        self.run_plot(None)
         Gtk.main()
 
 
     def run_plot(self, widget):
-#        _color_map = self.cmap_list[self.cmap_combobox.get_active()]
-#        _data_type = self.type_combobox.get_active()
         _data_type = int(self.type_combobox.get_model().get_value(self.type_combobox.get_active_iter(), 0))
         _filled_contours = self.contour_checkbutton.get_active()
         _color_map = self.cmap_combobox.get_model().get_value(self.cmap_combobox.get_active_iter(), 0)
@@ -158,20 +162,33 @@ class VOAP2PPlotGUI:
         else:
         	_plot_groups = [int(self.group_combobox.get_model().get_value(self.group_combobox.get_active_iter(),0))-1]
         _time_zone = self.tz_spinbutton.get_value_as_int()
+        
         if _data_type < 5:
+            self.empty_plot_viewport()
             plot = VOAP2PPlot(self.in_filename,
                         data_type = _data_type,
                         plot_groups = _plot_groups,
                         time_zone = _time_zone,
                         color_map = _color_map,
                         filled_contours = _filled_contours,
+                        run_quietly = True,
                         parent = self.p2p_plot_dialog)
+            canvas = plot.get_canvas()
+            plot.close()
+            canvas.show()
+            self.plot_viewport.pack_start(canvas, True, True, 0)
         else: # do a 3D plot
             plot = VOA3DPlot(self.in_filename,
                         color_map = _color_map,
                         parent = self.p2p_plot_dialog)
-        #self.dialog.run()
 
+        
+    def empty_plot_viewport(self):
+        def destroy_widget(widget, data):
+            Gtk.Widget.destroy(widget)
+            
+        Gtk.Container.foreach(self.plot_viewport, destroy_widget, None)
+                           
 
     def populate_combo(self, cb, d, sort_by='value'):
         _model = Gtk.ListStore(GObject.TYPE_STRING, GObject.TYPE_STRING)
@@ -209,9 +226,3 @@ class VOAP2PPlotGUI:
 
     def quit_application(self, *args):
         self.p2p_plot_dialog.destroy()
-        #only emit main_quit if we're running as a standalone app
-        #todo do we need to do anyother clean-up here if we're _not_
-        #running as a standalone app
-        if not self.parent:
-            Gtk.main_quit
-            sys.exit(0)

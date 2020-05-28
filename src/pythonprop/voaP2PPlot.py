@@ -122,7 +122,7 @@ class VOAP2PPlot:
                 dpi=150,
                 parent = None,
                 user_bands=None,
-                datadir=None):
+                datadir=None): 
 
 
         """
@@ -198,10 +198,10 @@ class VOAP2PPlot:
             self.x_axes_ticks = np.arange(0,25,4)
             cbar_ax = [0.85, 0.1, 0.04, 0.675]
 
-        fig = plt.figure()
+        self.fig = plt.figure()
         #fig, ax = plt.subplots(nrows=num_rows, ncols=num_cols)
 
-        self.main_title_label = fig.suptitle(plot_label+str(self.image_defs['title']), fontsize=self.main_title_fontsize)
+        self.main_title_label = self.fig.suptitle(plot_label+str(self.image_defs['title']), fontsize=self.main_title_fontsize)
 
         #for ax, chan_grp in zip(axs, plot_groups):
         for idx, chan_grp in enumerate(plot_groups):
@@ -237,6 +237,7 @@ class VOAP2PPlot:
 
             if idx==0:
                 self.add_legend(ax)
+                
             title_str = group_info.strip()
             if number_of_subplots > 1:
                 title_str = self.get_small_title(title_str)
@@ -286,18 +287,25 @@ class VOAP2PPlot:
                         format = FuncFormatter(eval('self.'+self.image_defs['formatter'])))
 
         if save_file :
-            fig.savefig(save_file, dpi=self.dpi, facecolor=fig.get_facecolor(), edgecolor='none')
+            self.fig.savefig(save_file, dpi=self.dpi, facecolor=self.fig.get_facecolor(), edgecolor='none')
+
+        self.canvas = FigureCanvasGTK3Agg(self.fig)
 
         if not self.run_quietly:
-            canvas = FigureCanvasGTK3Agg(fig)
-            canvas.show()
+            self.canvas.show()
             dia = VOAPlotWindow('pythonProp - ' + self.image_defs['title'],
-                        canvas,
+                        self.canvas,
                         parent=parent,
                         dpi=self.dpi,
                         datadir=datadir)
-        return
+        return 
 
+    def get_canvas(self):
+        return self.canvas
+        
+    def close(self):
+        # Do some cleanup
+        plt.close(self.fig)
 
     def get_png(self, id):
         print("creating a png")

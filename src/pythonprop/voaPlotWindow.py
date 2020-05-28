@@ -81,14 +81,15 @@ class VOAPlotWindow():
             self.win.show_all()
             Gtk.main()
         else:
-            self.win = Gtk.Dialog(title, parent=self.parent, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT)
-            self.win.add_buttons(
-                            Gtk.STOCK_PRINT, self.PLOT_RESPONSE_PRINT,
-                            Gtk.STOCK_SAVE, self.PLOT_RESPONSE_SAVE,
-                            Gtk.STOCK_CLOSE, self.PLOT_RESPONSE_CLOSE)
-            self.win.vbox.pack_start(self.canvas, True, True, 0)
-            self.win.set_default_size(700, 600)
-            self.win.show()
+            self.ui_file = os.path.join(datadir, "ui", "voaPlotDisplayDialog.ui")
+
+            self.wTree = Gtk.Builder()
+            self.wTree.add_from_file(self.ui_file)
+            self.get_objects("plot_display_dialog", "print_button", "save_button", "close_button")
+            
+            #self.win = Gtk.Dialog(title, parent=self.parent, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT)
+            
+            self.plot_display_dialog.show()
             response = None
             while response != self.PLOT_RESPONSE_CLOSE and response != Gtk.ResponseType.DELETE_EVENT:
                 response = self.win.run()

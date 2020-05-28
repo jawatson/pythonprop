@@ -3,7 +3,8 @@ ui_DATA = voacapgui.ui \
   voaAntennaChooser.ui \
   voaAreaChooser.ui \
   voaAreaPlotDialog.ui \
-  voaP2PPlotDialog.ui \
+  voaPlotDisplayDialog.ui \
+	voaP2PPlotViewDialog.ui \
   voaPropWindowBox.ui \
   voaSiteChooser.ui \
   voaTextFileViewDialog.ui \
