@@ -26,6 +26,9 @@ import datetime
 import gettext
 import locale
 
+import gi
+gi.require_version("Gtk", "3.0")
+
 from gi.repository import GObject
 from gi.repository import Gtk
 
@@ -94,7 +97,8 @@ class VOAP2PPlotGUI:
         in_file = VOAOutFile(self.in_filename)
 
         self.parent = parent
-        
+        self.plot = None
+
         self.ui_file = os.path.join(self.datadir, "ui", "voaP2PPlotViewDialog.ui")
 
         self.wTree = Gtk.Builder()
@@ -107,7 +111,7 @@ class VOAP2PPlotGUI:
                 "contour_checkbutton",
                 "cmap_combobox",
                 "plot_viewport")
-        
+
         if in_file.get_number_of_groups() >= 2:
             self.plot_type_d[5] = _('3D: MUF')
 
@@ -141,13 +145,15 @@ class VOAP2PPlotGUI:
                       "on_group_combobox_changed" : self.run_plot,
                       "on_tz_spinbutton_value_changed" : self.run_plot,
                       "on_cmap_combobox_changed" : self.run_plot,
-                      "on_contour_checkbutton_toggled" : self.run_plot}
+                      "on_contour_checkbutton_toggled" : self.run_plot,
+                      "on_save_button_clicked" : self.save_plot,
+                      "on_print_button_clicked" : self.print_plot}
 
         self.wTree.connect_signals(event_dic)
         self.type_combobox.connect("changed", self.on_type_combo_changed)
 
         self.p2p_plot_dialog.connect('delete_event', self.quit_application)
-        
+
         self.p2p_plot_dialog.show_all()
         self.run_plot(None)
         Gtk.main()
@@ -162,10 +168,10 @@ class VOAP2PPlotGUI:
         else:
         	_plot_groups = [int(self.group_combobox.get_model().get_value(self.group_combobox.get_active_iter(),0))-1]
         _time_zone = self.tz_spinbutton.get_value_as_int()
-        
+
         if _data_type < 5:
             self.empty_plot_viewport()
-            plot = VOAP2PPlot(self.in_filename,
+            self.plot = VOAP2PPlot(self.in_filename,
                         data_type = _data_type,
                         plot_groups = _plot_groups,
                         time_zone = _time_zone,
@@ -173,22 +179,23 @@ class VOAP2PPlotGUI:
                         filled_contours = _filled_contours,
                         run_quietly = True,
                         parent = self.p2p_plot_dialog)
-            canvas = plot.get_canvas()
-            plot.close()
+            canvas = self.plot.get_canvas()
+            #plot.close()
+            #delete self.plot()
             canvas.show()
             self.plot_viewport.pack_start(canvas, True, True, 0)
-        else: # do a 3D plot
-            plot = VOA3DPlot(self.in_filename,
+        else: # do a 3D plot todo do we need this any more..?
+            self.plot = VOA3DPlot(self.in_filename,
                         color_map = _color_map,
                         parent = self.p2p_plot_dialog)
 
-        
+
     def empty_plot_viewport(self):
         def destroy_widget(widget, data):
             Gtk.Widget.destroy(widget)
-            
+
         Gtk.Container.foreach(self.plot_viewport, destroy_widget, None)
-                           
+
 
     def populate_combo(self, cb, d, sort_by='value'):
         _model = Gtk.ListStore(GObject.TYPE_STRING, GObject.TYPE_STRING)
@@ -215,6 +222,39 @@ class VOAP2PPlotGUI:
         self.contour_checkbutton.set_sensitive(is_data_plot)
         self.cmap_combobox.set_sensitive(is_data_plot)
 
+    def save_plot(self, widget):
+        if self.plot:
+            print('we have a plot')
+            file_dialog = Gtk.FileChooserDialog(
+                "Save as...",
+                self.parent,
+                Gtk.FileChooserAction.SAVE,
+                (Gtk.STOCK_SAVE, Gtk.ResponseType.OK, Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
+            )
+
+            png_filter = Gtk.FileFilter()
+            png_filter.add_mime_type("image/png")
+            png_filter.add_pattern("*.png")
+            file_dialog.add_filter(png_filter)
+
+            jpg_filter = Gtk.FileFilter()
+            jpg_filter.add_mime_type("image/jpeg")
+            jpg_filter.add_pattern("*.jpg")
+            file_dialog.add_filter(jpg_filter)
+
+            response = file_dialog.run()
+            if response == Gtk.ResponseType.OK:
+                self.plot.save(file_dialog.get_filename())
+
+            elif response == Gtk.ResponseType.CANCEL:
+                pass
+
+            file_dialog.destroy()
+
+    def print_plot(self, widget):
+        print('printing')
+        if self.plot:
+            print('we have a plot')
 
     def get_objects(self, *names):
         for name in names:

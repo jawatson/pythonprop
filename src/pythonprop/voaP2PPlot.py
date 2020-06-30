@@ -118,11 +118,11 @@ class VOAP2PPlot:
                 time_zone = 0,
                 plot_max_freq = 30.0,
                 run_quietly = False,
-                save_file = '',
+                #save_file = '',
                 dpi=150,
                 parent = None,
                 user_bands=None,
-                datadir=None): 
+                datadir=None):
 
 
         """
@@ -173,8 +173,8 @@ class VOAP2PPlot:
             matplotlib.rcParams['ytick.labelsize'] = 10
             matplotlib.rcParams['figure.subplot.top'] = 0.79 # single figure plots have a larger title so require more space at the top.
             self.x_axes_ticks = np.arange(0,25,2)
-            
-            
+
+
         elif ((number_of_subplots >= 2) and (number_of_subplots <= 6 )):
             num_rows = 2
             num_cols = int(math.ceil(float(number_of_subplots)/float(num_rows)))
@@ -185,7 +185,7 @@ class VOAP2PPlot:
             matplotlib.rcParams['xtick.labelsize'] = 8
             matplotlib.rcParams['ytick.labelsize'] = 8
             self.x_axes_ticks = np.arange(0,25,4)
-            
+
         else:
             num_rows = 3
             num_cols = int(math.ceil(float(number_of_subplots)/float(num_rows)))
@@ -237,7 +237,7 @@ class VOAP2PPlot:
 
             if idx==0:
                 self.add_legend(ax)
-                
+
             title_str = group_info.strip()
             if number_of_subplots > 1:
                 title_str = self.get_small_title(title_str)
@@ -271,23 +271,20 @@ class VOAP2PPlot:
                     ax.axhspan(ch-0.04, ch+0.04, alpha=0.5, ec='0.5', fc='0.5')
 
         if (self.data_type > 0):
-            
+
             if number_of_subplots == 1:
                 plt.subplots_adjust(right=0.85, top=0.775)
                 cax = plt.axes([0.85, 0.1, 0.04, 0.675]) # [left, bottom, width, height]
             elif number_of_subplots >=2 and number_of_subplots <=6:
                 plt.subplots_adjust(right=0.85, top=0.9)
-                cax = plt.axes([0.875, 0.1, 0.04, 0.8]) 
+                cax = plt.axes([0.875, 0.1, 0.04, 0.8])
             else:
                 plt.subplots_adjust(right=0.85, top=0.9)
-                cax = plt.axes([0.875, 0.1, 0.04, 0.8]) 
-                
+                cax = plt.axes([0.875, 0.1, 0.04, 0.8])
+
             plt.colorbar(im,
                         cax=cax,
                         format = FuncFormatter(eval('self.'+self.image_defs['formatter'])))
-
-        if save_file :
-            self.fig.savefig(save_file, dpi=self.dpi, facecolor=self.fig.get_facecolor(), edgecolor='none')
 
         self.canvas = FigureCanvasGTK3Agg(self.fig)
 
@@ -298,11 +295,14 @@ class VOAP2PPlot:
                         parent=parent,
                         dpi=self.dpi,
                         datadir=datadir)
-        return 
+        return
 
     def get_canvas(self):
         return self.canvas
-        
+
+    def save(self, save_file):
+        self.fig.savefig(save_file, dpi=self.dpi, facecolor=self.fig.get_facecolor(), edgecolor='none')
+
     def close(self):
         # Do some cleanup
         plt.close(self.fig)
@@ -504,7 +504,6 @@ def main(data_file, datadir=None):
                     plot_max_freq = plot_max_freq,
                     plot_bands = bands,
                     run_quietly = args.run_quietly,
-                    save_file = args.save_file,
                     dpi = args.dpi,
                     datadir=datadir)
 
