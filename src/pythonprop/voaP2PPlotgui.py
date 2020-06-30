@@ -32,6 +32,8 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import GObject
 from gi.repository import Gtk
 
+from .voaPlotFilePrinter import VOAPlotFilePrinter
+
 GETTEXT_DOMAIN = 'voacapgui'
 LOCALE_PATH = os.path.join(os.path.realpath(os.path.dirname(sys.argv[0])), 'po')
 
@@ -66,7 +68,7 @@ class VOAP2PPlotGUI:
 
     # set the users itshfdata directory.
     # todo mofify to suit windows as well...
-    itshfbc_path = os.path.expanduser("~")+os.sep+'itshfbc'
+    #itshfbc_path = os.path.expanduser("~")+os.sep+'itshfbc'
 
 
     plot_type_d = { 0: _('None'),
@@ -222,11 +224,12 @@ class VOAP2PPlotGUI:
         self.contour_checkbutton.set_sensitive(is_data_plot)
         self.cmap_combobox.set_sensitive(is_data_plot)
 
+
     def save_plot(self, widget):
         if self.plot:
             print('we have a plot')
             file_dialog = Gtk.FileChooserDialog(
-                "Save as...",
+                _("Save as..."),
                 self.parent,
                 Gtk.FileChooserAction.SAVE,
                 (Gtk.STOCK_SAVE, Gtk.ResponseType.OK, Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
@@ -251,10 +254,14 @@ class VOAP2PPlotGUI:
 
             file_dialog.destroy()
 
+
     def print_plot(self, widget):
         print('printing')
         if self.plot:
-            print('we have a plot')
+            p = VOAPlotFilePrinter(self.plot.get_canvas())
+            print_parent = self.parent if self.parent else self.win
+            p.run(print_parent)
+
 
     def get_objects(self, *names):
         for name in names:
