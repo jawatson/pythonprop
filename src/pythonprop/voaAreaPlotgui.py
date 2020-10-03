@@ -94,14 +94,18 @@ class VOAAreaPlotGUI:
             datadir=""):
         self.voa_filename = data_source_filename
         self.parent = parent
-        self.ui_file = os.path.join(datadir, "ui", "voaAreaPlotDialog.ui")
+        self.ui_file = os.path.join(datadir, "ui", "voaAreaPlotViewDialog.ui")
         self.wTree = Gtk.Builder()
         self.wTree.add_from_file(self.ui_file)
 
         self.get_objects("area_plot_dialog", "type_combobox", "group_combobox",
                         "tz_spinbutton", "cmap_combobox", "contour_checkbutton",
-                        "greyline_checkbutton", "parallels_checkbutton",
-                        "meridians_checkbutton", "save_button")
+                        "save_button", "plot_viewport")
+
+        """
+        "greyline_checkbutton", "parallels_checkbutton",
+        "meridians_checkbutton",
+        """
         """
         if not self.parent:
             self.win = Gtk.Window()
@@ -112,7 +116,7 @@ class VOAAreaPlotGUI:
             self.win = Gtk.Dialog("Plot Control", self.parent)
             self.win.get_content_area().add(self.main_box)
         """
-        
+
         self.populate_combo(self.type_combobox, self.plot_type_d, 'value')
         model = self.type_combobox.get_model()
         iter = model.get_iter_first()
@@ -150,15 +154,62 @@ class VOAAreaPlotGUI:
 
         event_dic = { "on_dialog_destroy" : self.quit_application,
                       "on_cancel_button_clicked" : self.quit_application,
-                      "on_ok_button_clicked" : self.run_plot}
+                      "on_ok_button_clicked" : self.run_plot,
+                      "on_type_combobox_changed" : self.run_plot,
+                      "on_group_combobox_changed" : self.run_plot,
+                      "on_tz_spinbutton_value_changed" : self.run_plot,
+                      "on_cmap_combobox_changed" : self.run_plot,
+                      "on_contour_checkbutton_toggled" : self.run_plot,
+                      "on_save_button_clicked" : self.save_plot,
+                      "on_print_button_clicked" : self.print_plot}
         self.wTree.connect_signals(event_dic)
         self.save_button.connect("clicked", self.on_save_clicked)
 
         self.area_plot_dialog.show_all()
         if not enable_save:
             self.save_button.hide()
+
+        self.run_plot(None)
         Gtk.main()
 
+    def save_plot(self, widget):
+        print('saving the plot')
+        if self.plot:
+            print('we have a plot')
+            file_dialog = Gtk.FileChooserDialog(
+                _("Save as..."),
+                self.parent,
+                Gtk.FileChooserAction.SAVE,
+                (Gtk.STOCK_SAVE, Gtk.ResponseType.OK, Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
+            )
+
+            png_filter = Gtk.FileFilter()
+            png_filter.add_mime_type("image/png")
+            png_filter.add_pattern("*.png")
+            file_dialog.add_filter(png_filter)
+
+            jpg_filter = Gtk.FileFilter()
+            jpg_filter.add_mime_type("image/jpeg")
+            jpg_filter.add_pattern("*.jpg")
+            file_dialog.add_filter(jpg_filter)
+
+            response = file_dialog.run()
+            if response == Gtk.ResponseType.OK:
+                self.plot.save(file_dialog.get_filename())
+
+            elif response == Gtk.ResponseType.CANCEL:
+                pass
+
+            file_dialog.destroy()
+
+    def print_plot(self, widget):
+        print('printing')
+        if self.plot:
+            p = VOAPlotFilePrinter(self.plot.get_canvas())
+            print_parent = self.parent if self.parent else self.win
+            p.run(print_parent)
+
+    # todo add a second save button or even a small menu...
     def on_save_clicked(self, widget):
         dialog = Gtk.FileChooserDialog("Save prediction data", self.area_plot_dialog,
             Gtk.FileChooserAction.SAVE,
@@ -205,15 +256,20 @@ class VOAAreaPlotGUI:
         	_vg_files = list(range(1,self.num_plots+1))
         else:
         	_vg_files = [self.group_combobox.get_active()]
-        plot = VOAAreaPlot(self.voa_filename,
+        self.plot = VOAAreaPlot(self.voa_filename,
                         data_type = _data_type,
                         vg_files = _vg_files,
                         color_map = _color_map,
                         filled_contours = self.contour_checkbutton.get_active(),
-                        plot_meridians = self.meridians_checkbutton.get_active(),
-                        plot_parallels = self.parallels_checkbutton.get_active(),
-                        plot_nightshade = self.greyline_checkbutton.get_active(),
+                        #plot_meridians = self.meridians_checkbutton.get_active(),
+                        #plot_parallels = self.parallels_checkbutton.get_active(),
+                        #plot_nightshade = self.greyline_checkbutton.get_active(),
                         parent = self.area_plot_dialog)
+        canvas = self.plot.get_canvas()
+        #plot.close()
+        #delete self.plot()
+        canvas.show()
+        self.plot_viewport.pack_start(canvas, True, True, 0)
 
 
     def populate_combo(self, cb, d, sort_by='value'):

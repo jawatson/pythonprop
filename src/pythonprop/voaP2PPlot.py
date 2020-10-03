@@ -307,10 +307,6 @@ class VOAP2PPlot:
         # Do some cleanup
         plt.close(self.fig)
 
-    def get_png(self, id):
-        print("creating a png")
-        self.save_plot("test.png")
-
     def add_legend(self, ax):
         leg = ax.legend(('MUF', 'FOT'),ncol=1)
         leg.get_frame().set_alpha(0.75)
