@@ -65,6 +65,9 @@ from .voaPlotWindow import VOAPlotWindow
 
 import gettext
 import locale
+
+matplotlib.use('GTK3Agg')
+
 GETTEXT_DOMAIN = 'voacapgui'
 LOCALE_PATH = os.path.join(os.path.realpath(os.path.dirname(sys.argv[0])), 'po')
 
@@ -105,6 +108,8 @@ class VOAP2PPlot:
     KSA_BANDS = [(7.0, 7.2), (14.0, 14.35), (18.068, 18.168), \
                     (21.0, 21.45), (24.89, 24.99), (28.0, 29.7)]
 
+    portland = ListedColormap(["#0C3383", "#0b599b","#0a7fb4","#57a18f","#bec255","#f2c438","#f2a638","#ef8235","#e4502a","#d91e1e"])
+    matplotlib.cm.register_cmap(name='portland', cmap=portland)
 
     def __init__(self, data_file,
                 plot_groups = [1],
@@ -136,8 +141,6 @@ class VOAP2PPlot:
 
         self.image_defs = self.IMG_TYPE_DICT[self.data_type]
         self.user_bands = user_bands
-        portland = ListedColormap(["#0C3383", "#0b599b","#0a7fb4","#57a18f","#bec255","#f2c438","#f2a638","#ef8235","#e4502a","#d91e1e"])
-        matplotlib.cm.register_cmap(name='portland', cmap=portland)
 
         if plot_groups[0]=='a':
             num_grp = self.df.get_number_of_groups()
@@ -165,15 +168,14 @@ class VOAP2PPlot:
         if number_of_subplots <= 1:
             num_rows = 1
             num_cols = 1
-            self.main_title_fontsize = 24
-            matplotlib.rcParams['legend.fontsize'] = 12
+            self.main_title_fontsize = 12
+            matplotlib.rcParams['legend.fontsize'] = 10
             matplotlib.rcParams['axes.labelsize'] = 12
             matplotlib.rcParams['axes.titlesize'] = 8
             matplotlib.rcParams['xtick.labelsize'] = 10
             matplotlib.rcParams['ytick.labelsize'] = 10
             matplotlib.rcParams['figure.subplot.top'] = 0.79 # single figure plots have a larger title so require more space at the top.
             self.x_axes_ticks = np.arange(0,25,2)
-
 
         elif ((number_of_subplots >= 2) and (number_of_subplots <= 6 )):
             num_rows = 2
@@ -274,13 +276,13 @@ class VOAP2PPlot:
 
             if number_of_subplots == 1:
                 plt.subplots_adjust(right=0.85, top=0.775)
-                cax = plt.axes([0.85, 0.1, 0.04, 0.675]) # [left, bottom, width, height]
+                cax = plt.axes([0.85, 0.1, 0.02, 0.675]) # [left, bottom, width, height]
             elif number_of_subplots >=2 and number_of_subplots <=6:
                 plt.subplots_adjust(right=0.85, top=0.9)
-                cax = plt.axes([0.875, 0.1, 0.04, 0.8])
+                cax = plt.axes([0.875, 0.1, 0.02, 0.8])
             else:
                 plt.subplots_adjust(right=0.85, top=0.9)
-                cax = plt.axes([0.875, 0.1, 0.04, 0.8])
+                cax = plt.axes([0.875, 0.1, 0.02, 0.8])
 
             plt.colorbar(im,
                         cax=cax,

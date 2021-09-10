@@ -72,6 +72,8 @@ lang = gettext.translation(GETTEXT_DOMAIN, LOCALE_PATH, languages=langs, fallbac
 lang.install()
 
 # https://scitools.org.uk/cartopy/docs/latest/gallery/axes_grid_basic.html#sphx-glr-gallery-axes-grid-basic-py
+matplotlib.use('GTK3Agg')
+
 
 class VOAAreaPlot:
 
@@ -86,6 +88,9 @@ class VOAAreaPlot:
     COLOUR_MAPS = [ _('autumn'), _('bone'), _('cool'), _('copper'), _('gray'), \
                 _('hot'), _('hsv'), _('jet'), _('pink'), _('spring'), \
                 _('summer'), _('winter') ]
+
+    portland = ListedColormap(["#0C3383", "#0b599b","#0a7fb4","#57a18f","#bec255","#f2c438","#f2a638","#ef8235","#e4502a","#d91e1e"])
+    plt.register_cmap(name='portland', cmap=portland)
 
     default_font = {'family' : 'sans-serif'}
     show_subplot_frame = True
@@ -145,8 +150,6 @@ class VOAAreaPlot:
         #    print "-180 < Latitude < 180.0, -90 < Longitude < 90"
         #    sys.exit(1)
 
-        portland = ListedColormap(["#0C3383", "#0b599b","#0a7fb4","#57a18f","#bec255","#f2c438","#f2a638","#ef8235","#e4502a","#d91e1e"])
-        plt.register_cmap(name='portland', cmap=portland)
         colMap = color_map
 
         projection = ccrs.PlateCarree()
@@ -288,10 +291,10 @@ class VOAAreaPlot:
             """
             gl = ax.gridlines(crs=projection, draw_labels=True,
                   linewidth=1, color='black', alpha=0.75)
-            gl.xlabels_top = False
-            gl.xlabels_bottom = False
-            gl.ylabels_left = False
-            gl.ylabels_right = False
+            gl.top_labels = False
+            gl.bottom_labels = False
+            gl.left_labels = False
+            gl.right_labels = False
             gl.xlines = False
             gl.ylines = False
             if plot_meridians:
@@ -302,7 +305,7 @@ class VOAAreaPlot:
                 else:
                     meridians = np.arange(-180, 240.0, 60.0)
                 gl.xlines = True
-                gl.xlabels_bottom = True
+                gl.bottom_labels = True
                 gl.xformatter = LONGITUDE_FORMATTER
                 gl.xlocator = mticker.FixedLocator(meridians)
 
@@ -312,7 +315,7 @@ class VOAAreaPlot:
                 else:
                     parallels = np.arange(-90.0, 120.0, 30.0)
                 gl.ylines = True
-                gl.ylabels_right = True
+                gl.right_labels = True
                 gl.yformatter = LATITUDE_FORMATTER
                 gl.ylocator = mticker.FixedLocator(parallels)
 
@@ -330,6 +333,7 @@ class VOAAreaPlot:
             ax.set_visible(False)
 
         plt.colorbar(im,
+            ax=ax,
             ticks = self.image_defs['y_labels'],
             format = mticker.FuncFormatter(eval('self.'+self.image_defs['formatter'])))
 
