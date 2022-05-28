@@ -132,6 +132,10 @@ class VOAFile:
                 elif line.startswith("Gridsize"):
                     self.gridsize = int(line[11:16])
                     if DEBUG: print("Gridsize = ", self.gridsize)
+                    if self.gridsize < 2:
+                        msg = "Grid size parsed is less than 2 resulting in div by zero."
+                        msg += "\nInput file: {}".format(self.filename)
+                        raise Exception(msg)
                     if int(line[19:20]) in PROJECTION:
                         self.projection = PROJECTION[int(line[19:20])]
                     if DEBUG: print("Projection = ", self.projection)
