@@ -77,6 +77,8 @@ gettext.bindtextdomain(GETTEXT_DOMAIN, LOCALE_PATH)
 gettext.textdomain(GETTEXT_DOMAIN)
 
 
+from os import path
+
 from .voaTextFileViewDialog import VOATextFileViewDialog
 from .voaDatFile import *
 from .voaDefaults import *
@@ -101,7 +103,7 @@ class VOACAP_GUI():
         itshfbc_path = 'C:\itshfbc'
         prefs_dir = 'C:\itshfbc\database\\'
     else:
-        itshfbc_path = os.path.expanduser("~")+os.sep+'itshfbc'
+        itshfbc_path = path.join(os.path.expanduser("~"), 'itshfbc')
         prefs_dir = os.path.expanduser("~")+os.sep+'.voacapgui'+os.sep
 
 
