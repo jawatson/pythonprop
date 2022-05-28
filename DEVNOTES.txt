@@ -1,0 +1,6 @@
+cd pythonprop/src
+ipython
+import sys
+from pythonprop import voacapgui
+voacapgui.main(sys.argv, datadir='/usr/local/share/pythonprop')
+
