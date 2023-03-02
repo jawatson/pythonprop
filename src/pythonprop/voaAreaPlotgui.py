@@ -252,6 +252,8 @@ class VOAAreaPlotGUI:
     def run_plot(self, widget):
         _color_map = self.cmap_combobox.get_model().get_value(self.cmap_combobox.get_active_iter(), 0)
         _data_type = self.type_combobox.get_model().get_value(self.type_combobox.get_active_iter(), 0)
+        self.empty_plot_viewport()
+
         if self.group_combobox.get_active() == 0:
         	_vg_files = list(range(1,self.num_plots+1))
         else:
@@ -270,6 +272,14 @@ class VOAAreaPlotGUI:
         #delete self.plot()
         canvas.show()
         self.plot_viewport.pack_start(canvas, True, True, 0)
+
+
+    def empty_plot_viewport(self):
+        print('empty plot')
+        def destroy_widget(widget, data):
+            Gtk.Widget.destroy(widget)
+
+        Gtk.Container.foreach(self.plot_viewport, destroy_widget, None)
 
 
     def populate_combo(self, cb, d, sort_by='value'):
