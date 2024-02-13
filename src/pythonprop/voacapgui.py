@@ -98,8 +98,8 @@ class VOACAP_GUI():
     # Determine where the itshfbc and prefs files are, based on OS
     # The windows paths are guesses and need checking....
     if os.name == 'nt':
-        itshfbc_path = 'C:\itshfbc'
-        prefs_dir = 'C:\itshfbc\database\\'
+        itshfbc_path = r'C:\itshfbc'
+        prefs_dir = r'C:\itshfbc\database' + '\\'
     else:
         itshfbc_path = os.path.expanduser("~")+os.sep+'itshfbc'
         prefs_dir = os.path.expanduser("~")+os.sep+'.voacapgui'+os.sep

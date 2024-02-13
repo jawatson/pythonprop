@@ -144,7 +144,7 @@ class VOASiteChooser:
         #sm.set_select_function(self.geo_tv_selected, False) # todo pygobject check this (it's just a guess)
         sm.connect("changed", self.geo_tv_selected)
         
-        self.alpha_numeric_re = re.compile('[\W_]+')
+        self.alpha_numeric_re = re.compile(r'[\W_]+')
         self.latitude_column = 0
         self.longitude_column = 0
          
