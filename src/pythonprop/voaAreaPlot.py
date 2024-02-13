@@ -114,6 +114,9 @@ class VOAAreaPlot:
 
         self.datadir = datadir
 
+        # set backend during initialization to avoid switching error
+        matplotlib.use('GTK3Agg')
+
         try:
             plot_parameters = VOAFile((in_file))
             plot_parameters.parse_file()

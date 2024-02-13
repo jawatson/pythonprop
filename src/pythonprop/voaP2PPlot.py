@@ -136,6 +136,10 @@ class VOAP2PPlot:
 
         self.image_defs = self.IMG_TYPE_DICT[self.data_type]
         self.user_bands = user_bands
+
+        # set backend during initialization to avoid switching error
+        matplotlib.use('GTK3Agg')
+
         portland = ListedColormap(["#0C3383", "#0b599b","#0a7fb4","#57a18f","#bec255","#f2c438","#f2a638","#ef8235","#e4502a","#d91e1e"])
         matplotlib.cm.register_cmap(name='portland', cmap=portland)
 
