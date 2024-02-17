@@ -59,7 +59,7 @@ class templates:
 
     def load(self):
         if not self.area_templates_file: return -1
-        re_tag_name = re.compile('\[(.*)\]')
+        re_tag_name = re.compile(r'\[(.*)\]')
         fd = None
         try:
             fd = open(os.path.expandvars(self.area_templates_file))
