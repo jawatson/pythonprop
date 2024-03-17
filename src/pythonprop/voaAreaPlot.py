@@ -21,6 +21,7 @@
 # 02110-1301, USA.
 #
 
+import ipdb
 import argparse
 import datetime
 import gettext
@@ -132,7 +133,7 @@ class VOAAreaPlot:
         if len(points_of_interest) > 0:
             self.points_of_interest.extend(points_of_interest)
         """
-        
+
         imageBuf = np.zeros([img_grid_size, img_grid_size], float)
 
         area_rect = plot_parameters.get_area_rect()
@@ -209,19 +210,22 @@ class VOAAreaPlot:
                     cbar_pad=0.2,
                     cbar_size='3%',
                     label_mode='')
-        
+
         self.main_title_label = fig.suptitle(str(self.image_defs['title']), fontsize=self.main_title_fontsize)
 
 
-        
+
         #for plot_idx, vg_file in enumerate(vg_files):
         for plot_idx, ax, vg_file in zip(range(number_of_subplots), axgr, vg_files):
-            
+
             points = np.zeros([img_grid_size,img_grid_size], float)
 
-            lons = np.arange(area_rect.get_sw_lon(), area_rect.get_ne_lon()+0.001,(area_rect.get_ne_lon()-area_rect.get_sw_lon())/float(img_grid_size-1))
+            ipdb.set_trace()
+            area_diff = (area_rect.get_ne_lon()-area_rect.get_sw_lon()) + 0.001
+            lons = np.arange(area_rect.get_sw_lon(), area_rect.get_ne_lon()+0.001, area_diff/float(img_grid_size-1))
             lons[-1] = min(180.0, lons[-1])
-            lats = np.arange(area_rect.get_sw_lat(), area_rect.get_ne_lat()+0.001,(area_rect.get_ne_lat()-area_rect.get_sw_lat())/float(img_grid_size-1))
+            area_diff = (area_rect.get_ne_lat()-area_rect.get_sw_lat()) + 0.001
+            lats = np.arange(area_rect.get_sw_lat(), area_rect.get_ne_lat()+0.001, area_diff/float(img_grid_size-1))
             lats[-1] = min(90.0, lats[-1])
 
             #ax.label_outer()
@@ -244,12 +248,12 @@ class VOAAreaPlot:
             vgFile.close()
             if 'zf' in locals():
                 zf.close()
-            
+
             ax.set_extent([area_rect.get_sw_lon(),
                         area_rect.get_ne_lon(),
                         area_rect.get_sw_lat(),
                         area_rect.get_ne_lat()], projection)
-                        
+
             ax.coastlines()
 
             lons, lats  = np.meshgrid(lons, lats)
@@ -275,7 +279,7 @@ class VOAAreaPlot:
                     vmin=self.image_defs['min'],
                     vmax=self.image_defs['max'],
                     transform=projection)
-                    
+
             if plot_nightshade:
                 self.fill_dark_side(ax,
                             time=plot_parameters.get_daynight_datetime(vg_files[plot_idx]-1),
@@ -331,18 +335,18 @@ class VOAAreaPlot:
                 title_str = plot_parameters.get_minimal_plot_description_string(vg_files[plot_idx]-1, self.image_defs['plot_type'], time_zone=time_zone)
             self.subplot_title_label = ax.set_title(title_str)
 
-        # Hide any unused subplots        
+        # Hide any unused subplots
         for ax in axgr[number_of_subplots:]:
             ax.set_visible(False)
 
         axgr.cbar_axes[0].colorbar(im,
             ticks = self.image_defs['y_labels'],
             format = mticker.FuncFormatter(eval('self.'+self.image_defs['formatter'])))
-        
+
         if save_file :
-            plt.savefig(save_file, 
-                dpi=self.dpi, 
-                facecolor=fig.get_facecolor(), 
+            plt.savefig(save_file,
+                dpi=self.dpi,
+                facecolor=fig.get_facecolor(),
                 edgecolor='none')
 
         #todo this ought to a command line param
@@ -465,7 +469,7 @@ def main(in_file, datadir=None):
     parser = argparse.ArgumentParser(description="Plot voacap area data")
     parser.add_argument("in_file",
         help = _("Path to the .voa file.  This should be in the same directory as the associated .vgx files."))
-    
+
     parser.add_argument("-c", "--contours",
         dest = "plot_contours",
         action = "store_true",
@@ -488,7 +492,7 @@ def main(in_file, datadir=None):
         action="store_true",
         default=False,
         help=_("Plot meridians."))
-        
+
     parser.add_argument("-k", "--background",
         dest="face_colour",
         default='white',
@@ -606,7 +610,7 @@ def main(in_file, datadir=None):
             except:
                 print(_("Error reading vg files, resetting to '1'"))
                 vg_files = [1]
-                
+
     if args.timezone:
         time_zone = int(args.timezone)
         if time_zone > 12: time_zone = 0
