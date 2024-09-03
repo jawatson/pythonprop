@@ -140,9 +140,10 @@ class VOAP2PPlot:
         # set backend during initialization to avoid switching error
         matplotlib.use('GTK3Agg')
 
-        portland = ListedColormap(["#0C3383", "#0b599b","#0a7fb4","#57a18f","#bec255","#f2c438","#f2a638","#ef8235","#e4502a","#d91e1e"])
+        portland = ListedColormap(["#0C3383", "#0b599b","#0a7fb4","#57a18f","#bec255","#f2c438","#f2a638","#ef8235","#e4502a","#d91e1e"],
+name="portland")
         try:
-            matplotlib.cm.register_cmap(name='portland', cmap=portland)
+            matplotlib.colormaps.register(cmap=portland)
         except ValueError:
             print("Portland colormap is already registered")
 
