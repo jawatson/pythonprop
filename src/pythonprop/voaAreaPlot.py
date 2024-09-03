@@ -156,7 +156,7 @@ class VOAAreaPlot:
         colMap = color_map
 
         projection = ccrs.PlateCarree()
-        axes_class = (GeoAxes,dict(map_projection=projection))
+        axes_class = (GeoAxes,dict(projection=projection))
 
         number_of_subplots = len(vg_files)
 
