@@ -204,7 +204,7 @@ name="portland")
                     cbar_mode='single',
                     cbar_pad=0.2,
                     cbar_size='3%',
-                    label_mode='')
+                    label_mode='L')
 
         self.main_title_label = fig.suptitle(plot_label+str(self.image_defs['title']), fontsize=self.main_title_fontsize)
 
