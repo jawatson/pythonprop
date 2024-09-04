@@ -292,7 +292,7 @@ class VOAAreaPlot:
                     ax.plot([xpt],[ypt],'ro')
                     ax.text(xpt+100000,ypt+100000,location.get_name())
             """
-            gl = ax.gridlines(crs=projection, draw_labels=True,
+            gl = ax.gridlines(crs=projection, draw_labels=["bottom", "left"],
                   linewidth=1, color='black', alpha=0.75)
             gl.xlabels_top = False
             gl.xlabels_bottom = False
