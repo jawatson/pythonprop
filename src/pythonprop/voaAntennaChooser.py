@@ -84,7 +84,7 @@ class VOAAntennaChooser:
             testLine = f.readline()
             f.close()
             if (testLine.find("parameters") == 9):
-                antenna_description = re.sub('\s+', ' ', antenna_description)
+                antenna_description = re.sub(r'\s+', ' ', antenna_description)
                 antenna_file = os.path.relpath(antenna_file, self.antenna_path)
                 if len(antenna_file) > 21:
                     err_msg_body = "The file path ('{:s}')\nis too long and should be less than 21 characters.\n\nPlease rename the antenna file.".format(antenna_file)
